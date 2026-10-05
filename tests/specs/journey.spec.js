@@ -9,11 +9,11 @@ async function openJourney(app, id = 'JRN-20') {
 }
 
 test.describe('journey builder and monitor', () => {
-  test('Journey Builder opens on the list, like Campaign', async ({ app }) => {
+  test('Journeys opens on the list', async ({ app }) => {
     await app.locator('.nav button[data-view="journeys"]').click();
     await expect(app.locator('#jl-card')).toBeVisible();
     await expect(app.locator('#jsplit')).toBeHidden();
-    await expect(app.locator('#crumb .cur')).toHaveText('Journey Builder');
+    await expect(app.locator('#crumb .cur')).toHaveText('Journeys');
     const heads = await app.$$eval('#jl-table thead th', (t) => t.map((x) => x.textContent.trim()));
     expect(heads).toEqual(expect.arrayContaining(['Journey', 'Status', 'Validation', 'Trigger', 'Steps', 'Version', 'Entered', 'Conv. rate', 'Actions']));
     // the old modal and its List button are gone
@@ -26,7 +26,7 @@ test.describe('journey builder and monitor', () => {
     await expect(app.locator('#jsel')).toHaveValue('JRN-07');
     await app.locator('#btn-jback').click();
     await expect(app.locator('#jl-card')).toBeVisible();
-    await expect(app.locator('#crumb .cur')).toHaveText('Journey Builder');
+    await expect(app.locator('#crumb .cur')).toHaveText('Journeys');
   });
 
   test('Create your journey: a centred screen, then the canvas with the entry step', async ({ app }) => {
@@ -56,12 +56,12 @@ test.describe('journey builder and monitor', () => {
   });
 
   test('the canvas is fitted the first time the builder is opened', async ({ app }) => {
-    // The prototype boots on the Dashboard, so the canvas is measured and fitted
+    // The prototype boots on the journey list, so the canvas is measured and fitted
     // when the builder is first shown — not at boot, where the hidden SVG
     // measures 0x0. fitView has a zoom floor of 0.45, so a wide journey can
     // still run off the right edge; what must hold is that the journey starts
     // at the top left of the viewport rather than somewhere off screen.
-    await expect(app.locator('.view.active')).toHaveId('view-dashboard');
+    await expect(app.locator('.view.active')).toHaveId('view-journeys');
     await openJourney(app);
 
     const placed = await app.evaluate(() => {

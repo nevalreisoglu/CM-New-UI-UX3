@@ -24,18 +24,4 @@ test.describe('branding', () => {
     await app.selectOption('#role-sel', 'admin');
     await expect(app.locator('#role-lbl')).toHaveText('Etiya Admin');
   });
-
-  test('ETIYA is offered as a campaign brand once multi-brand is on', async ({ app }) => {
-    // Campaign Brand is a configurable field, off by default, so turn it on first.
-    await app.selectOption('#role-sel', 'admin');
-    await app.locator('.nav button[data-view="parameters"]').click();
-    await app.locator('#par-cfg input[data-cfg="multiBrand"]').check();
-
-    await app.locator('.nav button[data-view="campaigns"]').click();
-    await app.locator('#camp-new').click();
-    await app.locator('#cc-skip').click(); // past the creation screen, straight to the Info step
-    const brand = app.locator('#camp-card select[data-k="label"]');
-    await expect(brand).toBeVisible();
-    await expect(brand.locator('option', { hasText: 'ETIYA' })).toHaveCount(1);
-  });
 });

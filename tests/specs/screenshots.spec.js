@@ -8,20 +8,6 @@ const { test, expect } = require('./fixtures');
  * only fails if a screen cannot be reached or renders empty.
  */
 const SHOTS = [
-  ['dashboard', 'admin', async (app) => app.locator('.nav button[data-view="dashboard"]').click()],
-  ['programs', 'admin', async (app) => app.locator('.nav button[data-view="programs"]').click()],
-  ['campaign-list', 'admin', async (app) => app.locator('.nav button[data-view="campaigns"]').click()],
-  ['campaign-create', 'marketer', async (app) => {
-    await app.locator('.nav button[data-view="campaigns"]').click();
-    await app.locator('#camp-new').click();
-  }],
-  ['campaign-info-step', 'admin', async (app) => {
-    await app.locator('.nav button[data-view="campaigns"]').click();
-    await app.locator('#camp-new').click();
-    await app.locator('#cc-name').fill('Package renewal — SMS offer');
-    await app.locator('#camp-card [data-obj="Retention"]').click();
-    await app.locator('#cc-start').click();
-  }],
   ['journey-list', 'admin', async (app) => app.locator('.nav button[data-view="journeys"]').click()],
   ['journey-create', 'marketer', async (app) => {
     await app.locator('.nav button[data-view="journeys"]').click();
@@ -29,30 +15,16 @@ const SHOTS = [
   }],
   ['journey-builder', 'admin', async (app) => {
     await app.locator('.nav button[data-view="journeys"]').click();
-    await app.locator('#jl-table [data-jopen="JRN-20"]').click();
+    await app.locator('#jl-table [data-jopen]').first().click();
   }],
   ['journey-monitor', 'admin', async (app) => app.locator('.nav button[data-view="monitor"]').click()],
+  ['segments', 'admin', async (app) => app.locator('.nav button[data-view="segmentation"]').click()],
   ['segment-workbench', 'admin', async (app) => {
     await app.locator('.nav button[data-view="segmentation"]').click();
     await app.locator('#seg-new').click();
     await app.locator('#seg-search').click();
   }],
-  ['reports', 'admin', async (app) => app.locator('.nav button[data-view="reports"]').click()],
-  ['operation-analysis', 'marketer', async (app) => app.locator('.nav button[data-view="opsan"]').click()],
-  ['survey-results', 'marketer', async (app) => {
-    await app.locator('.nav button[data-view="surveys"]').click();
-    await app.locator('[data-srvres="SRV-01"]').click();
-  }],
-  ['survey-editor', 'marketer', async (app) => {
-    await app.locator('.nav button[data-view="surveys"]').click();
-    await app.locator('[data-srvopen="SRV-01"]').click();
-  }],
-  ['parameters', 'admin', async (app) => app.locator('.nav button[data-view="parameters"]').click()],
-  ['dashboard-cmo', 'cmo', async (app) => app.locator('.nav button[data-view="dashboard"]').click()],
-  ['dashboard-campaign-detail', 'cmo', async (app) => {
-    await app.locator('.nav button[data-view="dashboard"]').click();
-    await app.locator('#db-card [data-dbc]').first().click();
-  }],
+  ['policies', 'admin', async (app) => app.locator('.nav button[data-view="policies"]').click()],
   ['user-manual', 'marketer', async (app) => app.locator('#btn-manual').click()],
 ];
 

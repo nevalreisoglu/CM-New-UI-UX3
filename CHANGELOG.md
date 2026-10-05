@@ -2,6 +2,12 @@
 
 Version numbers follow the published artifact versions.
 
+## v58 — 5 Oct 2026
+**Journey Studio, phase (a): journey-only navigation.** The prototype becomes a standalone Journey Studio for the Fizz demo.
+- Navigation is **Journeys · Journey Monitor · Segments · Policies**; the role switcher keeps Marketer / Approver / Admin (CMO dropped — it had no page left). Boot view is the journey list.
+- Removed, code and markup: Dashboard, Getting started and guided tours, Program, Campaign, Offers, Surveys, Reports, Operation analysis, Decision API, Datamart page, Templates (design) admin page, Parameters, Release & licences. The Delivery step keeps its template picker and content editor; segments keep the datamart catalogue they query; Policies (hidden since X6) is visible again as a read-only list.
+- Tests: campaign / dashboard / tour specs and the ops, srv, dm and tour scripts are gone; navigation and roles specs rewritten; screenshots refreshed. User manual rewritten for the four pages (to be completed with the new journey model).
+
 ## v57 — 24 Sept 2026
 **Guided tours for Journey and Program** (decision X7).
 - **Build your first journey** (marketer, admin; 15 steps): *Create your journey* with `balance_low` → the canvas → a Delivery with the journey's own SMS text → a Wait for event (`offer_accepted`, 1 day) → an *accepted* branch to the goal and a *timeout* branch to a push reminder → Validate → Activate → a test event in the simulation strip → Journey Monitor.

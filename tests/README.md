@@ -26,9 +26,8 @@ version that matches.
 | Spec | What it protects |
 | --- | --- |
 | `branding.spec.js` | The brand reads ETIYA everywhere; the old "ETYA" spelling cannot come back. |
-| `navigation.spec.js` | Every menu entry opens its page, the breadcrumb follows, the menu collapses to an icon rail. |
-| `roles.spec.js` | Role views: the marketer never sees Parameters, the executive never sees the build pages, the admin sees everything, and switching role moves off a page the new role may not see. |
-| `campaign.spec.js` | The *Create your campaign* screen (centred, no stepper, name required, choices applied, template copy), then the eight-step editor: list search, the Offer step disabled for Info campaigns, a heading per step, name required before leaving Info, and the readiness panel counting without blocking. |
+| `navigation.spec.js` | The four Journey Studio pages open from the menu, the stripped modules are gone from the page, the breadcrumb follows, the menu collapses to an icon rail. |
+| `roles.spec.js` | Role views: Marketer, Approver and Admin all see the same four pages; the footer note and the actions follow the role. |
 | `segments.spec.js` | The segment workbench: definition beside live audience insight, Search counting the audience, and the assistant living in a dialog rather than the form. |
 | `journey.spec.js` | The builder canvas and palette, and the v41 simulation strips in both Journey Builder and Journey Monitor — marked demo-only, never styled as primary actions, sharing one clock. |
 | `manual.spec.js` | The **User manual** button in the top bar: the dialog opens, closes three ways, renders the markdown as headings/lists/tables, the contents list jumps, and the embedded copy still matches `docs/user-manual.md`. |
@@ -39,13 +38,7 @@ Node scripts (run with `node <name>.js`; an empty error list is the pass conditi
 
 | Script | What it walks |
 | --- | --- |
-| `ops.js` | Operation analysis: the scope bar, all four tabs, column chooser and technical ids, sort, resize, the advanced filter, CSV export, saved views, the row panel, empty states, masking, and **Results** from a campaign — at 1280 and 1440 px, menu open and collapsed. |
 | `jlist.js` | The Journey list: filters, row actions, open and return, *Create your journey*, and the layout at 1280 and 1440 px. |
-| `srv.js` | Surveys: creates a survey with all six question types, previews it, attaches it to a push and a pull channel and a journey step, and reads its results. |
-| `dm.js` | The Datamart catalogue. |
-| `tour.js` | The guided tours. |
-| `tour-journey.js` | *Build your first journey*: end to end with Do it for me / Next (asserts a validated, active journey with a Delivery, a Wait with two branches and an Exit), by hand, Getting started, resume after a reload, the ? menu, a role change. |
-| `tour-program.js` | *Group work in a program* end to end and by hand (asserts a saved program with a goal, a cap and members), resume, and *Follow a program* for CMO and approver. |
 | `brand-audit.js` | AA contrast of every rendered text node on every page and a set of deep states. |
 
 ## Screenshots
