@@ -2,6 +2,12 @@
 
 Version numbers follow the published artifact versions.
 
+## v62 — 5 Oct 2026
+**Journey Studio, phase (e): Fizz sample data, scale, docs.**
+- Demo datamart is Fizz-flavoured: FR/EN first names, Québec cities, Fizz-like plan names, `fr`/`en` language, `+1 5XX` numbers, CAD. Signed-in users are bilingual fictional names. The chrome reads "Etiya · Journey Studio".
+- **Scale**: one simulated contact stands for ≈6,500 real ones (`DEMO_K`; 1.96 M contacts in total) in the list, the version bar, the stats strip and the monitor; the simulation strips say so. The list header counts contacts, folders and live journeys.
+- Docs rewritten for the Journey Studio: `CLAUDE.md` (architecture page), `README.md`, `docs/product-description.md`, `docs/user-manual.md` (re-embedded), `docs/decisions.md` (J-A … J-K, incl. the four assumptions to confirm), `tests/README.md`; `tests/brand-audit.js` walks the four pages and the new deep states.
+
 ## v61 — 5 Oct 2026
 **Journey Studio, phase (d): validation panel, Journey Monitor, anomalies.**
 - **Validation panel** above the canvas: Validate toggles it, a refused Activate opens it; every check listed, failing ones name the step and select it on click.

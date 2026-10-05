@@ -58,7 +58,7 @@ test.describe('journey versions', () => {
     await expect(app.locator('#btn-activate')).toBeEnabled();
     await app.locator('#btn-activate').click();
     await expect(app.locator('#vbar [data-tour="v-status"]')).toHaveText('Active');
-    await expect(app.locator('#vbar .vb-who')).toContainText('activated by Ayşe Demir');
+    await expect(app.locator('#vbar .vb-who')).toContainText('activated by Camille Tremblay');
     // the birthday contacts inside v1 keep finishing their steps; Closed comes when they are all out
     await app.selectOption('#vsel', '1');
     await expect(app.locator('#vbar .vb-who')).toContainText('closing since');

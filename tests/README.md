@@ -29,7 +29,10 @@ version that matches.
 | `navigation.spec.js` | The four Journey Studio pages open from the menu, the stripped modules are gone from the page, the breadcrumb follows, the menu collapses to an icon rail. |
 | `roles.spec.js` | Role views: Marketer, Approver and Admin all see the same four pages; the footer note and the actions follow the role. |
 | `segments.spec.js` | The segment workbench: definition beside live audience insight, Search counting the audience, and the assistant living in a dialog rather than the form. |
-| `journey.spec.js` | The builder canvas and palette, and the v41 simulation strips in both Journey Builder and Journey Monitor — marked demo-only, never styled as primary actions, sharing one clock. |
+| `journey.spec.js` | The list opens first, a journey opens on the canvas and returns, Create your journey, the canvas is fitted on first open, the palette collapses, and the simulation strips are demo-only and share one clock. |
+| `versions.spec.js` | The journey model: Draft / Live / Past derived from versions, the lifecycle coverage strip, the version bar and locked structure, Activate → Closing, Stop (Closing / Closed), journey settings, Create with folder and phase. |
+| `nodes.spec.js` | The step inventory: palette groups and order, the Entry group swapping the entry type (and the API code sample), type-driven paths on waits and splits, the Wait slipped between two deliveries, the engagement split binding, validation blocking Activate, shuffle weights. |
+| `monitor.spec.js` | Journey Monitor: General (totals, channel totals, Marketing Agent alerts, versions), View version (read-only canvas with the stats strip), step export strategies, time range and the simulation driving the numbers, the validation panel. |
 | `manual.spec.js` | The **User manual** button in the top bar: the dialog opens, closes three ways, renders the markdown as headings/lists/tables, the contents list jumps, and the embedded copy still matches `docs/user-manual.md`. |
 | `demo-data.spec.js` | No real person is named in the file; every e-mail address is on example.com; sample customers have masked ids and +90 5XX numbers; the top-bar user comes from `DEMO_USERS`. |
 | `screenshots.spec.js` | Writes reference screenshots of the main screens to `screenshots/`. |
@@ -38,8 +41,7 @@ Node scripts (run with `node <name>.js`; an empty error list is the pass conditi
 
 | Script | What it walks |
 | --- | --- |
-| `jlist.js` | The Journey list: filters, row actions, open and return, *Create your journey*, and the layout at 1280 and 1440 px. |
-| `brand-audit.js` | AA contrast of every rendered text node on every page and a set of deep states. |
+| `brand-audit.js` | AA contrast of every rendered text node on the four pages (two widths, menu open and collapsed) and a set of deep states: live and draft canvases, the step panels, a closed version, the filtered list, create, the execution report, the monitor's two tabs and the export, the segment workbench. |
 
 ## Screenshots
 

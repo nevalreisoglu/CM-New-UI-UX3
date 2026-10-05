@@ -1,549 +1,159 @@
-# ECM Journey Studio — product description
+# Journey Studio — product description
 
-What the redesigned Etiya Campaign Management (ECM) front end is, who uses it,
-and why each screen is shaped the way it is. This describes the **prototype** in
-`index.html`; anything not yet built is called out as such.
+What the prototype is, who uses it, and why each screen is shaped the way it is.
+The click-through walkthrough is in `user-manual.md`; the decisions and their reasons in
+`decisions.md`.
 
----
+## 1. What it is for
 
-## 1. The problem the redesign set out to fix
+Fizz runs its lifecycle communication in Symplify today: journeys built on a canvas, driven
+by events, dates, segments and engagement, sent mostly by email in French and English to
+about 1.96 million contacts. The **Journey Studio** is Etiya's answer: the same journey
+capabilities, in the Etiya design system, plus the few things Symplify cannot do —
+communication and invitation **policies**, entries from **Digital Twin** signals and the
+**Marketing Agent**, and the Agent's **anomaly alerts** on the monitor.
 
-ECM had grown one field at a time. The result:
-
-- **One flat form per object.** A campaign was a single long page with every
-  field on it, whether or not the campaign used it. Budget and Campaign Status
-  had been dead for years and were still there.
-- **No sense of progress.** Nothing told a marketer what was still missing, so
-  campaigns were saved half-finished and discovered later by the approver.
-- **Everyone saw everything.** A CMO opening ECM landed in the same screen as an
-  administrator configuring channels.
-- **Segments were a query tool, not an audience tool.** You wrote filters and
-  got a row count, with no feel for who was in the segment.
-- **Template and content were the same object**, so changing wording meant
-  touching a design, and designs multiplied.
-
-The redesign keeps the ECM data model and reorganises the surface: who sees
-what, in what order, with what feedback.
-
----
+The prototype exists to align the team and the customer on that scope before development
+starts. It is one HTML file; nothing is sent, nothing is saved between reloads.
 
 ## 2. Who uses it
 
-| Role | What they do | What they see |
-| --- | --- | --- |
-| **Marketer** | Builds campaigns, journeys, segments, surveys and content. | Dashboard, Program, Campaign, Journey Builder, Segments, Surveys, Reports, Operation analysis, Journey Monitor. |
-| **Approver** (checker) | Reviews and activates what marketers submit. | The same plan/operate pages (Operation analysis included), plus the approval actions. No audience, survey or content authoring. |
-| **Admin** | Configures the platform: channels, senders, rule defaults, form fields, templates, licences. | Everything, including Datamart, Parameters and Release & licences. |
-| **CMO / Executive** | Watches outcomes. | Dashboard, Program and Reports only. Never the build pages. |
+| Role | What they do here |
+| --- | --- |
+| Marketer | Builds journeys and segments, edits step content, tests, submits. |
+| Approver | Reviews, **activates** a Draft version and **stops** a live one. |
+| Admin | Both, plus the lifecycle phase list and journey settings across folders. |
 
-The role is a picker in the top bar (in the product it comes from the signed-in
-user). Changing it hides menu entries and, if the open page is no longer
-allowed, moves to the first page that is. Maker/checker is a real separation:
-the person who builds is not the person who activates.
-
----
+All three roles see the same four pages — Journeys · Journey Monitor · Segments · Policies.
+The role changes what a page lets you do, not which pages exist.
 
 ## 3. The object model
 
-- **Program** — a business initiative with a goal, a period, an owner and a
-  contact cap. Campaigns and journeys are its *members*; results roll up.
-  A program is the answer to "what are we trying to achieve this quarter".
-- **Campaign** — one offer or message to one audience over one period, through
-  push channels (we send) or pull channels (shown when the customer comes).
-- **Journey** — a flow of steps a customer moves through over time, with its own
-  delivery steps, timers, conditions and goals.
-- **Segment** — a saved audience definition, built from filters over a datamart,
-  a file, or SQL. Channel-scoped exclusion lists sit beside it.
-- **Offer / NBO** — what is being given. A campaign either names offers or hands
-  the decision to Next Best Offer.
-- **Template** (design) and **content** (text) — deliberately separate, see §5.
-
----
-
-## 4. The campaign in eight steps
-
-`Info · Targeting · Offer · Channel & content · Communication rules · Schedule ·
-Approval · Summary`
-
-Two rules shape the whole flow:
-
-**A new campaign starts on a creation screen, not in the editor.** **+ New
-campaign** opens *Create your campaign*: one centred column with the name, a
-row of objective cards (Acquisition, Upsell / Cross-sell, Retention, Winback,
-Informational) and the push-or-pull choice as two cards (*We send it* / *The
-customer sees it when they come*). **Start building** creates the draft and
-opens the editor on Info with the stepper. The goal is asked once and carries
-the campaign type, category and sub-category with it: Acquisition, Upsell /
-Cross-sell, Retention and Winback are Offer campaigns filed under Onboarding,
-Upsell, Retention and Win-back; Informational is an Information campaign. The
-two campaign types are **Offer** and **Information** — not "Info", which is the
-name of the first step. The editor shows the goal as a chip in its header, next
-to the status and the type (*Goal: Retention*); the chip opens the five goals
-to change it, and a campaign created with *Skip* reads *Set goal*. No step of
-the form asks for it again; Summary shows it. Push starts on SMS, pull on
-In-App, and the exact channels are picked in Info. Underneath, *Start from a
-template* offers a copy of one of the three most recent campaigns, and *Skip —
-go straight to the form* opens an empty editor for people who know what they
-want. Each step of the editor then opens with a heading in the marketer's voice
-(*Tell us about your campaign*, *Who will you reach?* … *Ready to launch*); the
-stepper labels stay short.
-
-**Steps are not a wizard you must finish in order.** You can jump to any step,
-and nothing blocks saving: parts of a campaign are done by different people on
-different days.
-
-**Readiness means "ready to submit", and counts only what the maker does.** Six
-items — name, period and channels; a target with customers in it; an offer (not
-for Information campaigns, which count five); content for every required slot
-of every channel, variant B included; an explicit rules choice; an explicit
-schedule choice. Approval is not an item — the marketer cannot complete it — so
-the Approval step shows a **state**: not submitted, pending, approved or
-rejected. The header reads *Ready to submit: n of 6*.
-
-**Defaults are not counted as done.** Communication rules start with *Apply the
-standard rules* and *Customise for this campaign* both unselected; Schedule
-starts with *Run now* and *Schedule* both unselected. A preselected Run now made
-an accidental immediate send one click away.
-
-**Readiness lives where the work is, not in a side panel.** The panel that
-listed the items repeated the stepper, took a fifth of the width and still did
-not say what was missing inside a step. Now the stepper carries it, a step's
-tooltip lists what it still needs in plain words (*SMS: message is empty*),
-empty required fields are marked once you have left the step or tried to
-submit, Summary opens with **Before you can submit** — each item linked to its
-step and field — and **Submit for approval** with anything missing opens the
-same list as a dialog instead of submitting.
-
-**The stepper is one connected path, coloured by readiness.** A line joins the
-steps; a step whose readiness item is met is green with a ✓ and the line after
-it is green (Summary turns green when every item is met); the current step keeps
-its orange highlight; a step you visited that still needs something has an
-amber outline and dot; the rest are grey. Approval is grey, amber, green or red
-with the approval state. The colours follow `campReady()`, not clicks, update
-as you type, and never block moving between steps.
-
-**Steps that do not apply leave the path.** An Information campaign has no
-offer, so the stepper shows seven steps and runs from Targeting straight to
-Channel & content, and *Ready to submit* counts five.
-
-Step by step:
-
-1. **Info** — name, period, control group,
-   program, and **channels**. Channels are grouped into **push** (SMS, MMS,
-   e-mail, mobile/web push, telemarketing — we send) and **pull** (in-app card,
-   self-care banner, chatbot — shown when the customer comes). A campaign uses
-   one kind or the other, never both; a follow-up on the other kind is a second
-   campaign or a journey step. Priority applies to pull and telemarketing only,
-   because only there do campaigns compete for a slot.
-   Objective, Description and Campaign Brand are **configurable fields** — an
-   admin turns them on per customer in Parameters, so single-brand operators
-   never see a brand picker.
-2. **Targeting** — two columns: available segments on the left, the target on
-   the right, with a live count of customers and of the segments you included
-   and excluded; the global exclusion lists are a separate quiet line, since
-   the marketer did not add them. Exclusions are channel-scoped.
-3. **Offer / NBO** — name offers, or hand the choice to Next Best Offer.
-   Optional promo code. Skipped for Information campaigns.
-4. **Channel & content** — one content block per channel, written into the
-   slots of a chosen template, with a live render (phone frame for SMS/push,
-   mail frame for e-mail). A/B and dynamic content are two independent
-   switches. Content can be copied from another campaign.
-5. **Communication rules** — an explicit choice: apply the standard rules from
-   Parameters (shown read-only) or customise them for this campaign.
-6. **Schedule** — an explicit choice: Run now or Schedule, with its date and
-   time. The pre-sent period lives in Parameters now, not here.
-7. **Approval** — its own step, with a timeline of who did what and the
-   approval state. The approver activates; the marketer cannot.
-8. **Summary** — *Before you can submit* at the top, then everything on one page
-   for the final read.
-
----
-
-## 5. Template is design, content is text
-
-The decision that removed the most duplication.
-
-- A **template** is a design: a layout with named slots, per channel. Templates
-  are **administration**, not campaign work, so they live under Administration
-  and only an admin edits them.
-- **Content** is what goes in the slots, and it is written **inside a delivery**
-  — in the campaign step or the journey step that sends it, with the render
-  updating as you type.
-
-So changing wording never touches a design, and one design serves many
-campaigns. Content can be copied from another campaign when a message is nearly
-the same.
-
----
-
-## 6. Segments as a workbench
-
-The segment editor is two columns:
-
-- **Left — definition.** Name, description, group, source (datamart query,
-  uploaded file, or SQL), and the query builder: column · operator · value,
-  combined with AND or OR.
-- **Right — audience.** Live insight that updates as filters change: headline
-  counts, distribution charts, reachability by channel. Result rows are pulled
-  on demand with **Search**, not on every keystroke.
-
-The **natural-language assistant** ("prepaid customers in Kyiv whose package
-expires in 2 days") sits in a dialog, not in the form. It proposes filters into
-the query builder; you see and edit every one. It is a starting point, never a
-black box — a long list such as regions becomes a single `in` filter you can
-read.
-
----
-
-## 7. Journeys
-
-**Journey Builder opens on a list, like Campaign.** Campaign and journey are
-equal top-level entities, and an operator with fifty journeys has to be able to
-search them. The **Journey List** uses the campaign list's components: a search
-by name or ID, status chips (Draft · Active · Paused · Ended), **Advanced
-filters** (program, trigger type, channel used in a delivery step, owner,
-datamart, updated date range), and per row the journey with its program, its
-status, a **validation indicator** (the journey's checks — entry, exits,
-reachability, content, active offers — as a small bar with the unresolved items
-in the tooltip, the way the campaign list shows readiness), the trigger with its
-event or segment, steps, version, customers inside, entered, converted and
-conversion rate, and the last update with its owner. **Open** goes to the
-canvas; **More** holds Monitor, Execution report, Copy and Pause / Resume (for
-approvers and admins).
-
-**A new journey starts on a creation screen**, the same centred one as a
-campaign: a name, a description and **what starts it** as three cards — *When
-something happens* (an event), *When someone enters a segment*, *On a schedule*
-— each revealing its one follow-up field. **Start building** creates a Draft
-with the entry step on the canvas; *Start from a template* opens a copy of an
-existing journey. On the canvas, **‹ Journey list** goes back, and the journey
-dropdown stays as a quick switcher.
-
-The **Journey Builder** canvas of typed steps — entry, delivery, timer,
-wait, condition, offer, NBO, parallel, external call, exit — colour-coded by
-type, connected by edges you draw from a step's out port. Delivery steps are
-owned by the journey, with their content written in the step.
-
-The **Journey Monitor** shows per-customer state: participants, who is active,
-deliveries, goal reached, events rejected by re-entry or concurrency rules, a
-funnel by step, and a point-in-time participant list.
-
-Both carry a **simulation strip** (see §9).
-
----
-
-## 8. Dashboard, Program and Reports
-
-- **Dashboard** — the page the prototype opens on. Presets per role, and
-  panels can be hidden and re-added from a fixed set; there is no panel builder.
-  - **Headline strip — business outcome only.** The Executive preset shows five
-    tiles, and every one carries its denominator or comparison on the second
-    line, never a bare percentage: **Campaigns** run in the period (active ·
-    ended); **Converted customers** — the unit in the label, "2.3 % of
-    delivered · 2.4M delivered" underneath, a tooltip saying what counts as a
-    conversion; **Revenue** with the average per conversion; **ROI** with net
-    and spend; and **Extra conversions from campaigns** — a two-segment bar,
-    baseline grey and incremental turquoise, that sums to the converted total,
-    with "n would have converted anyway · n thanks to campaigns", the share of
-    all conversions, and a tooltip that walks through the control-group
-    arithmetic. Each tile has a sparkline of the period's daily series and a
-    delta against the previous period; a zero change says "no change" with no
-    arrow. Revenue and ROI are marked *BSS feed, demo*: in the prototype they
-    are derived from the conversions (₴ 720 ARPU uplift per conversion, ₴ 1.10
-    per message sent; ROI = net ÷ spend).
-  - **Operator scale.** Aggregate figures on the dashboard and on Reports are
-    multiplied once (`DEMO_SCALE`) so the CMO view reads as it would in
-    production — millions delivered, tens of thousands converted — and a pill
-    says *Demo figures at operator scale*. The row-level screens (campaign
-    list, targeting, journeys, Operation analysis) keep the 30-customer demo
-    set, because they are about individual records. The **Marketer preset** shows
-    the state of the marketer's work instead: **Needs your action** (drafts,
-    rejected, without content, ending within 7 days), **Waiting for approval**
-    (with the oldest wait), **Going out this week** (scheduled sends, the next
-    one named), **Live**, and **Top campaign** (the best conversion rate, with
-    how many campaigns sit below average). Every tile opens what it counts. The
-    Ops preset shows Customers reached, Conversions, Conversion rate, Waiting on
-    you and Live. No preset puts Delivered, Opened or Clicked totals in the
-    strip: summed across campaigns they are noise — per campaign they are in
-    Campaign performance, which is the marketer's first panel.
-  - **Campaign performance** — every campaign in the period with Status,
-    Targeted, Delivered, Opened, Clicked (rates of delivered), Conversions,
-    Conversion rate and Revenue, sortable by any column. Clicking a campaign
-    opens its detail in the same panel: its funnel from Targeted to Converted,
-    what the communication rules removed, its split by channel, and its
-    control-group uplift when it has a control group. × returns to the table;
-    **Open campaign ›** goes to the editor.
-  - **Live now** — six counters, each with a status colour on a left bar, a dot
-    and an icon, and a word saying what the colour means: running and live
-    (turquoise), delivered today (green), next scheduled send (grey), waiting for
-    approval (amber above zero), failed deliveries (red above zero, green
-    "none" at zero). The numbers stay dark. Click a counter to open what it
-    counts.
-  - **Needs attention**, delivered and conversions per day, funnel and
-    eliminations, by channel, by category, top journeys and control-group uplift
-    (Executive).
-- **Program** — list, overview, a Gantt timeline of members, a members picker,
-  and settings: goal, contact cap, summary report.
-- **Reports** — campaign and journey results, with CSV export (disabled in the
-  prototype).
-
----
-
-## 8b. Onboarding: Getting started and guided tours
-
-ECM is a product people are dropped into, usually with a deadline. The
-onboarding layer answers two questions — *what should I do first?* and *what is
-this control?* — without turning either into an obstacle.
-
-**The design principle: first-run guidance is shown once, can be restarted, and
-never blocks.** A welcome card appears once per role. Everything else is opt-in
-from the **?** button or the Getting started page. No tour prevents using the
-page underneath it: the spotlight leaves the target fully live, and Skip and
-Escape are on every step.
-
-**Getting started** is a checklist per role — the marketer's runs from the
-dashboard through a first campaign; the approver's is about the queue; the
-admin's is the five Parameters screens; the executive's is reading results.
-Items tick themselves off **from real application state wherever that can be
-observed** — a segment that was actually saved, a campaign that actually reached
-*Pending approval* — rather than from having sat through a tour. Watching a tour
-is not the same as having done the thing, and the checklist should not pretend
-otherwise. Building a journey counts once a journey you made passes validation
-with a delivery in it; grouping work, once a program you made has a member;
-following a program, once its Timeline was opened.
-
-**Guided tours** dim the page, cut a hole around one element and put a short
-explanation beside it, with a step counter and a progress bar. Two things make
-them more than a slideshow:
-
-- They are **interactive**. A step that asks you to name the campaign waits
-  until you have typed a name; a step that asks you to pick a channel waits
-  until a channel is picked. The tour follows the user, not a script. On those
-  steps the primary button is **Do it for me** and performs the step, so the
-  same tour runs as a hands-off demo end to end. A secondary **Show me where**
-  flashes the control instead. The primary button is never a no-op: a button
-  whose only effect is a subtle highlight reads as broken.
-- They follow the **real editor**. The campaign tour moves through the actual
-  eight steps and honours their rules — on an Information campaign the Offer step is
-  skipped, exactly as the editor skips it.
-
-Eight tours ship: *Create your first campaign* (the important one — seventeen
-steps ending with a real campaign submitted for approval), *Create a segment*,
-*Review and approve a campaign*, *Read the dashboard*, *Admin setup*, and one
-per remaining top-level object:
-
-- **Build your first journey** (marketer, admin) — Felix's balance-low story:
-  *Create your journey* with the `balance_low` event, a Delivery with the
-  journey's own SMS text, a Wait for event (`offer_accepted`, 1 day) whose
-  *accepted* branch reaches the goal and whose *timeout* branch sends a push
-  reminder, then Validate, Activate (the journey's existing activation path — a
-  Draft ignores events), a test event from the simulation strip, and Journey
-  Monitor.
-- **Group work in a program** (marketer, admin) — a *Q4 Retention push*
-  program with a goal and a contact cap, saved, given members, then read on its
-  timeline and Overview.
-- **Follow a program** (CMO, approver) — four read-only steps: dashboard,
-  program list, goal progress, timeline.
-
-Every top-level object therefore has its own first-run tour on the same engine,
-with the same rules: a step waits for the user to act, and every waiting step
-can be done for them.
-
-Progress is remembered per role, so a tour abandoned halfway offers to resume.
-A tour is written for one role; changing role stops it rather than walking
-someone through screens they cannot see.
-
----
-
-## 8c. Datamart (Administration)
-
-**The principle: a datamart is a documented, profiled, access-controlled data
-product, and segments consume it.** Not a list of tables with settings on them.
-
-The screen that existed before answered "what columns are there". The questions
-people actually arrived with were different: *what data do we even have? is it
-current? what does this column mean? can I join it to something? if I change it,
-what breaks?* The module is built around those five.
-
-**What data exists.** A list of every datamart with its type — Customer (one row
-per subscriber), Event (one row per thing that happened), Lookup (reference data
-joined for its attributes) — its key column, its size, and what uses it, written
-as "3 segments · 2 campaigns · 1 journey" rather than a number with no referent.
-
-**Is it current.** Every datamart carries a health state derived from its last
-load: fresh, stale, or failed. A stale datamart quietly makes every segment built
-on it wrong, so the state is on the list row, on the detail header, and — for the
-admin — in the dashboard's "Needs attention" queue.
-
-**What a column means.** The Columns tab is the heart of it. Each attribute has a
-readable label in EN and TR, a description, an attribute group, roles (key,
-reference, output), privacy and masking, and a **profile computed from the actual
-rows**: fill rate, distinct count, top values, min/max/mean. Nothing is
-hard-coded; the profile is what the data says. A column with few distinct values
-is offered as a **category**, which is what turns a free-text filter in Segments
-into a value list with an `in` operator.
-
-**Can I join it.** Relationships are declared here, validated so both sides have
-the same type, and they are the *only* way a segment may join a second datamart.
-Before, the join was hard-wired; now the segment builder reads the relationship
-and shows the real columns.
-
-**What breaks if I change it.** Usage is computed, never stored: which segments
-filter on a column, which campaigns and journeys reach it through those segments,
-and whether the column is a personalisation placeholder in content. Deleting a
-datamart that something depends on is disabled with the reason. Changing a
-column's type or key role while segments filter on it asks first and lists them.
-
-Privacy is a first-class column property rather than a policy document. Personal
-columns declare a masking rule, and the Data tab shows the values as a marketer
-would see them at the flip of a toggle — the admin sees them unmasked, and the
-screen says which of the two it is showing.
-
-Loading is deliberately a **concept** in the prototype and labelled as one: the
-source, the schedule, a simulated run and a load history with schema-change
-notes. The guard rails it states for query-based sources — read-only view, a
-100k-row preview cap and a 30 s statement timeout — are the ones the SQL
-discussion in meeting 2 asked for.
-
----
-
-## 8d. Operation analysis (Operate)
-
-**The principle: one row-level screen with context above the grid, instead of
-five raw grids.** The current product has five report screens — Delivery
-Result, Elimination Result, Promotion Result, Active Promotions and Survey
-Result — each a grid with a permanent NOT/AND/OR strip and nothing else: no
-period, no campaign filter, no totals, no way back to the campaign, and the
-technical ids first. Customers use them often, so the grid keeps its power; the
-redesign adds what it lacked.
-
-- **One scope bar** — period (last 7, 30 or 90 days), a searchable campaign
-  picker, channel and campaign status, with Reset — filters every tab and stays
-  put when you switch tabs.
-- **Campaigns and journeys.** Journey Delivery steps produce rows too. The
-  first column is the **Source** — a Campaign or Journey chip with the object's
-  name — the scope bar has a **Source** filter (All · Campaigns · Journeys),
-  and the picker lists campaigns and journeys. Journey rows link to the journey.
-- **Four tabs.** *Deliveries* is one row per execution: source, status,
-  channel, delivery type, execution date, targeted, delivered, eliminated,
-  control group, delivery status. *Eliminations* shows who was removed and by
-  which rule, with a breakdown by rule above the grid that uses the same reasons
-  and shares as the dashboard funnel — the two screens agree, and a bar filters
-  the grid. *Promotions* lists every promotion code with its promo code,
-  recipient, result, sent date, validity and status; **Active only** replaces
-  the separate Active Promotions screen. *Surveys* is the results view of §8e.
-- **A summary strip per tab** — targeted, delivered, eliminated, control group
-  and failed (red above zero); eliminated, the most-triggered rule, campaigns
-  affected and share of targeted; codes issued, sent, redeemed, redemption rate
-  and codes expiring within 7 days.
-- **The grid** — column chooser (show, hide, reorder), sort on any header,
-  resizable columns, a sticky header, 50-row pages. Technical ids are hidden
-  until *Show technical IDs* or the chooser asks for them. The NOT/AND/OR
-  builder opens from **Advanced filter** and each condition becomes a chip.
-  **Export CSV** writes the filtered rows and visible columns; Excel is a
-  concept. **Saved views** keep the scope, tab, columns and filters (in memory
-  in the prototype; per user in the product).
-- **A side panel** per row with every field, ids included, and **Open
-  campaign ›**, **Open delivery** (the campaign's Channel & content step) and
-  **Open customer** (a concept link).
-- **Privacy.** Recipient e-mail and phone are masked in the grid, the panel and
-  the export; an admin can reveal them with a switch.
-- **Entry from a campaign.** **Results** on the campaign list and in the editor
-  header opens Operation analysis on Deliveries, filtered to that campaign.
-- **Reports vs Operation analysis.** Each page says it in one line: Reports is
-  the aggregated, chart-led view; Operation analysis is the row-level,
-  operational one.
-
-The rows are a dated 90-day history built from each campaign's 90-day
-dashboard totals, so the 90-day view agrees with the dashboard; shorter periods
-are slices of that history.
-
----
-
-## 8e. Surveys (Audience & content)
-
-**The principle: a narrow, native feedback capability, not a survey research
-platform.** Surveys ran through LimeSurvey; answers stayed in another tool.
-Natively, responses land in the Event DataMart and become segmentable — the
-detractors of last month are an audience like any other.
-
-- **A survey is content, not a campaign type.** There is no survey campaign
-  flow. In a campaign's *Channel & content* step every channel card (except
-  telemarketing) has **Attach survey**; the journey Delivery step has the same
-  control. SMS, e-mail and push get a personal `{{SURVEY_LINK}}` placeholder;
-  In-App, Web Self Care and Chatbot render the questions inside the card.
-- **The list** shows status (Draft / Active / Closed), question count,
-  channels, responses, last response and the campaigns that use each survey.
-- **The editor** is a workbench like Segments: definition on the left (name,
-  description, status, validity, thank-you message, languages, scoring),
-  questions in the middle, the survey as the customer sees it on the right — in
-  the phone frame, or as a Web Self Care card, in each language.
-- **Six question types**: NPS (0–10), CSAT (1–5), Rating (stars), Single choice,
-  Multiple choice, Free text. Each has its text, a required switch, options
-  where the type needs them (with a score when scoring is on), and **one
-  branching rule**: *if the answer is X, skip to question N or to the end*.
-  Reorder with ↑ ↓, remove with ×. **At most ten questions** — the screen says
-  why: completion drops with every question and most customers answer on a
-  phone.
-- **Deliberately out of scope**: pages or sections, drag-and-drop, a logic
-  canvas, quotas, panels.
-- **Results** are the Surveys tab of Operation analysis: a survey picker;
-  responses, response rate (of the deliveries that carried the survey), average
-  score, completion rate and NPS; an NPS panel with promoters, passives and
-  detractors as a stacked bar and the trend over the period; one chart per
-  question, with the latest free-text answers under masked customer ids; and
-  the response grid, whose side panel shows the full answer set, including the
-  questions a branching rule skipped.
-
----
-
-## 9. What is prototype scaffolding, not product
-
-The prototype has **no back end, no clock and no sends**. Nothing leaves the
-browser. Two things exist only to make it demonstrable, and since v41 they are
-fenced off visually — a dashed purple strip with a `⚗ Simulation · demo only`
-badge, in both the Journey Builder and the Journey Monitor:
-
-- **Advance 1 day / Advance 5 days / Reset** — move a simulated clock so you can
-  watch customers progress. In the product the monitor updates on its own.
-- **Send event** — inject a business event for a chosen customer.
-
-Buttons inside the strip are deliberately not styled as primary actions. The
-prototype runs three simulated days at load so the monitor is not empty.
-
-Also demo-only: 30 customers, 18 campaigns (one waiting for approval, one
-sent back by the approver), 3 journeys of fixed sample data;
-test sends raise a toast instead of doing anything. Operation analysis exports
-a real CSV of its demo rows; Excel export and Open customer are concepts. The data names
-no real person: users come from one fictional list (the signed-in user is Ayşe
-Demir in every role view), and sample customers have masked ids
-(`CUS-****7919`), `+90 5XX XXX nn nn` numbers and `@example.com` addresses.
-
----
+- A **journey** is a container: name, description, **folder** (project), **lifecycle
+  phase** (Acquire · Onboard · Grow · Retain · Winback — an editable list), priority
+  (1–100), end date with its expiry action, an "ignore unsubscribe" flag and test users.
+- The steps live in a **journey version**. A version is **Draft → Active → Closing →
+  Closed**:
+  - **Draft** — fully editable.
+  - **Active** — one per journey. Admits contacts. Structure locked (no adding, removing
+    or re-connecting steps); step content stays editable so copy can be fixed live.
+  - **Closing** — set when a newer version is activated or when an approver stops it
+    gently. No new entries; the contacts inside finish their steps; it closes itself when
+    empty.
+  - **Closed** — final. Nothing moves, nothing can be reactivated; copy it to a new
+    version instead.
+- A journey's status is derived from its versions: **Live** while any version is Active or
+  Closing, **Draft** while it only has drafts (and closed history), **Past** when
+  everything is closed.
+- A **segment** (kept from CM) is a saved audience on the datamart; journeys reference
+  segments in entries, waits and splits. A **policy** is a communication or invitation rule
+  a Delivery step picks; consent and exclusion lists always apply underneath.
+
+## 4. Journeys — the list
+
+The list answers "what runs where": name, folder, phase, status, the active version (with
+a Closing or Draft sibling as a chip), contacts entered in the last 30 days and the last
+activation. Filters by status, folder, phase and entry type; bulk duplicate and move to
+folder.
+
+Above it, the **Lifecycle coverage** strip counts live journeys per phase and highlights
+empty phases — the demo's "where are the gaps" view. Clicking a phase filters the list.
+
+**Create your journey** is one centred screen: name, description, folder, phase and the
+entry type (seven cards). It creates a Draft v1 with the entry and an Exit in place and
+opens the canvas. A copy of a recent journey is one click away.
+
+## 5. The canvas
+
+The **palette** is grouped Entry · Message · Wait · Split · Action. Exactly one Entry step
+exists per version; the Entry group *swaps its type*:
+
+| Entry | Config | Note |
+| --- | --- | --- |
+| Segment | segment, evaluation frequency, time slot | Symplify "Custom" |
+| Date attribute | attribute, N days before / after / on, yearly | covers Birthday |
+| Event (API / BSS) | event, payload fields, create contact if missing | immediate; **API code** shows a sample payload |
+| Joins list | list, source (API / import / opt-in / any) | immediate |
+| Unengaged | channel, inactivity days | |
+| Digital Twin signal | signal, threshold | CM-only |
+| Agent suggestion | read-only card with the rationale | CM-only |
+
+Common to all: include the project (folder) segment, re-entry rule (never / after N days /
+always).
+
+**Message** — Delivery: channel, template (design), the journey's own FR/EN text, A/B or
+dynamic variant, control group, **policies** applied at send time, and — only when the
+journey's ignore-unsubscribe flag is on — a per-step "send even if unsubscribed" that asks
+for confirmation. Its engagement feeds the Engagement split.
+
+**Wait** — duration (minutes / hours / days); until date (weekdays, day of month, date);
+for event (**accepted · rejected · timeout**, with an explainer of the webhook and the
+one-time release URL); for segment match (**matched · timeout**); Priority (**allowed ·
+denied**, against a priority rollup).
+
+**Split** — Engagement (bound to a previous Delivery; one path per chosen interaction plus
+**Remaining**); Segment (ordered list, evaluated top-down, plus Remaining); Shuffle
+(weights with "Set equal").
+
+**Action** — Set attribute (static value or the timestamp when reached); Call external
+(labelled webhook or MCP tool); Control group (hold-out, exportable, a segment can be
+built from it); Audience sync (Meta / Google); Exit (optionally a goal that counts as a
+conversion).
+
+Behaviours: drag from a port to connect — a multi-path step takes its next free path label;
+paths may merge; a step can be disconnected and re-attached; a Delivery dropped after a
+Delivery gets a one-day Wait slipped in between. Cards show the type, the name, a one-line
+summary of the configuration and, on live versions, a **stats strip** (entered · waiting ·
+exited; for Delivery sent / opened / clicked / conv).
+
+The **version bar** on top: version dropdown (status, activated by / when), Activate,
+Stop ▾ (Closing or Closed), Copy to new version, Test ▾ (count matches, first 10 matching
+contacts, test send), Execution report. The **validation panel** lists every check — entry
+set up, waits with a duration or date, splits with a segment, engagement splits bound to a
+Delivery, every path ending in an Exit, every step reachable, every Delivery with content,
+shuffle weights at 100 % — and blocks Activate until all are green; a failing item selects
+the step.
+
+The right panel holds the **journey settings** (collapsible) above the **step details**.
+
+## 6. Journey Monitor
+
+One journey at a time. **General**: entered / active / exited / conversions, channel
+totals (sent · opened · clicked · converted), the **Marketing Agent's anomaly alerts** —
+two or three steps whose daily volume deviates from the 30-day baseline, with a confidence
+level, "Open step" and "Dismiss" — the versions table (status, activated by / when, entry,
+counters, View version, Step export) and the participant list at a point in time.
+**View version**: the read-only canvas with the stats strip and alert markers, a steps
+table, "Open in builder".
+
+**Step export** opens from any step: strategy entered / exited / was in / entered and
+exited, the time range, a count and the columns; the download is a mock.
+
+The **time range** (7 / 30 / 90 days / all) scales what the monitor shows.
+
+## 7. Segments and Policies
+
+Both are kept from CM with their previous screens. Segments: a list and the workbench
+(definition beside a live audience insight, query builder, natural-language assistant in a
+dialog). Policies: a read-only list of communication and invitation policies, with the
+journeys that pick each one.
+
+## 8. What is prototype scaffolding, not product
+
+- The **simulation strip** ("⚗ Simulation · demo only") — send an event, advance the
+  clock — and the day counter. Deliberately styled as not part of the product.
+- The simulation runs on 30 synthetic contacts; every number shown is multiplied so that
+  one simulated contact stands for about 6,500 real ones (1.96 M in total). The execution
+  report and the participant list stay per simulated contact.
+- Anomaly alerts, API code, test sends, exports and audience syncs are mocked and say so.
+
+## 9. Non-goals
+
+Campaign and offer management, the email content editor's internals, real integrations,
+authentication, i18n of the UI (English UI, FR/EN sample content).
 
 ## 10. Visual language
 
-One theme, Etiya commercial palette: navy primary, dark-orange accent, two
-greys. The menu and the bars are a light lilac wash with dark text, not a solid
-dark block, so the content leads and the brand stays present. Bordered cards with tinted section headers, an 8-point spacing grid,
-36px inputs, tabular numerals for anything countable. Orange is reserved for
-the primary action and the current step — it is never decoration.
-
-Every field that needs explaining carries a tooltip. Row actions are labelled
-buttons, not bare icons; the only icon-only control is the menu burger, and
-collapsing the menu moves each label into a tooltip.
-
----
-
-## 11. Known gaps in the prototype
-
-- **Offers and Policies are hidden from every role** (not removed): their pages
-  are still in `index.html`, but no menu entry leads to them. Campaigns still
-  pick offers in the Offer step.
-- Reports is a layout with sample numbers, not a reporting engine.
-- Operation analysis and survey results read generated demo rows; saved views
-  and new surveys last until the page reloads, and a newly attached survey
-  has no responses.
-- Nothing is persisted: a reload starts over. A guided tour resumed after a
-  reload therefore always picks up from *New campaign* — the draft it was
-  building no longer exists.
+The Etiya brand kit: navy and lilac primary, orange as accent, turquoise as action, Roboto.
+Palette, token map and contrast rules are in `brand.md`; `tests/brand-audit.js` checks every
+rendered text node against AA.

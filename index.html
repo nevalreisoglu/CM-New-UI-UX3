@@ -329,7 +329,7 @@ svg.canvas{display:block;width:100%;height:100%;user-select:none}
 .toolrow select[data-jf]{border:1px solid var(--line);border-radius:4px;padding:5px 8px;background:#fff;font-size:12px}
 .pill.grey{background:var(--surface-2);color:var(--ink-2);border-color:transparent}
 .ctool{flex-wrap:wrap}
-#jtable td:first-child{white-space:nowrap}
+#jl-table td:nth-child(3) .chip{white-space:nowrap}
 
 /* api */
 .api{display:grid;grid-template-columns:280px 1fr;gap:12px;flex:1;min-height:0;padding:0 20px 16px}
@@ -1164,7 +1164,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
 
 <div class="app">
   <header class="topbar">
-    <div class="logo"><span class="mark"></span><span class="w"><b>ETIYA</b><small>Marketing Cloud</small></span></div>
+    <div class="logo"><span class="mark"></span><span class="w"><b>ETIYA</b><small>Journey Studio</small></span></div>
     <button class="burger" id="btn-nav" aria-label="Collapse or expand the menu" title="Collapse menu"><i></i></button>
     <div class="proto"><span class="pill" title="Prototype — not a product version">Prototype</span></div>
     <div class="tright">
@@ -1178,7 +1178,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
         </select>
       </div>
       <div class="lang"><span>EN</span><span>⌄</span></div>
-      <div class="avatar"><span class="a"></span><span class="n"><b id="me-name">Ayşe Demir</b><small id="role-lbl">Marketer</small></span></div>
+      <div class="avatar"><span class="a"></span><span class="n"><b id="me-name">Camille Tremblay</b><small id="role-lbl">Marketer</small></span></div>
     </div>
   </header>
 
@@ -1214,7 +1214,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
                 <span style="color:var(--ink-3)">·</span>
                 <button class="btn sm" id="btn-tick-j" title="Move the simulated clock one day forward">Advance 1 day</button>
                 <span class="pill" id="daypill-j">Day 0</span>
-                <span class="hint">The prototype has no real clock or sends. Events run immediate steps at once; Timer and Wait steps move with "Advance 1 day". Not a product control.</span>
+                <span class="hint">The prototype has no real clock or sends. Events run immediate steps at once; waits move with "Advance 1 day". One simulated contact stands for ≈6,500 real ones in every number shown. Not a product control.</span>
               </div>
               <div class="ctool">
                 <button class="ic" title="Help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h0"/></svg><span>Help</span></button>
@@ -1348,7 +1348,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
           <button class="btn sm" id="btn-tick5" title="Five days at once">Advance 5 days</button>
           <button class="btn sm" id="btn-reset" title="Back to day 0; participants reloaded from the entry segment">Reset</button>
           <span class="pill" id="daypill">Day 0</span>
-          <span class="hint">The prototype has no real clock or sends — these buttons move a simulated clock so you can watch contacts progress. In the product the monitor updates on its own.</span>
+          <span class="hint">The prototype has no real clock or sends — these buttons move a simulated clock so you can watch contacts progress; one simulated contact stands for ≈6,500 real ones. In the product the monitor updates on its own.</span>
         </div>
         <div id="mon-body"></div>
       </div>
@@ -1384,83 +1384,140 @@ Etiya Journey Studio: **nothing is sent and nothing is saved between reloads.**
 | Breadcrumb | Journey Studio › page › what is open (a journey id, a segment name). |
 | Toasts | Bottom right. Every action confirms itself, including the ones the prototype only pretends to do. |
 
-## Journeys
-
-The page opens on the **journey list**: name, status, validation, trigger, steps,
-version, customers inside, entered and converted. Search by name or id, filter by
-status, open the advanced filters for trigger type, channel, owner, datamart and
-dates. **Open** puts a journey on the canvas; **More** offers Monitor, Execution
-report, Copy and Pause / Resume.
-
-### Create your journey
-
-- **+ New journey** asks for a name, a description and what starts the journey:
-  an event, a segment entry or a schedule.
-- **Start building** creates a Draft with its entry step in place and opens the
-  canvas. A copy of a recent journey is one click away under *Start from a template*.
-
-### The canvas
-
-- The **palette** on the left lists the step types. Drag one onto the canvas, or
-  click it to add it after the selected step.
-- Drag a step to move it; drag from the orange port to connect it; click a link's
-  label to remove the connection; × on a step or the Delete key removes it.
-- The **Journey Builder Info** panel on the right holds the journey name and the
-  selected step's settings. A Delivery step is a full delivery: channel, template,
-  content text, A/B or dynamic content, control group and communication rules.
-- **Validate** checks the structure; **Activate** needs an approver or an admin.
-
-### The simulation strip — demo only
-
-Both Journeys and Journey Monitor carry a dashed strip badged **⚗ Simulation · demo only**.
-It is not part of the product. The prototype has no clock and sends nothing; the
-strip moves a simulated clock so you can watch customers move:
-
-- **Send event** admits a customer through an event entry and runs the immediate steps.
-- **Advance 1 day** lets timers and waits expire.
-
 ## Roles
 
 The role view in the top bar changes what you may do, not what you see:
 
-1. **Marketer** builds journeys and segments and submits them.
-2. **Approver** activates and stops journey versions.
+1. **Marketer** builds journeys and segments, edits step content and tests.
+2. **Approver** activates a Draft version and stops a live one (Closing or Closed).
 3. **Admin** does both, and maintains the lifecycle phase list and folders.
+
+## Journeys
+
+The page opens on the **journey list**: name, folder, lifecycle phase, status
+(Draft / Live / Past), active version, contacts entered in the last 30 days and the last
+activation. Search by name, description or id; filter by status, folder, phase and entry
+type. Tick rows for the bulk actions (duplicate, move to folder). **Open** puts a journey
+on the canvas; **More** offers Monitor, Execution report, Duplicate and Move to folder.
+
+Above the list, the **Lifecycle coverage** strip counts live journeys per phase and
+highlights the phases without one. Click a phase to filter the list by it.
+
+### Create your journey
+
+- **+ New journey** asks for a name, a description, a folder, a lifecycle phase and
+  what starts the journey — one of the seven entry types.
+- **Start building** creates a Draft v1 with the entry and an Exit in place and opens
+  the canvas. *Start from a template* copies a recent journey instead.
+
+### Versions
+
+A journey is a container; its steps live in a **version**. The **version bar** on top of
+the canvas shows the version dropdown (status, who activated it and when) and the actions:
+
+- **Activate** — approver or admin; a Draft only; blocked until the validation is green.
+  The current Active version goes to **Closing**: no new entries, the contacts inside
+  finish their steps, and it closes itself when empty.
+- **Stop ▾** — *Closing* (gentle) or *Closed* (release everyone now). Closed is final.
+- **Copy to new version** — a new Draft with the same steps.
+- **Test ▾** — count the entry's matches, show the first 10 matching contacts, test-send
+  every Delivery to the journey's test users (mock).
+- **Execution report** — one row per step executed for a simulated contact.
+
+An Active or Closing version has a **locked structure**: no adding, removing or
+re-connecting steps, but every step's content can still be edited. A Closed version is
+read-only.
+
+### The canvas
+
+- The **palette** is grouped **Entry · Message · Wait · Split · Action**. Drag a step
+  onto the canvas, or click it to add it after the selected step. The Entry group does not
+  add a step — it **swaps the type** of the one entry step.
+- Drag a step to move it; drag from the orange port to connect it — a step with several
+  paths (a wait for event, a split) takes its next free path label; click a path label to
+  disconnect; × on a step or the Delete key removes it. Paths may merge.
+- Two Deliveries in a row get a one-day **Wait** slipped in between.
+- Cards show the step type, its name, a one-line summary and — on live versions — a
+  **stats strip**: entered · waiting · exited, or sent · opened · clicked · conv for a Delivery.
+- **Validate** opens the validation panel above the canvas: every check, the failing ones
+  naming the step (click it to select the step). Activate opens the same panel when a check
+  fails.
+
+### The right panel
+
+- **Journey settings** (collapsible): name, description, folder, lifecycle phase,
+  priority 1–100, end date and what happens then (Closing or Closed), *Ignore
+  unsubscribe* (service messages only — every Delivery step then has to confirm "send even
+  if unsubscribed" on its own), test users.
+- **Step details** for the selected step. Highlights:
+  - **Entry**: the type buttons, the type's fields (segment + frequency, date attribute +
+    offset, event + payload + *API code*, list, channel + inactivity, Digital Twin signal,
+    the Agent's rationale), include-project-segment and the re-entry rule.
+  - **Delivery**: channel, template, the journey's own text with parameters, content mode
+    (single, A/B, dynamic), control group, the **policies** applied at send time, test send.
+  - **Wait for event**: event, timeout and the explainer of the webhook and the one-time
+    release URL; its paths accepted · rejected · timeout with their targets.
+  - **Engagement split**: the Delivery it evaluates and the interactions, one path each
+    plus Remaining. **Segment split**: an ordered segment list. **Shuffle**: weights and
+    *Set equal*.
+  - **Call external**: the endpoint, labelled webhook or MCP tool. **Control group**: the
+    hold-out share, export and "build a segment from it".
+
+### The simulation strip — demo only
+
+Both Journeys and Journey Monitor carry a dashed strip badged **⚗ Simulation · demo only**.
+It is not part of the product. The prototype has no clock and sends nothing; the strip
+moves a simulated clock so you can watch contacts move:
+
+- **Send event** admits a contact through an Event entry (or releases a Wait for event).
+- **Advance 1 day** lets waits expire and scheduled entries admit new matches.
+- One simulated contact stands for about 6,500 real ones in every number shown.
 
 ## Journey Monitor
 
-Pick a journey. The page shows status, version and activation for every journey,
-then for the selected one:
+Pick a journey. **General** shows:
 
-- **Participants · Active now · Goal reached · Exited** as four tiles.
-- The **funnel** — how many customers reached each step.
-- The **participant list at a point in time**: drag the slider to see who was where on an earlier day.
-- **Download CSV** is a mock; the prototype exports nothing.
+- **Entered · Active now · Exited · Conversions** as four tiles, and the channel totals.
+- **Anomaly alerts** from the Marketing Agent: steps whose daily volume deviates from the
+  30-day baseline, with a confidence level. *Open step* jumps to it; *Dismiss* hides it.
+- The **versions** table — status, activated by / when, entry, counters — with *View
+  version* and *Step export*.
+- The **participant list at a point in time**: drag the slider to see who was where on an
+  earlier day. *Download CSV* is a mock.
+
+**View version** draws the version read-only with the stats strip and the alert markers,
+lists the steps with their counters, and offers *Open in builder*. Click a step for its
+**export**: entered / exited / was in / entered and exited, the time range, the count and
+the columns. The **time range** (7 / 30 / 90 days / all) scales the numbers.
 
 ## Segments
 
 Segments are built on a datamart and belong to a segment group. **+ New segment**
 opens the workbench: the definition on the left, the query builder and a live
 audience insight on the right. **Search** counts the audience. A segment can be
-an exclusion list for chosen channels.
+an exclusion list for chosen channels. Journeys reference segments in entries, waits
+and splits.
 
 ## Policies
 
-Communication policies attached to journeys: invitation (quiet period after an
-offer group), communication (may this outbound go out today, on this channel),
-per-channel control group and region switches. The page is read-only; a journey's
-Delivery step picks the policy it applies.
+Communication policies (caps, quiet hours) and invitation policies (quiet periods after a
+journey) that a Delivery step picks. The page is read-only and shows which journeys pick
+each policy; consent and exclusion lists always apply underneath.
 
 ## Tips for a demo
 
 - Append `?notour` to the URL for a clean start.
-- Use **Send event** on an Active journey, then **Advance 1 day**, and watch the step badges and the monitor change.
-- Switch the role to **Approver** before activating a journey — a marketer cannot.
-- Toasts tell you when an action is only pretended (test send, export, activation side effects).
+- Open **Winback – unengaged 90d** as an Approver: the live version with its stats strip,
+  then **Copy to new version**, change a step, **Activate** — v4 goes to Closing.
+- Open **Payment failed – dunning**: a Draft whose validation fails on an unconnected path;
+  connect it and Activate.
+- In the Monitor, pick a journey, read the Agent's alerts, switch to **View version**, click
+  a step for its export, then **Advance 5 days** and watch the strip change.
+- Toasts tell you when an action is only pretended (test send, export, audience sync).
 <!-- MANUAL:END -->
   </script>
 
-  <div class="modal-bg" id="seg-nl-modal" hidden><div class="card modal" style="width:min(640px,92vw)"><div class="ph"><h3>Describe the audience</h3><span class="pill acc">concept</span><div class="grow" style="flex:1"></div><button class="btn sm outline" id="seg-nl-close">Close</button></div><div class="pb" style="padding:8px 20px 18px;display:flex;flex-direction:column;gap:10px"><div class="nlrow"><span class="nlk">✦</span><input id="seg-nl" placeholder="e.g. prepaid customers in Kyiv or Odesa whose package expires in 2 days"></div><small style="color:var(--ink-2)">The assistant turns the sentence into filters in the query builder. You still see and edit every filter; long lists (regions, plans…) become one <b>in</b> filter.</small><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn primary" id="seg-nl-go">Build filters</button></div></div></div></div>
+  <div class="modal-bg" id="seg-nl-modal" hidden><div class="card modal" style="width:min(640px,92vw)"><div class="ph"><h3>Describe the audience</h3><span class="pill acc">concept</span><div class="grow" style="flex:1"></div><button class="btn sm outline" id="seg-nl-close">Close</button></div><div class="pb" style="padding:8px 20px 18px;display:flex;flex-direction:column;gap:10px"><div class="nlrow"><span class="nlk">✦</span><input id="seg-nl" placeholder="e.g. prepaid contacts in Montréal or Laval whose plan renews in 2 days"></div><small style="color:var(--ink-2)">The assistant turns the sentence into filters in the query builder. You still see and edit every filter; long lists (regions, plans…) become one <b>in</b> filter.</small><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn primary" id="seg-nl-go">Build filters</button></div></div></div></div>
 <div class="toast" id="toast"></div>
   <div class="modal-bg" id="exp-modal" hidden>
     <div class="modal card" style="width:min(640px,92vw)">
@@ -1479,20 +1536,20 @@ Delivery step picks the policy it applies.
       <div class="stats" id="rep-stats"></div>
       <div class="h4">Steps of this journey</div>
       <div class="padx" id="rep-steps" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      <div class="h4">Executions — one row per step executed for a customer, newest first</div>
+      <div class="h4">Executions — one row per step executed for a simulated contact, newest first</div>
       <div class="padx" style="overflow:auto;max-height:46vh">
         <table class="tbl" id="rep-table"><thead><tr><th>Day · time</th><th>Customer</th><th>Entered by</th><th>Step</th><th>Action</th><th>Channel</th><th>Result</th></tr></thead><tbody></tbody></table>
       </div>
       <div class="toolrow" style="justify-content:flex-end"><button class="btn sm outline" id="rep-csv">Export CSV</button><button class="btn dark" id="rep-close2">Close</button></div>
     </div>
   </div>
-  <footer class="footer"><div class="logo"><span class="mark"></span><span class="w"><b>ETIYA</b><small>Marketing Cloud</small></span></div><div class="c">2026 © ETIYA ALL RIGHTS RESERVED</div></footer>
+  <footer class="footer"><div class="logo"><span class="mark"></span><span class="w"><b>ETIYA</b><small>Journey Studio</small></span></div><div class="c">2026 © ETIYA ALL RIGHTS RESERVED</div></footer>
 </div>
 
 <script>
 /* Demo users: fictional names only — no real person, customer or employee appears in the prototype.
    `me` is the signed-in user in every role view; change the names here and nowhere else. */
-const DEMO_USERS={me:'Ayşe Demir',approver:'Mert Yıldız',approver2:'Selin Kaya',crm:'Elif Şahin',growth:'Can Aydın',analyst:'Deniz Arslan',analyst2:'Ece Koç'};
+const DEMO_USERS={me:'Camille Tremblay',approver:'Jordan Roy',approver2:'Priya Nair',crm:'Émile Gagnon',growth:'Sarah Whitfield',analyst:'Noah Bélanger',analyst2:'Ana Costa'};
 document.getElementById('me-name').textContent=DEMO_USERS.me;
 const TODAY='2026-09-14';
 /* ---------- DATA ---------- */
@@ -1641,12 +1698,12 @@ const MLS=[
   {id:'ML-2201',name:'Prepaid churn risk ≥ 0.6',desc:'Retention save list; refreshed on every execution',group:'Retention',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-09-02',by:DEMO_USERS.me,filters:[{col:'CUSTOMER_TYPE',op:'equals',val:'prepaid'},{col:'CHURN_RISK',op:'greater and equal',val:'0.6'}]},
   {id:'ML-2202',name:'Package expiry in next 2 days',desc:'Daily renewal reminder audience — owner Felix; feeds campaign 433 and the renewal journey',group:'Package renewal',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-09-08',by:DEMO_USERS.me,filters:[{col:'PACKAGE_EXPIRY_DATE',op:'in next days',val:'2'},{col:'IS_TEST_CUSTOMER',op:'equals',val:'N'}]},
   {id:'ML-2203',name:'Opened renewal SMS (campaign 433)',group:'Package renewal',dm:'Event',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-09-13',by:DEMO_USERS.me,filters:[{col:'CAMPAIGN_ID',op:'equals',val:'433'},{col:'OPENED',op:'equals',val:'Y'}]},
-  {id:'ML-2210',name:'Kharkiv region — exclusion',desc:'Regulatory: no outbound SMS/push in Kharkiv oblast',group:'Exclusions',dm:'Main',method:'Dynamic query',logic:'AND',excl:true,exclCh:['sms','push'],status:'Active',created:'2026-09-08',by:DEMO_USERS.me,filters:[{col:'REGION',op:'equals',val:'Kharkiv'}]},
+  {id:'ML-2210',name:'Saguenay — exclusion',desc:'Pilot region: no outbound SMS/push during the network migration',group:'Exclusions',dm:'Main',method:'Dynamic query',logic:'AND',excl:true,exclCh:['sms','push'],status:'Active',created:'2026-09-08',by:DEMO_USERS.me,filters:[{col:'REGION',op:'equals',val:'Saguenay'}]},
   {id:'ML-2301',name:'New subscribers ≤ 14 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-08-20',by:DEMO_USERS.me,filters:[{col:'TENURE_DAYS',op:'lower and equal',val:'14'}]},
-  {id:'ML-2402',name:'5G-ready device, no unlimited plan',group:'Upsell',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-08-20',by:DEMO_USERS.me,filters:[{col:'DEVICE_5G',op:'equals',val:'Y'},{col:'PLAN',op:'not equals',val:'Unlimited'}]},
-  {id:'ML-2501',name:'Language · FR',desc:'Contacts whose preferred language is French',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'uk'}]},
+  {id:'ML-2402',name:'5G-ready device, no unlimited plan',group:'Upsell',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-08-20',by:DEMO_USERS.me,filters:[{col:'DEVICE_5G',op:'equals',val:'Y'},{col:'PLAN',op:'not equals',val:'Mobile Unlimited'}]},
+  {id:'ML-2501',name:'Language · FR',desc:'Contacts whose preferred language is French',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'fr'}]},
   {id:'ML-2502',name:'Language · EN',desc:'Contacts whose preferred language is English',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'en'}]},
-  {id:'ML-2511',name:'FR · new account ≤ 30 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'uk'},{col:'TENURE_DAYS',op:'lower and equal',val:'30'}]},
+  {id:'ML-2511',name:'FR · new account ≤ 30 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'fr'},{col:'TENURE_DAYS',op:'lower and equal',val:'30'}]},
   {id:'ML-2512',name:'EN · new account ≤ 30 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'en'},{col:'TENURE_DAYS',op:'lower and equal',val:'30'}]},
   {id:'ML-2520',name:'Active members · 6+ months',group:'Upsell',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-05-20',by:DEMO_USERS.growth,filters:[{col:'TENURE_DAYS',op:'greater and equal',val:'180'}]},
 ];
@@ -1713,13 +1770,13 @@ function contentToItem(ch,tplId,slots,extra){ const t=tplOf(tplId)||{}; const sl
 const SAMPLE_SLOTS={subject:'Subject line',preheader:'Preheader text',headline:'Headline goes here',lead:'One-line lead that sets up the offer.',body:'Body text of the message. Placeholders such as {{FIRST_NAME}} resolve at send time.',cta:'Button',title:'Title',replies:'YES · NO'};
 const CONTENT_ITEMS=[
   {id:'MMS-401',ch:'mms',name:'Renewal offer with visual',status:'Active',updated:'2026-09-18',by:DEMO_USERS.me,sender:'DEMO-TELCO',dyn:'',media:'renewal-banner.jpg',variants:{en:'{{FIRST_NAME}}, your {{PLAN}} package ends on {{PACKAGE_EXPIRY_DATE}}. Renew now — the offer is in the picture.'}},
-  {id:'SMS-301',ch:'sms',name:'Renewal offer (uk/en dynamic)',status:'Active',updated:'2026-09-12',by:DEMO_USERS.me,sender:'DEMO-TELCO',dyn:'LANGUAGE',variants:{en:'Hi {{FIRST_NAME}}, your {{PLAN}} package ends on {{PACKAGE_EXPIRY_DATE}}. Renew today and get +10% bonus data. Reply YES or renew in the app.',uk:'Вітаємо, {{FIRST_NAME}}! Ваш пакет {{PLAN}} закінчується {{PACKAGE_EXPIRY_DATE}}. Поновіть сьогодні та отримайте +10% бонусу. Відповідайте YES або поновіть у застосунку.'}},
+  {id:'SMS-301',ch:'sms',name:'Renewal offer (fr/en dynamic)',status:'Active',updated:'2026-09-12',by:DEMO_USERS.me,sender:'DEMO-TELCO',dyn:'LANGUAGE',variants:{en:'Hi {{FIRST_NAME}}, your {{PLAN}} package ends on {{PACKAGE_EXPIRY_DATE}}. Renew today and get +10% bonus data. Reply YES or renew in the app.',fr:'Вітаємо, {{FIRST_NAME}}! Ваш пакет {{PLAN}} закінчується {{PACKAGE_EXPIRY_DATE}}. Поновіть сьогодні та отримайте +10% бонусу. Відповідайте YES або поновіть у застосунку.'}},
   {id:'SMS-302',ch:'sms',name:'Top-up bonus +10%',status:'Active',updated:'2026-09-02',by:DEMO_USERS.me,sender:'DEMO-TELCO',dyn:'',variants:{en:'{{FIRST_NAME}}, top up today and get +10% bonus on your balance. Valid 7 days.'}},
-  {id:'SMS-303',ch:'sms',name:'Last day — don\'t miss it',status:'Active',updated:'2026-09-12',by:DEMO_USERS.me,sender:'DEMO-TELCO',dyn:'LANGUAGE',variants:{en:'{{FIRST_NAME}}, today is the last day of your {{PLAN}} package. Renew now to keep your data and bonus.',uk:'{{FIRST_NAME}}, сьогодні останній день пакета {{PLAN}}. Поновіть зараз, щоб зберегти інтернет і бонус.'}},
+  {id:'SMS-303',ch:'sms',name:'Last day — don\'t miss it',status:'Active',updated:'2026-09-12',by:DEMO_USERS.me,sender:'DEMO-TELCO',dyn:'LANGUAGE',variants:{en:'{{FIRST_NAME}}, today is the last day of your {{PLAN}} package. Renew now to keep your data and bonus.',fr:'{{FIRST_NAME}}, сьогодні останній день пакета {{PLAN}}. Поновіть зараз, щоб зберегти інтернет і бонус.'}},
   {id:'SMS-310',ch:'sms',name:'Get the app link',status:'Active',updated:'2026-07-02',by:DEMO_USERS.crm,sender:'DEMO-TELCO',dyn:'',variants:{en:'Welcome, {{FIRST_NAME}}! Manage your number in the app: demo-telco.test/app'}},
   {id:'SMS-320',ch:'isms',name:'Interactive SMS · reply YES',status:'Active',updated:'2026-09-12',by:DEMO_USERS.me,sender:'DEMO-TELCO',dyn:'',keywords:'YES → activate offer · NO → stop · HELP → agent',variants:{en:'{{FIRST_NAME}}, add 5 GB for 30 days? Reply YES to activate, NO to stop.'}},
   {id:'EML-201',ch:'email',name:'Welcome (banner)',status:'Active',updated:'2026-08-11',by:DEMO_USERS.me,subject:{A:'Welcome to the network, {{FIRST_NAME}}'},preheader:'Your number is active — here is what to do first',hero:'Welcome, {{FIRST_NAME}}!',lead:'Your {{PLAN}} is active on {{MSISDN}}.',body:'Install the app to check your balance, manage your package and get offers made for you.',cta:'Open the app',dyn:'',variants:{en:''}},
-  {id:'EML-210',ch:'email',name:'Renewal offer — A/B subject',status:'Active',updated:'2026-09-12',by:DEMO_USERS.me,subject:{A:'{{FIRST_NAME}}, your {{PLAN}} package ends on {{PACKAGE_EXPIRY_DATE}}',B:'Keep your data — renew {{PLAN}} with +10% bonus'},preheader:'Renew before {{PACKAGE_EXPIRY_DATE}} and keep your bonus',hero:'Your package ends on {{PACKAGE_EXPIRY_DATE}}',lead:'Renew {{PLAN}} today and get +10% bonus data.',body:'Hi {{FIRST_NAME}}, your current balance is {{BALANCE_UAH}} UAH. Renew now and your package continues without interruption — the bonus is added automatically.',cta:'Renew now',dyn:'',variants:{en:''}},
+  {id:'EML-210',ch:'email',name:'Renewal offer — A/B subject',status:'Active',updated:'2026-09-12',by:DEMO_USERS.me,subject:{A:'{{FIRST_NAME}}, your {{PLAN}} package ends on {{PACKAGE_EXPIRY_DATE}}',B:'Keep your data — renew {{PLAN}} with +10% bonus'},preheader:'Renew before {{PACKAGE_EXPIRY_DATE}} and keep your bonus',hero:'Your package ends on {{PACKAGE_EXPIRY_DATE}}',lead:'Renew {{PLAN}} today and get +10% bonus data.',body:'Hi {{FIRST_NAME}}, your current balance is {{BALANCE_CAD}} CAD. Renew now and your package continues without interruption — the bonus is added automatically.',cta:'Renew now',dyn:'',variants:{en:''}},
   {id:'EML-211',ch:'email',name:'5G first month free (dynamic by device)',status:'Active',updated:'2026-07-20',by:DEMO_USERS.growth,subject:{A:'5G is ready for you, {{FIRST_NAME}}'},preheader:'First month on us',hero:'Try 5G — first month free',lead:'Your device supports 5G.',body:'Switch on 5G for 30 days at no cost. After the trial, keep it or go back with one tap.',cta:'Activate 5G',dyn:'DEVICE_5G',variants:{en:''}},
   {id:'EML-212',ch:'email',name:'Data add-on 5GB',status:'Active',updated:'2026-05-02',by:DEMO_USERS.growth,subject:{A:'5 GB extra for 30 days'},preheader:'One tap to add',hero:'5 GB extra, 30 days',lead:'For heavy days.',body:'You used {{DATA_USAGE_GB}} GB last month. Add 5 GB for 30 days.',cta:'Add 5 GB',dyn:'',variants:{en:''}},
   {id:'EML-230',ch:'email',name:'NPS survey link',status:'Active',updated:'2026-06-14',by:DEMO_USERS.crm,subject:{A:'30 days with us — how are we doing?'},preheader:'One question, 10 seconds',hero:'How likely are you to recommend us?',lead:'One question, 10 seconds.',body:'Hi {{FIRST_NAME}}, you have been with us for {{TENURE_DAYS}} days. Tell us how it is going.',cta:'Answer the survey',dyn:'',variants:{en:''}},
@@ -1747,17 +1804,17 @@ CONTENTS.sms=CONTENTS.sms.concat(tplFor('isms').map(t=>`${t.id} · ${t.name}`));
 /* sample journeys name their copy in the content field; give each Delivery the channel's default template and keep the copy as text */
 const SAMPLE_COPY={'EML-301':'Votre commande vous attend — finalisez-la en 2 minutes et recevez votre carte SIM gratuitement.','EML-302':'Your order is waiting — finish it in 2 minutes and get your SIM card free.','EML-303':'Votre panier vous attend. Besoin d\'aide pour choisir votre forfait ?','EML-304':'Your cart is waiting. Need help picking a plan?','EML-311':'Votre essai est terminé. Gardez la connexion : votre forfait continue à {{PLAN}} dès aujourd\'hui. / Your trial has ended — keep the connection: your plan continues as {{PLAN}} from today.','SMS-321':'Fizz: votre essai est terminé. Continuez sans interruption: fizz.ca/continuer / Your trial ended. Keep going: fizz.ca/continue','EML-331':'Joyeux anniversaire {{FIRST_NAME}}! 2 Go de bonus vous attendent dans votre compte. / Happy birthday {{FIRST_NAME}}! 2 GB of bonus data is waiting in your account.','EML-341':'Ça fait longtemps, {{FIRST_NAME}}. Voici ce qui a changé chez Fizz — et une offre pour revenir. / It\'s been a while, {{FIRST_NAME}}. Here is what changed at Fizz — and an offer to come back.','EML-342':'10 Go offerts pour votre retour, {{FIRST_NAME}}. / 10 GB on us for coming back, {{FIRST_NAME}}.','SMS-351':'Fizz: 10 Go offerts si vous revenez ce mois-ci. fizz.ca/retour / 10 GB on us if you come back this month. fizz.ca/back','PSH-361':'Niveau {{LOYALTY_TIER}} atteint! Votre récompense est prête. / Level {{LOYALTY_TIER}} reached! Your perk is ready.','EML-371':'Votre paiement a été refusé. Mettez à jour votre carte pour garder votre forfait actif. / Your payment was declined. Update your card to keep your plan active.','SMS-381':'Fizz: paiement en attente — mettez à jour votre carte: fizz.ca/paiement / Payment pending — update your card: fizz.ca/payment','EML-391':'Parrainez un ami: 25 $ pour vous, 25 $ pour lui. / Refer a friend: $25 for you, $25 for them.'};
 JOURNEYS.forEach(j=>j.versions.forEach(V=>V.nodes.forEach(n=>{ if(n.type!=='delivery') return; const fix=k=>{ const v=String(n.cfg[k]||''); const id=v.split(' ·')[0]; if(SAMPLE_COPY[id]){ if(k==='content') n.cfg.text=SAMPLE_COPY[id]; else n.cfg.textB=SAMPLE_COPY[id]; const t=tplOf(tplDefault(n.cfg.channel)); n.cfg[k]=t?`${t.id} · ${t.name}`:v; } }; fix('content'); if(n.cfg.contentB) fix('contentB'); })));
-const PARAMS=['FIRST_NAME','MSISDN','PLAN','PACKAGE_EXPIRY_DATE','BALANCE_UAH','DATA_USAGE_GB','TENURE_DAYS','REGION'];
+const PARAMS=['FIRST_NAME','MSISDN','PLAN','PACKAGE_EXPIRY_DATE','BALANCE_CAD','DATA_USAGE_GB','TENURE_DAYS','REGION'];
 function resolveParams(t,cust,mark){ const r=cust?cust.row:null; return String(t||'').replace(/\{\{(\w+)\}\}/g,(m,k)=>{ const v=r&&r[k]!==undefined?r[k]:(k==='AGENT'?'Olena':null); if(v===null) return mark?`<span class="param">{{${k}}}</span>`:m; const out=k==='PACKAGE_EXPIRY_DATE'||k.endsWith('_DATE')?String(v).split('-').reverse().join('.'):v; return mark?`<b class="rv">${esc(out)}</b>`:out; }); }
 function pickVariant(item,cust){ const vs=item.variants||{}; if(item.dyn==='LANGUAGE'&&cust&&vs[cust.row.LANGUAGE]) return cust.row.LANGUAGE; return Object.keys(vs)[0]||'en'; }
 const contentsFor=ch=>{ if(String(ch).startsWith('Preferred')) return ['Per-channel content set · Renewal','Per-channel content set · Reminder','Per-channel content set · Onboarding']; return CONTENTS[ch]||['— select content']; };
 const CHANNELS = ['Preferred cascade (push → sms → email)','sms','push','email','whatsapp','tm','wsc','chatbot','order'];
 const STOPS = ['1 channel','2 channels','3 channels','all preferred channels'];
 const CGS = ['off','5% per channel','10% per channel','exact 2,000 per channel','uploaded list CG-11'];
-/* ---------- DATAMART (30-row synthetic Kyivstar demo datamart — same rows as ECM_Demo_Datamart_Kyivstar.csv) ---------- */
-const DATAMART_ROWS=[{"CUSTOMER_ID":"CUS-****7919","FIRST_NAME":"Oksana","MSISDN":"+90 5XX XXX 01 11","EMAIL":"test.oksana100001@example.com","PUSH_TOKEN":"tok_100001","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.4","CHURN_RISK":"0.72","REGION":"Kyiv","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"2.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6838","FIRST_NAME":"Andrii","MSISDN":"+90 5XX XXX 57 64","EMAIL":"test.andrii100002@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_UAH":"0.8","CHURN_RISK":"0.68","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"2.6","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5757","FIRST_NAME":"Kateryna","MSISDN":"+90 5XX XXX 78 72","EMAIL":"test.kateryna100003@example.com","PUSH_TOKEN":"tok_100003","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_UAH":"2.0","CHURN_RISK":"0.66","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"23.4","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4676","FIRST_NAME":"Dmytro","MSISDN":"+90 5XX XXX 62 25","EMAIL":"test.dmytro100004@example.com","PUSH_TOKEN":"tok_100004","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.3","CHURN_RISK":"0.71","REGION":"Lviv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.7","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3595","FIRST_NAME":"Olena","MSISDN":"+90 5XX XXX 46 13","EMAIL":"test.olena100005@example.com","PUSH_TOKEN":"tok_100005","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.7","CHURN_RISK":"0.79","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"1.9","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2514","FIRST_NAME":"Taras","MSISDN":"+90 5XX XXX 31 72","EMAIL":"test.taras100006@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-17","BALANCE_UAH":"2.8","CHURN_RISK":"0.75","REGION":"Dnipro","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"7.5","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1433","FIRST_NAME":"Iryna","MSISDN":"+90 5XX XXX 66 74","EMAIL":"test.iryna100007@example.com","PUSH_TOKEN":"tok_100007","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"2.7","CHURN_RISK":"0.64","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.0","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9352","FIRST_NAME":"Yurii","MSISDN":"+90 5XX XXX 87 44","EMAIL":"test.yurii100008@example.com","PUSH_TOKEN":"tok_100008","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-19","BALANCE_UAH":"1.5","CHURN_RISK":"0.77","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"10.4","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8271","FIRST_NAME":"Nataliia","MSISDN":"+90 5XX XXX 38 09","EMAIL":"test.nataliia100009@example.com","PUSH_TOKEN":"tok_100009","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"7.9","CHURN_RISK":"0.79","REGION":"Vinnytsia","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.7","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7190","FIRST_NAME":"Maksym","MSISDN":"+90 5XX XXX 88 29","EMAIL":"test.maksym100010@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"0.8","CHURN_RISK":"0.64","REGION":"Poltava","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.1","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6109","FIRST_NAME":"Anna","MSISDN":"+90 5XX XXX 66 11","EMAIL":"test.anna100011@example.com","PUSH_TOKEN":"tok_100011","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-11","BALANCE_UAH":"8.9","CHURN_RISK":"0.81","REGION":"Zaporizhzhia","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.6","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5028","FIRST_NAME":"Roman","MSISDN":"+90 5XX XXX 45 41","EMAIL":"test.roman100012@example.com","PUSH_TOKEN":"tok_100012","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_UAH":"3.2","CHURN_RISK":"0.9","REGION":"Chernihiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"5.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3947","FIRST_NAME":"Sofiia","MSISDN":"+90 5XX XXX 00 00","EMAIL":"test.sofiia100013@example.com","PUSH_TOKEN":"tok_100013","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_UAH":"110.8","CHURN_RISK":"0.21","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.1","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2866","FIRST_NAME":"Bohdan","MSISDN":"+90 5XX XXX 11 30","EMAIL":"test.bohdan100014@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-17","BALANCE_UAH":"105.0","CHURN_RISK":"0.38","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"16.5","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1785","FIRST_NAME":"Mariia","MSISDN":"+90 5XX XXX 47 29","EMAIL":"test.mariia100015@example.com","PUSH_TOKEN":"tok_100015","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"26.6","CHURN_RISK":"0.08","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"20.0","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9704","FIRST_NAME":"Ihor","MSISDN":"+90 5XX XXX 50 46","EMAIL":"test.ihor100016@example.com","PUSH_TOKEN":"tok_100016","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-16","BALANCE_UAH":"56.1","CHURN_RISK":"0.05","REGION":"Lviv","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8623","FIRST_NAME":"Viktoriia","MSISDN":"+90 5XX XXX 30 25","EMAIL":"test.viktoriia100017@example.com","PUSH_TOKEN":"tok_100017","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"105.8","CHURN_RISK":"0.23","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7542","FIRST_NAME":"Oleh","MSISDN":"+90 5XX XXX 24 65","EMAIL":"test.oleh100018@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"17.4","CHURN_RISK":"0.07","REGION":"Dnipro","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"4.3","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6461","FIRST_NAME":"Yana","MSISDN":"+90 5XX XXX 22 89","EMAIL":"test.yana100019@example.com","PUSH_TOKEN":"tok_100019","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-23","BALANCE_UAH":"72.3","CHURN_RISK":"0.09","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"1.1","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5380","FIRST_NAME":"Serhii","MSISDN":"+90 5XX XXX 82 29","EMAIL":"test.serhii100020@example.com","PUSH_TOKEN":"tok_100020","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-19","BALANCE_UAH":"79.8","CHURN_RISK":"0.2","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"3.4","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4299","FIRST_NAME":"Daryna","MSISDN":"+90 5XX XXX 78 90","EMAIL":"test.daryna100021@example.com","PUSH_TOKEN":"tok_100021","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-11","BALANCE_UAH":"44.3","CHURN_RISK":"0.24","REGION":"Vinnytsia","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3218","FIRST_NAME":"Vitalii","MSISDN":"+90 5XX XXX 26 88","EMAIL":"test.vitalii100022@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-16","BALANCE_UAH":"32.6","CHURN_RISK":"0.26","REGION":"Poltava","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2137","FIRST_NAME":"Alina","MSISDN":"+90 5XX XXX 69 03","EMAIL":"test.alina100023@example.com","PUSH_TOKEN":"tok_100023","CUSTOMER_TYPE":"postpaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"80.7","CHURN_RISK":"0.17","REGION":"Zaporizhzhia","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.1","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1056","FIRST_NAME":"Petro","MSISDN":"+90 5XX XXX 08 60","EMAIL":"test.petro100024@example.com","PUSH_TOKEN":"tok_100024","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"95.7","CHURN_RISK":"0.26","REGION":"Chernihiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.6","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8975","FIRST_NAME":"Liliia","MSISDN":"+90 5XX XXX 40 57","EMAIL":"test.liliia100025@example.com","PUSH_TOKEN":"tok_100025","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"100.0","CHURN_RISK":"0.37","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"12.1","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7894","FIRST_NAME":"Artem","MSISDN":"+90 5XX XXX 88 23","EMAIL":"test.artem100026@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-19","BALANCE_UAH":"61.9","CHURN_RISK":"0.37","REGION":"Kyiv","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"19.5","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6813","FIRST_NAME":"Tetiana","MSISDN":"+90 5XX XXX 66 33","EMAIL":"test.tetiana100027@example.com","PUSH_TOKEN":"tok_100027","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-17","BALANCE_UAH":"21.2","CHURN_RISK":"0.08","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"5.3","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5732","FIRST_NAME":"Vasyl","MSISDN":"+90 5XX XXX 23 46","EMAIL":"test.vasyl100028@example.com","PUSH_TOKEN":"tok_100028","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-19","BALANCE_UAH":"81.8","CHURN_RISK":"0.24","REGION":"Lviv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"18.9","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****4651","FIRST_NAME":"Kristina","MSISDN":"+90 5XX XXX 87 12","EMAIL":"test.kristina100029@example.com","PUSH_TOKEN":"tok_100029","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-11","BALANCE_UAH":"57.7","CHURN_RISK":"0.41","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****3570","FIRST_NAME":"Denys","MSISDN":"+90 5XX XXX 13 50","EMAIL":"test.denys100030@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-16","BALANCE_UAH":"28.7","CHURN_RISK":"0.34","REGION":"Dnipro","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"14.4","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"}];
+/* ---------- DATAMART (30-row synthetic Fizz-flavoured demo datamart; fictional names, masked ids) ---------- */
+const DATAMART_ROWS=[{"CUSTOMER_ID":"CUS-****7919","FIRST_NAME":"Camille","MSISDN":"+1 5XX XXX 01 11","EMAIL":"test.camille100001@example.com","PUSH_TOKEN":"tok_100001","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_CAD":"1.4","CHURN_RISK":"0.72","REGION":"Montréal","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"2.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6838","FIRST_NAME":"Mathieu","MSISDN":"+1 5XX XXX 57 64","EMAIL":"test.mathieu100002@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_CAD":"0.8","CHURN_RISK":"0.68","REGION":"Montréal","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"2.6","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5757","FIRST_NAME":"Zoé","MSISDN":"+1 5XX XXX 78 72","EMAIL":"test.zoe100003@example.com","PUSH_TOKEN":"tok_100003","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile + Home 50 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_CAD":"2.0","CHURN_RISK":"0.66","REGION":"Montréal","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"23.4","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4676","FIRST_NAME":"Olivier","MSISDN":"+1 5XX XXX 62 25","EMAIL":"test.olivier100004@example.com","PUSH_TOKEN":"tok_100004","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_CAD":"1.3","CHURN_RISK":"0.71","REGION":"Gatineau","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.7","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3595","FIRST_NAME":"Charlotte","MSISDN":"+1 5XX XXX 46 13","EMAIL":"test.charlotte100005@example.com","PUSH_TOKEN":"tok_100005","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_CAD":"1.7","CHURN_RISK":"0.79","REGION":"Laval","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"1.9","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2514","FIRST_NAME":"Antoine","MSISDN":"+1 5XX XXX 31 72","EMAIL":"test.antoine100006@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-17","BALANCE_CAD":"2.8","CHURN_RISK":"0.75","REGION":"Sherbrooke","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"7.5","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1433","FIRST_NAME":"Chloé","MSISDN":"+1 5XX XXX 66 74","EMAIL":"test.chloe100007@example.com","PUSH_TOKEN":"tok_100007","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_CAD":"2.7","CHURN_RISK":"0.64","REGION":"Québec","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.0","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9352","FIRST_NAME":"Logan","MSISDN":"+1 5XX XXX 87 44","EMAIL":"test.logan100008@example.com","PUSH_TOKEN":"tok_100008","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 15 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-19","BALANCE_CAD":"1.5","CHURN_RISK":"0.77","REGION":"Québec","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"10.4","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8271","FIRST_NAME":"Sophie","MSISDN":"+1 5XX XXX 38 09","EMAIL":"test.sophie100009@example.com","PUSH_TOKEN":"tok_100009","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_CAD":"7.9","CHURN_RISK":"0.79","REGION":"Lévis","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.7","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7190","FIRST_NAME":"Thomas","MSISDN":"+1 5XX XXX 88 29","EMAIL":"test.thomas100010@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile + Home 50 GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_CAD":"0.8","CHURN_RISK":"0.64","REGION":"Trois-Rivières","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.1","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6109","FIRST_NAME":"Emma","MSISDN":"+1 5XX XXX 66 11","EMAIL":"test.emma100011@example.com","PUSH_TOKEN":"tok_100011","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-11","BALANCE_CAD":"8.9","CHURN_RISK":"0.81","REGION":"Saguenay","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.6","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5028","FIRST_NAME":"Raphaël","MSISDN":"+1 5XX XXX 45 41","EMAIL":"test.raphael100012@example.com","PUSH_TOKEN":"tok_100012","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile + Home 50 GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_CAD":"3.2","CHURN_RISK":"0.9","REGION":"Longueuil","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"5.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3947","FIRST_NAME":"Florence","MSISDN":"+1 5XX XXX 00 00","EMAIL":"test.florence100013@example.com","PUSH_TOKEN":"tok_100013","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_CAD":"110.8","CHURN_RISK":"0.21","REGION":"Montréal","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.1","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2866","FIRST_NAME":"Félix","MSISDN":"+1 5XX XXX 11 30","EMAIL":"test.felix100014@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile + Home 50 GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-17","BALANCE_CAD":"105.0","CHURN_RISK":"0.38","REGION":"Montréal","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"16.5","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1785","FIRST_NAME":"Alice","MSISDN":"+1 5XX XXX 47 29","EMAIL":"test.alice100015@example.com","PUSH_TOKEN":"tok_100015","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_CAD":"26.6","CHURN_RISK":"0.08","REGION":"Montréal","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"20.0","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9704","FIRST_NAME":"Nathan","MSISDN":"+1 5XX XXX 50 46","EMAIL":"test.nathan100016@example.com","PUSH_TOKEN":"tok_100016","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-16","BALANCE_CAD":"56.1","CHURN_RISK":"0.05","REGION":"Gatineau","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8623","FIRST_NAME":"Jade","MSISDN":"+1 5XX XXX 30 25","EMAIL":"test.jade100017@example.com","PUSH_TOKEN":"tok_100017","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile + Home 50 GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_CAD":"105.8","CHURN_RISK":"0.23","REGION":"Laval","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7542","FIRST_NAME":"William","MSISDN":"+1 5XX XXX 24 65","EMAIL":"test.william100018@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_CAD":"17.4","CHURN_RISK":"0.07","REGION":"Sherbrooke","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"4.3","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6461","FIRST_NAME":"Mia","MSISDN":"+1 5XX XXX 22 89","EMAIL":"test.mia100019@example.com","PUSH_TOKEN":"tok_100019","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-23","BALANCE_CAD":"72.3","CHURN_RISK":"0.09","REGION":"Québec","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"1.1","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5380","FIRST_NAME":"Samuel","MSISDN":"+1 5XX XXX 82 29","EMAIL":"test.samuel100020@example.com","PUSH_TOKEN":"tok_100020","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-19","BALANCE_CAD":"79.8","CHURN_RISK":"0.2","REGION":"Québec","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"3.4","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4299","FIRST_NAME":"Léa","MSISDN":"+1 5XX XXX 78 90","EMAIL":"test.lea100021@example.com","PUSH_TOKEN":"tok_100021","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-11","BALANCE_CAD":"44.3","CHURN_RISK":"0.24","REGION":"Lévis","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3218","FIRST_NAME":"Lucas","MSISDN":"+1 5XX XXX 26 88","EMAIL":"test.lucas100022@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-16","BALANCE_CAD":"32.6","CHURN_RISK":"0.26","REGION":"Trois-Rivières","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2137","FIRST_NAME":"Maya","MSISDN":"+1 5XX XXX 69 03","EMAIL":"test.maya100023@example.com","PUSH_TOKEN":"tok_100023","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_CAD":"80.7","CHURN_RISK":"0.17","REGION":"Saguenay","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.1","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1056","FIRST_NAME":"Gabriel","MSISDN":"+1 5XX XXX 08 60","EMAIL":"test.gabriel100024@example.com","PUSH_TOKEN":"tok_100024","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 15 GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_CAD":"95.7","CHURN_RISK":"0.26","REGION":"Longueuil","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.6","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8975","FIRST_NAME":"Juliette","MSISDN":"+1 5XX XXX 40 57","EMAIL":"test.juliette100025@example.com","PUSH_TOKEN":"tok_100025","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 15 GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_CAD":"100.0","CHURN_RISK":"0.37","REGION":"Montréal","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"12.1","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7894","FIRST_NAME":"Noah","MSISDN":"+1 5XX XXX 88 23","EMAIL":"test.noah100026@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 30 GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-19","BALANCE_CAD":"61.9","CHURN_RISK":"0.37","REGION":"Montréal","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"19.5","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6813","FIRST_NAME":"Rosalie","MSISDN":"+1 5XX XXX 66 33","EMAIL":"test.rosalie100027@example.com","PUSH_TOKEN":"tok_100027","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 15 GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-17","BALANCE_CAD":"21.2","CHURN_RISK":"0.08","REGION":"Montréal","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"5.3","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5732","FIRST_NAME":"Jacob","MSISDN":"+1 5XX XXX 23 46","EMAIL":"test.jacob100028@example.com","PUSH_TOKEN":"tok_100028","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-19","BALANCE_CAD":"81.8","CHURN_RISK":"0.24","REGION":"Gatineau","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"18.9","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****4651","FIRST_NAME":"Ava","MSISDN":"+1 5XX XXX 87 12","EMAIL":"test.ava100029@example.com","PUSH_TOKEN":"tok_100029","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-11","BALANCE_CAD":"57.7","CHURN_RISK":"0.41","REGION":"Laval","LANGUAGE":"fr","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****3570","FIRST_NAME":"Liam","MSISDN":"+1 5XX XXX 13 50","EMAIL":"test.liam100030@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Mobile 5 GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-16","BALANCE_CAD":"28.7","CHURN_RISK":"0.34","REGION":"Sherbrooke","LANGUAGE":"fr","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"14.4","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"}];
 /* event (feedback) datamart: one row per delivery result, refreshed from the delivery_result table */
-const EVENT_ROWS=[{"CUSTOMER_ID":"CUS-****7919","MSISDN":"+90 5XX XXX 01 11","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****6838","MSISDN":"+90 5XX XXX 57 64","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****5757","MSISDN":"+90 5XX XXX 78 72","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****4676","MSISDN":"+90 5XX XXX 62 25","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****3595","MSISDN":"+90 5XX XXX 46 13","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****2514","MSISDN":"+90 5XX XXX 31 72","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****1433","MSISDN":"+90 5XX XXX 66 74","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****9352","MSISDN":"+90 5XX XXX 87 44","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"not delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****8271","MSISDN":"+90 5XX XXX 38 09","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****7190","MSISDN":"+90 5XX XXX 88 29","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****1785","MSISDN":"+90 5XX XXX 47 29","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****9704","MSISDN":"+90 5XX XXX 50 46","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****8623","MSISDN":"+90 5XX XXX 30 25","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****7542","MSISDN":"+90 5XX XXX 24 65","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"}];
+const EVENT_ROWS=[{"CUSTOMER_ID":"CUS-****7919","MSISDN":"+1 5XX XXX 01 11","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****6838","MSISDN":"+1 5XX XXX 57 64","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****5757","MSISDN":"+1 5XX XXX 78 72","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****4676","MSISDN":"+1 5XX XXX 62 25","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****3595","MSISDN":"+1 5XX XXX 46 13","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****2514","MSISDN":"+1 5XX XXX 31 72","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****1433","MSISDN":"+1 5XX XXX 66 74","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****9352","MSISDN":"+1 5XX XXX 87 44","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"not delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****8271","MSISDN":"+1 5XX XXX 38 09","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****7190","MSISDN":"+1 5XX XXX 88 29","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****1785","MSISDN":"+1 5XX XXX 47 29","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****9704","MSISDN":"+1 5XX XXX 50 46","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****8623","MSISDN":"+1 5XX XXX 30 25","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****7542","MSISDN":"+1 5XX XXX 24 65","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"}];
 
 /* ============ DATAMART CATALOGUE (v43) =====================================
    A datamart is a documented, profiled, access-controlled data product, and
@@ -1792,7 +1849,7 @@ const MAIN_COLUMNS=[
   col('DATA_USAGE_GB','num','Usage','Data usage (GB)','Veri Kullanımı (GB)','Data consumed in the current billing cycle.'),
   col('TENURE_DAYS','num','Usage','Tenure (days)','Müşteri Yaşı (gün)','Days since activation.'),
   col('LAST_TOPUP_DATE','date','Usage','Last top-up','Son Yükleme','Most recent prepaid top-up.'),
-  col('BALANCE_UAH','num','Value & balance','Balance (UAH)','Bakiye (UAH)','Current prepaid balance.'),
+  col('BALANCE_CAD','num','Value & balance','Balance (CAD)','Bakiye (CAD)','Current prepaid balance.'),
   col('CHURN_RISK','num','Scores & models','Churn risk','Kayıp Riski','Model score between 0 and 1; higher means likelier to leave.'),
   col('APP_INSTALLED','bool','Device & app','App installed','Uygulama Kurulu','Whether the self-care app is installed.',{category:true}),
   col('DEVICE_5G','bool','Device & app','5G device','5G Cihaz','Whether the handset supports 5G.',{category:true}),
@@ -1813,12 +1870,12 @@ const EVENT_COLUMNS=[
 ];
 /* A small lookup datamart, generated so the catalogue has a third shape. */
 const CATALOG_ROWS=[
-  ['Smart 5GB',149,5,500,'N'],['Smart 10GB',199,10,750,'N'],['Smart 20GB',279,20,1200,'Y'],
+  ['Mobile 5 GB',149,5,500,'N'],['Smart 10GB',199,10,750,'N'],['Smart 20GB',279,20,1200,'Y'],
   ['Unlimited 5G',399,999,9999,'Y'],['Start 2GB',99,2,250,'N'],['Data Only 15GB',229,15,0,'Y']
-].map(r=>({PLAN:r[0],PRICE_UAH:r[1],DATA_GB:r[2],MINUTES:r[3],IS_5G:r[4]}));
+].map(r=>({PLAN:r[0],PRICE_CAD:r[1],DATA_GB:r[2],MINUTES:r[3],IS_5G:r[4]}));
 const CATALOG_COLUMNS=[
   col('PLAN','text','Plan & product','Plan','Tarife','Tariff plan name — joins the main datamart.',{roles:['key','reference','output'],category:true,nullable:false}),
-  col('PRICE_UAH','num','Value & balance','Price (UAH)','Fiyat (UAH)','Monthly recurring charge.'),
+  col('PRICE_CAD','num','Value & balance','Price (CAD)','Fiyat (CAD)','Monthly recurring charge.'),
   col('DATA_GB','num','Plan & product','Data (GB)','Veri (GB)','Included data allowance.'),
   col('MINUTES','num','Plan & product','Minutes','Dakika','Included voice minutes.'),
   col('IS_5G','bool','Plan & product','5G plan','5G Tarife','Whether the plan carries 5G access.',{category:true})
@@ -1827,7 +1884,7 @@ const CATALOG_COLUMNS=[
 const genRows=(n,f)=>Array.from({length:n},(_,i)=>f(i));
 /* sample customers are fictional: masked ids and +90 5XX numbers, never a real subscriber's */
 const maskCid=n=>'CUS-****'+((n*7919)%9000+1000);
-const PROSPECT_ROWS=genRows(18,i=>({PROSPECT_ID:'P-'+(9100+i),MSISDN:'+90 5XX XXX '+String(1000+i*37).replace(/(\d\d)(\d\d)$/,'$1 $2'),SCORE:Math.round((0.3+((i*17)%60)/100)*100)/100,SOURCE:['Digital Twin','Web form','Retail'][i%3]}));
+const PROSPECT_ROWS=genRows(18,i=>({PROSPECT_ID:'P-'+(9100+i),MSISDN:'+1 5XX XXX '+String(1000+i*37).replace(/(\d\d)(\d\d)$/,'$1 $2'),SCORE:Math.round((0.3+((i*17)%60)/100)*100)/100,SOURCE:['Digital Twin','Web form','Retail'][i%3]}));
 const PROSPECT_COLUMNS=[
   col('PROSPECT_ID','text','Identity & contact','Prospect ID','Aday No','Identifier from the Digital Twin insight export.',{roles:['key','output'],nullable:false}),
   col('MSISDN','text','Identity & contact','Mobile number','Cep Telefonu','Contact number.',{privacy:'Personal',sensitivity:'High',masking:'Show last 4',predefined:'PHONE_NUMBER'}),
@@ -1839,11 +1896,11 @@ const PMEMAIL_COLUMNS=[
   col('EMAIL','text','Identity & contact','E-mail','E-posta','Uploaded address list.',{roles:['key','output'],privacy:'Personal',sensitivity:'High',masking:'Hash',predefined:'E_MAIL',nullable:false}),
   col('SEGMENT_TAG','text','Other','Tag','Etiket','Tag from the uploaded file.',{category:true})
 ];
-const INSURANCE_ROWS=genRows(12,i=>({CUSTOMER_ID:maskCid(100001+i),POLICY:'INS-'+(200+i),PREMIUM_UAH:60+i*7}));
+const INSURANCE_ROWS=genRows(12,i=>({CUSTOMER_ID:maskCid(100001+i),POLICY:'INS-'+(200+i),PREMIUM_CAD:60+i*7}));
 const INSURANCE_COLUMNS=[
   col('CUSTOMER_ID','text','Identity & contact','Customer ID','Müşteri No','Subscriber the policy belongs to.',{roles:['key','reference','output'],nullable:false}),
   col('POLICY','text','Other','Policy','Poliçe','Insurance policy number.'),
-  col('PREMIUM_UAH','num','Value & balance','Premium (UAH)','Prim (UAH)','Monthly premium.')
+  col('PREMIUM_CAD','num','Value & balance','Premium (CAD)','Prim (CAD)','Monthly premium.')
 ];
 
 const DATAMARTS=[
@@ -1868,7 +1925,7 @@ const DATAMARTS=[
    source:{kind:'API',detail:'Product catalogue API · /v1/offerings',schedule:'Daily 02:00'},
    relationships:[{to:'DM-1',on:[['PLAN','PLAN']],kind:'one-to-many'}],
    loads:[{at:'2026-09-14 02:00',status:'ok',added:0,changed:6,failed:0,secs:4}]},
-  {id:'DM-4',key:'Prospects',name:'KYIVSTAR PROSPECTS',type:'Customer',
+  {id:'DM-4',key:'Prospects',name:'FIZZ PROSPECTS',type:'Customer',
    desc:'Digital Twin insight export — acquisition candidates, not subscribers yet.',owner:'CVM analytics',
    keyColumn:'PROSPECT_ID',rows:()=>PROSPECT_ROWS,columns:PROSPECT_COLUMNS,
    source:{kind:'File upload',detail:'digital_twin_prospects.csv',schedule:'Manual'},
@@ -1954,7 +2011,7 @@ function maskValue(c,v){
 const msisdnFmt=m=>m.startsWith('+')?m:`${m.slice(0,3)} ${m.slice(3,5)} ${m.slice(5,8)} ${m.slice(8,10)} ${m.slice(10)}`;
 const CUSTOMERS = DATAMART_ROWS.map(r=>({
   id:msisdnFmt(r.MSISDN), cid:r.CUSTOMER_ID, name:r.FIRST_NAME, seg:`${r.CUSTOMER_TYPE} · ${r.PLAN}`,
-  attrs:{customerType:r.CUSTOMER_TYPE, churnRisk:+r.CHURN_RISK, balance:+r.BALANCE_UAH, appInstalled:r.APP_INSTALLED==='Y', device5g:r.DEVICE_5G==='Y', region:r.REGION, lang:r.LANGUAGE, dataUsageGb:+r.DATA_USAGE_GB, tenureDays:+r.TENURE_DAYS, plan:r.PLAN, packageExpiry:r.PACKAGE_EXPIRY_DATE},
+  attrs:{customerType:r.CUSTOMER_TYPE, churnRisk:+r.CHURN_RISK, balance:+r.BALANCE_CAD, appInstalled:r.APP_INSTALLED==='Y', device5g:r.DEVICE_5G==='Y', region:r.REGION, lang:r.LANGUAGE, dataUsageGb:+r.DATA_USAGE_GB, tenureDays:+r.TENURE_DAYS, plan:r.PLAN, packageExpiry:r.PACKAGE_EXPIRY_DATE},
   pref:(r.APP_INSTALLED==='Y'?['push','sms','email']:['sms','email']), row:r }));
 const custByCid=cid=>CUSTOMERS.find(c=>c.cid===String(cid));
 
@@ -2233,7 +2290,7 @@ function renderCanvas(){
   const j=curCtx(), S=simOf(j); const locked=vLocked(j.V), closed=j.status==='Closed', live=j.status==='Active'||j.status==='Closing';
   document.getElementById('jb').classList.toggle('locked',locked);
   const svg=document.getElementById('canvas');
-  drawVersion(svg,j,view,{locked,closed,live,sel:selNode,spot:S.parts[spotlight[j.id]]||null,drag});
+  drawVersion(svg,j,view,{locked,closed,live,sel:selNode,spot:S.parts[spotlight[j.id]]||null,drag,scale:DEMO_K});
   svg.querySelectorAll('.node').forEach(g=>{ g.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selNode=g.dataset.id; renderCanvas(); renderNodePanel(); } }); });
   svg.querySelectorAll('.nname input').forEach(i=>{ i.addEventListener('change',()=>{ const n=node(j,i.dataset.node); n.label=i.value; selNode=n.id; renderCanvas(); renderNodePanel(); }); i.addEventListener('keydown',e=>{ if(e.key==='Enter') i.blur(); e.stopPropagation(); }); });
   const active=Object.values(S.parts).filter(p=>p.status==='active').length, conv=Object.values(S.parts).filter(p=>p.status==='converted').length;
@@ -2465,7 +2522,8 @@ function renderPolicies(){
 let monTab='general', monV=null, monRange='30';
 const RANGE_K={7:0.28,30:1,90:2.6,all:4.1};
 const monScale=()=>DEMO_K*(RANGE_K[monRange]||1);
-const DEMO_K=1; // phase (e) raises this to the Fizz scale
+const DEMO_K=6500; // one simulated contact ≈ 6,500 Fizz contacts (1.96 M in total)
+const CONTACTS_TOTAL=1960000;
 const fmtK=n=>Math.round(n).toLocaleString();
 function monCtx(){ const j=jById(document.getElementById('msel').value||curJ)||JOURNEYS[0]; let V=jVer(j,monV); if(!V){ V=jMainV(j); monV=V.v; } return ctxOf(j,V); }
 /* channel totals across the journey's live versions */
@@ -2632,7 +2690,7 @@ function renderVersionBar(C,active,conv){
     <span class="vb-sep"></span>
     <label for="vsel" style="color:var(--ink-2)">Version</label><select id="vsel" class="btn sm outline" style="background:#fff">${vopt}</select>
     <span class="pill ${V_STATUS_CLS[V.status]}" data-tour="v-status">${V.status}</span><span class="vb-who">${who}</span>
-    ${live?`<span class="pill acc">${active} inside · ${conv} converted</span>`:''}
+    ${live?`<span class="pill acc" title="one simulated contact ≈ ${DEMO_K.toLocaleString()} real contacts">${fmtK(active*DEMO_K)} inside · ${fmtK(conv*DEMO_K)} converted</span>`:''}
     <div class="grow"></div>
     ${V.status==='Draft'?`<button class="btn sm primary" id="btn-activate" ${jCanAct()?'':'disabled title="Only an approver or an admin activates a version"'}>Activate</button>`:''}
     ${live?`<span class="dm-menu"><button class="btn sm outline" id="btn-stop" ${jCanAct()?'':'disabled title="Only an approver or an admin stops a version"'}>Stop ▾</button><div class="pop" hidden><button data-stop="closing" ${V.status==='Closing'?'disabled':''}>Closing — no new entries, contacts finish</button><button data-stop="closed" class="danger">Closed — release everyone now</button></div></span>`:''}
@@ -2735,7 +2793,7 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
   const sel=(k,label,opts)=>`<select data-jf="${k}" aria-label="${label}"><option value="">${label}: any</option>${opts.map(o=>`<option value="${esc(o)}" ${f[k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
   const selN=jSel.size;
   card.innerHTML=`<div class="card-h"><h2>Journeys</h2><div class="grow"></div><button class="btn primary sm" id="jl-new" style="white-space:nowrap">+ New journey</button>
-      <p>A journey is a container; its steps live in a version. Draft → Active → Closing → Closed per version; a journey is Live while a version is Active or Closing.</p></div>
+      <p>${CONTACTS_TOTAL.toLocaleString()} contacts · ${FOLDERS.length} folders · ${JOURNEYS.filter(j=>jStatus(j)==='Live').length} live journeys. A journey is a container; its steps live in a version (Draft → Active → Closing → Closed); a journey is Live while a version is Active or Closing.</p></div>
     ${coverageHtml()}
     <div class="toolrow" style="gap:8px">
       <div class="search-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="jl-q" placeholder="Search by name, description or journey ID" value="${esc(jQ)}" aria-label="Search journeys"></div>
@@ -2752,7 +2810,7 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
         <td><span class="chip">${esc(j.folder)}</span></td><td>${esc(j.phase)}</td>
         <td><span class="pill ${J_STATUS_CLS[st]}">${st}</span></td>
         <td>${A?`<b>v${A.v}</b>`:'<span style="color:var(--ink-3)">—</span>'}${cl.length?` <span class="pill warn" title="Closing: no new entries, contacts finish">v${cl.map(v=>v.v).join(', v')} closing</span>`:''}${D.length?` <span class="pill grey">v${D.map(v=>v.v).join(', v')} draft</span>`:''}</td>
-        <td class="num">${s.entered}${s.inside?` <span style="color:var(--ink-3);font-size:11px">· ${s.inside} inside</span>`:''}</td>
+        <td class="num">${fmtK(s.entered*DEMO_K)}${s.inside?` <span style="color:var(--ink-3);font-size:11px">· ${fmtK(s.inside*DEMO_K)} inside</span>`:''}</td>
         <td class="num" style="white-space:nowrap">${fmtWhen(jLastActivated(j))||'—'}</td>
         <td><span class="act"><button class="btn sm outline" data-jopen="${j.id}">Open</button><span class="dm-menu"><button class="btn sm outline" data-jmore="${j.id}" aria-haspopup="true" title="More actions">More ▾</button>
           <div class="pop" hidden><button data-jmon="${j.id}">Monitor</button><button data-jrep="${j.id}">Execution report</button><button data-jcopy="${j.id}">Duplicate</button><hr>${FOLDERS.filter(x=>x!==j.folder).map(x=>`<button data-jmove="${j.id}" data-to="${esc(x)}">Move to ${esc(x)}</button>`).join('')}</div></span></span></td></tr>`; }).join('')
@@ -2920,6 +2978,7 @@ function renderSegForm(){
   renderSegInsight();
 }
 /* concept: natural-language → filters (rule-based stand-in for the assistant) */
+const fold=x=>String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function segFromText(t){
   const s=t.toLowerCase(); const out=[]; let m;
   if(/\bprepaid\b/.test(s)) out.push({col:'CUSTOMER_TYPE',op:'equals',val:'prepaid'}); else if(/\bpostpaid\b/.test(s)) out.push({col:'CUSTOMER_TYPE',op:'equals',val:'postpaid'});
@@ -2927,12 +2986,12 @@ function segFromText(t){
   else if((m=s.match(/(\d+)\s+days?\s+(?:before|until)\s+(?:package\s+)?expir/))) out.push({col:'PACKAGE_EXPIRY_DATE',op:'in next days',val:m[1]});
   if((m=s.match(/churn\s*(?:risk)?\s*(?:above|over|>|at least|≥)\s*(0?\.\d+|\d+%?)/))) { let v=m[1].replace('%',''); if(+v>1) v=String(+v/100); out.push({col:'CHURN_RISK',op:'greater and equal',val:v}); }
   if((m=s.match(/\b(?:in|from|region[s]?)\s+((?:[a-zçğıöşü]+)(?:\s*(?:,|or|and)\s*[a-zçğıöşü]+)+)/))) { const regs=m[1].split(/\s*(?:,|or|and)\s*/).map(x=>x.trim()).filter(x=>x&&!['the','next','last'].includes(x)); if(regs.length>1) out.push({col:'REGION',op:'in',val:regs.map(r=>r[0].toUpperCase()+r.slice(1)).join(', ')}); }
-  else if((m=s.match(/\bin\s+(kyiv|odesa|lviv|kharkiv|dnipro)\b/))) out.push({col:'REGION',op:'equals',val:m[1][0].toUpperCase()+m[1].slice(1)});
+  else if((m=s.match(/\bin\s+(montr[ée]al|laval|qu[ée]bec|gatineau|sherbrooke|longueuil|saguenay)\b/))) out.push({col:'REGION',op:'equals',val:({montreal:'Montréal',quebec:'Québec'})[fold(m[1])]||m[1][0].toUpperCase()+m[1].slice(1)});
   if(/\b5g\b/.test(s)) out.push({col:'DEVICE_5G',op:'equals',val:'Y'});
-  if(/\bno\s+unlimited\b|\bnot\s+(?:on\s+)?unlimited\b/.test(s)) out.push({col:'PLAN',op:'not equals',val:'Unlimited'}); else if(/\bunlimited\b/.test(s)) out.push({col:'PLAN',op:'equals',val:'Unlimited'});
+  if(/\bno\s+unlimited\b|\bnot\s+(?:on\s+)?unlimited\b/.test(s)) out.push({col:'PLAN',op:'not equals',val:'Mobile Unlimited'}); else if(/\bunlimited\b/.test(s)) out.push({col:'PLAN',op:'equals',val:'Mobile Unlimited'});
   if((m=s.match(/(?:new|joined|tenure)\D{0,25}?(\d+)\s+day/))) out.push({col:'TENURE_DAYS',op:'lower and equal',val:m[1]});
   if(/\bapp\b/.test(s)&&/\b(?:without|no|not)\b/.test(s)) out.push({col:'APP_INSTALLED',op:'equals',val:'N'}); else if(/\bapp\s+(?:installed|users?)\b/.test(s)) out.push({col:'APP_INSTALLED',op:'equals',val:'Y'});
-  if((m=s.match(/balance\s*(?:below|under|<|less than)\s*(\d+)/))) out.push({col:'BALANCE_UAH',op:'lower',val:m[1]});
+  if((m=s.match(/balance\s*(?:below|under|<|less than)\s*(\d+)/))) out.push({col:'BALANCE_CAD',op:'lower',val:m[1]});
   if(/\b(?:opened|clicked)\b/.test(s)) { out.push({col:/clicked/.test(s)?'CLICKED':'OPENED',op:'equals',val:'Y'}); if((m=s.match(/campaign\s*(\d+)/))) out.push({col:'CAMPAIGN_ID',op:'equals',val:m[1]}); }
   if(/\btest\b/.test(s)&&/\b(?:exclude|without|no)\b/.test(s)) out.push({col:'IS_TEST_CUSTOMER',op:'equals',val:'N'});
   return out;
@@ -2958,7 +3017,7 @@ function renderSegInsight(){
     const buckets=[['<0.2',0],['0.2–0.4',0],['0.4–0.6',0],['0.6–0.8',0],['≥0.8',0]]; cust.forEach(r=>{ const v=parseFloat(r.CHURN_RISK)||0; buckets[Math.min(4,Math.floor(v/0.2))][1]++; });
     const days=Array.from({length:14},(_,i)=>{ const d=new Date(TODAY); d.setDate(d.getDate()+i); return d.toISOString().slice(0,10); }); const exp=days.map(d=>cust.filter(r=>r.PACKAGE_EXPIRY_DATE===d).length); const mxe=Math.max(1,...exp);
     const types=group('CUSTOMER_TYPE'); const tcol=['var(--green)','var(--sec)','var(--cta)','var(--grey-1)'];
-    box.innerHTML=`<div class="ins"><div class="tile"><div class="l">Customers</div><div class="v">${n}</div><div class="s">${pct(n,total)}% of the Main DataMart</div></div><div class="tile"><div class="l">Avg. churn risk</div><div class="v">${avg('CHURN_RISK').toFixed(2)}</div><div class="s">avg. balance ${avg('BALANCE_UAH')} UAH · tenure ${Math.round(avg('TENURE_DAYS'))} d</div></div><div class="tile"><div class="l">Expiring in 7 days</div><div class="v">${exp.slice(0,7).reduce((a,b)=>a+b,0)}</div><div class="s">package expiry ${TODAY} → +6 d</div></div><div class="tile"><div class="l">Removed by exclusion lists</div><div class="v" style="color:${excl?'var(--bad)':'var(--ink)'}">${excl}</div><div class="s">${excl?'net '+(n-excl)+' after global exclusions':'no global exclusion hits'}</div></div></div>
+    box.innerHTML=`<div class="ins"><div class="tile"><div class="l">Customers</div><div class="v">${n}</div><div class="s">${pct(n,total)}% of the Main DataMart</div></div><div class="tile"><div class="l">Avg. churn risk</div><div class="v">${avg('CHURN_RISK').toFixed(2)}</div><div class="s">avg. balance ${avg('BALANCE_CAD')} CAD · tenure ${Math.round(avg('TENURE_DAYS'))} d</div></div><div class="tile"><div class="l">Expiring in 7 days</div><div class="v">${exp.slice(0,7).reduce((a,b)=>a+b,0)}</div><div class="s">package expiry ${TODAY} → +6 d</div></div><div class="tile"><div class="l">Removed by exclusion lists</div><div class="v" style="color:${excl?'var(--bad)':'var(--ink)'}">${excl}</div><div class="s">${excl?'net '+(n-excl)+' after global exclusions':'no global exclusion hits'}</div></div></div>
       <div class="ins2">
         <div class="chart"><div class="ct">Reachable by channel <small>customers with an address / token</small></div>${hb(reach)}</div>
         <div class="chart"><div class="ct">By region</div>${hb(group('REGION',6))}</div>
@@ -3001,7 +3060,7 @@ function renderSegmentation(){ renderSegList(); if(curView==='segmentation') set
   g('seg-logic').onchange=()=>{ pull(); renderSegForm(); };
   document.querySelectorAll('#seg-tabs button').forEach(b=>b.onclick=()=>{ pull(); segDraft.method=b.dataset.m; g('seg-method').value=segDraft.method; renderSegForm(); });
   g('seg-add').onclick=()=>{ pull(); const c=colsOf(segDraft.dm)[segDraft.dm==='Event'?7:9]; segDraft.filters.push({col:c.k,op:opsFor(segDraft.dm,c.k)[0],val:''}); renderSegForm(); };
-  g('seg-nl-go').onclick=()=>{ pull(); const t=g('seg-nl').value.trim(); if(!t){ toast('Describe the audience','Type a sentence such as "prepaid customers in Kyiv or Odesa whose package expires in 2 days".','warn'); return; } const fs=segFromText(t); if(!fs.length){ toast('Nothing recognised','Try plan type, region, churn risk, package expiry, 5G device, app installed, tenure.','warn'); return; } segDraft.filters=fs; segDraft.logic='AND'; if(!segDraft.name) segDraft.name=t[0].toUpperCase()+t.slice(1); g('seg-nl-modal').hidden=true; renderSegForm(); toast('Filters built',`${fs.length} filter(s) added from your description — review them, then Search.`); };
+  g('seg-nl-go').onclick=()=>{ pull(); const t=g('seg-nl').value.trim(); if(!t){ toast('Describe the audience','Type a sentence such as "prepaid contacts in Montréal or Laval whose plan renews in 2 days".','warn'); return; } const fs=segFromText(t); if(!fs.length){ toast('Nothing recognised','Try plan type, region, churn risk, package expiry, 5G device, app installed, tenure.','warn'); return; } segDraft.filters=fs; segDraft.logic='AND'; if(!segDraft.name) segDraft.name=t[0].toUpperCase()+t.slice(1); g('seg-nl-modal').hidden=true; renderSegForm(); toast('Filters built',`${fs.length} filter(s) added from your description — review them, then Search.`); };
   g('seg-nl').onkeydown=e=>{ if(e.key==='Enter') g('seg-nl-go').click(); };
   g('seg-nl-open').onclick=()=>{ g('seg-nl-modal').hidden=false; g('seg-nl').focus(); };
   g('seg-nl-close').onclick=()=>{ g('seg-nl-modal').hidden=true; };
