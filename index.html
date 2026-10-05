@@ -252,7 +252,37 @@ svg.canvas{display:block;width:100%;height:100%;user-select:none}
 .log .ok{color:var(--ok)} .log .warn{color:var(--warn)} .log .bad{color:var(--bad)} .log .acc{color:var(--acc)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 20px 16px}
 .padx{padding:0 20px 16px}
-#jsel{max-width:300px;text-overflow:ellipsis}
+/* version bar + journey settings + list extras (Journey Studio) */
+.vbar{flex-wrap:wrap;row-gap:6px}
+.vbar .vb-name{display:inline-flex;align-items:center;gap:6px;font-size:13px;max-width:380px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vbar .vb-sep{width:1px;height:20px;background:var(--line)}
+.vbar .vb-who{font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.vbar #vsel{max-width:260px}
+.vbar .dm-menu{position:relative}
+.vbar .dm-menu .pop{position:fixed;min-width:260px}
+.jb.locked .palette button:not(.tog){opacity:.45;cursor:not-allowed}
+.jset summary{display:flex;align-items:center;cursor:pointer;list-style:none;padding:2px 0 6px}
+.jset summary::-webkit-details-marker{display:none}
+.jset .caret{margin-left:auto;width:8px;height:8px;border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);transform:rotate(-45deg);transition:transform .15s}
+.jset[open] .caret{transform:rotate(45deg)}
+.jset #jset-body{display:flex;flex-direction:column;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line-2);margin-bottom:6px}
+.js-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cover{display:grid;grid-template-columns:150px repeat(5,1fr);gap:8px;align-items:stretch;margin:4px 20px 6px}
+.cover .cv-l{display:flex;flex-direction:column;justify-content:center;font-size:12.5px;font-weight:600;color:var(--ink)}
+.cover .cv-l small{font-weight:400;color:var(--ink-3);font-size:11px}
+.cover .cv{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);text-align:left;cursor:pointer}
+.cover .cv b{font-size:20px;line-height:1.1;color:var(--green)}
+.cover .cv span{font-size:12px;color:var(--ink-2)}
+.cover .cv em{font-style:normal;font-size:10.5px;color:var(--warn)}
+.cover .cv.gap{background:var(--warn-soft);border-color:transparent}
+.cover .cv.gap b{color:var(--warn)}
+.cover .cv.on{outline:2px solid var(--cta-bright)}
+.cover .cv:hover{background:var(--surface-2)}
+.bulk{display:flex;align-items:center;gap:10px;margin:0 20px 8px;padding:8px 12px;border-radius:8px;background:var(--cta-soft);font-size:12.5px}
+.bulk label{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
+.bulk select{border:1px solid var(--line);border-radius:4px;padding:4px 8px;background:#fff}
+.toolrow select[data-jf]{border:1px solid var(--line);border-radius:4px;padding:5px 8px;background:#fff;font-size:12px}
+.pill.grey{background:var(--surface-2);color:var(--ink-2);border-color:transparent}
 .ctool{flex-wrap:wrap}
 #jtable td:first-child{white-space:nowrap}
 
@@ -1129,13 +1159,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
               <div class="pt"><span>Palette</span><button class="tog" id="btn-pal" title="Collapse palette" aria-label="Collapse palette"><i></i></button></div><div class="ps">Drag onto canvas, or click to add after the selected step</div>
             </div>
             <div class="cright">
-              <div class="ctool" style="background:var(--surface-2)">
-                <button class="btn sm outline" id="btn-jback" style="white-space:nowrap">‹ Journey list</button><label for="jsel" style="color:var(--ink-2)">Journey</label>
-                <select id="jsel" class="btn sm outline" style="background:#fff" title="Quick switch to another journey"></select><button class="btn sm primary" id="btn-jnew" style="white-space:nowrap">+ New journey</button>
-                <div class="meta" id="jmeta" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-                <div class="grow"></div>
-                <button class="btn sm outline" id="btn-report">Execution report</button>
-              </div>
+              <div class="ctool vbar" id="vbar" style="background:var(--surface-2)"></div>
               <div class="ctool evbar simbar" data-tour="j-sim" title="Demo only — not part of the product">
                 <span class="simtag">⚗ Simulation · demo only</span>
                 <label for="ev-name" style="color:var(--ink-2)">event</label><select id="ev-name"></select>
@@ -1166,14 +1190,12 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
           </div>
         </div>
         <aside class="card panel jinfo" id="jpanel">
-          <div class="ph"><h3>Journey Builder Info</h3><span class="pill" id="jp-type"></span><button class="tog" id="btn-info" title="Collapse panel" aria-label="Collapse panel"><i></i></button></div>
-          <div class="vlabel">Journey Builder Info</div>
+          <div class="ph"><h3>Journey</h3><span class="pill" id="jp-type" hidden></span><button class="tog" id="btn-info" title="Collapse panel" aria-label="Collapse panel"><i></i></button></div>
+          <div class="vlabel">Journey</div>
           <div class="pb">
-            <div class="fld"><label class="req" for="j-name">Name</label><input id="j-name"></div>
-            <div class="fld"><label for="j-desc">Description</label><input id="j-desc" placeholder="Description"></div>
+            <details class="jset" id="jset" open><summary><span class="sec" style="padding:0">Journey settings</span><span class="caret"></span></summary><div id="jset-body"></div></details>
             <div class="sec" id="jp-title">Step details</div>
             <div id="jp-body"><div class="empty">Select a step on the canvas.</div></div>
-            <div class="fld"><div class="row"><button class="btn dark" id="btn-back">Back</button><button class="btn grey" id="btn-pause">Pause / Resume</button><button class="btn primary" id="btn-activate">Activate</button></div></div>
           </div>
         </aside>
       </div>
@@ -1440,6 +1462,7 @@ Delivery step picks the policy it applies.
    `me` is the signed-in user in every role view; change the names here and nowhere else. */
 const DEMO_USERS={me:'Ayşe Demir',approver:'Mert Yıldız',approver2:'Selin Kaya',crm:'Elif Şahin',growth:'Can Aydın',analyst:'Deniz Arslan',analyst2:'Ece Koç'};
 document.getElementById('me-name').textContent=DEMO_USERS.me;
+const TODAY='2026-09-14';
 /* ---------- DATA ---------- */
 const OFFERS = [
   {id:'OFR-1042', name:'10% bonus on next top-up', catalog:'PO-88231 · Bonus Top-up 10%', params:{bonusPct:10, validityDays:7}, priority:20, tags:['Mobile','Prepaid','Retention','Bonus'], status:'Active',
@@ -1462,12 +1485,21 @@ const OFFERS = [
    content:{sms:{en:'Welcome! Your 1 GB + 100 min gift is active for 14 days.'}, email:{en:'Welcome to the network.'}}, stageContent:{presented:'Welcome gift', accepted:'Gift active'}, activation:'TMF622 ProductOrder → add PO-77001', journeys:['JRN-12']},
 ];
 
+/* Journey model: a journey is a container (name, folder, lifecycle phase, settings); the steps live in a
+   journey VERSION. Version statuses: Draft → Active → Closing → Closed. One Active version per journey;
+   activating a new one puts the current Active into Closing (no new entries, contacts finish their steps,
+   auto-Closed when empty). Journey status is derived: Draft / Live / Past (jStatus). */
+const PHASES=['Acquire','Onboard','Grow','Retain','Winback'];
+const FOLDERS=['churn_reduction','free-trial','loyalty','console-marketing'];
+const EXPIRY_ACTIONS=[['closing','Closing — no new entries, contacts inside finish'],['closed','Closed — stop everything']];
+const jCanAct=()=>ROLE==='approver'||ROLE==='admin';
+const V_STATUS_CLS={Draft:'grey',Active:'ok',Closing:'warn',Closed:''};
+const J_STATUS_CLS={Draft:'grey',Live:'ok',Past:''};
+function jBlank(o){ return Object.assign({id:'',name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],priority:50,endDate:'',expiryAction:'closing',ignoreUnsub:false,testUsers:[DEMO_USERS.me+' (test MSISDN)'],created:TODAY,updated:TODAY,createdBy:DEMO_USERS.me,entry:{reentryDays:30,maxConcurrent:1},exit:{goal:'offer_accepted',goalAction:'Activate offer via BSS',expireDays:14},versions:[],cur:1},o); }
 const JOURNEYS = [
-  {id:'JRN-20', name:'Balance low — instant top-up nudge', desc:'Event-only demo journey with second-based timers', status:'Active', version:1, created:'2026-09-10', createdBy:DEMO_USERS.me,
-   entry:{segment:'— (event only)', events:['balance_low'], reentryDays:1, maxConcurrent:1},
-   exit:{goal:'offer_accepted', goalAction:'Activate offer via BSS', expireDays:1},
-   policy:{invitationDays:7, communicationDays:1, region:'All'},
-   nodes:[
+  jBlank({id:'JRN-20', name:'Balance low — instant top-up nudge', desc:'Event-only demo journey with second-based timers', folder:'loyalty', phase:'Grow', created:'2026-09-10', createdBy:DEMO_USERS.me,
+   entry:{reentryDays:1, maxConcurrent:1}, exit:{goal:'offer_accepted', goalAction:'Activate offer via BSS', expireDays:1},
+   versions:[{v:1,status:'Active',activatedAt:'2026-09-10 09:12',activatedBy:DEMO_USERS.approver,nodes:[
     {id:'e1',type:'entry',x:40,y:140,label:'Entry',cfg:{segment:'— (event only)', events:'balance_low', mode:'Event only'}, next:['e2']},
     {id:'e2',type:'nbo',x:230,y:140,label:'Pick best offer',cfg:{source:'Digital Twin NBO (API)', scope:'Tag: Mobile › Prepaid', fallback:'OFR-1042', min:'score ≥ 0.5'}, next:['e3']},
     {id:'e3',type:'delivery',x:420,y:140,label:'SMS',cfg:{campaign:'3310 · Top-up bonus 10%', channel:'sms', content:'SMS-302 · Top-up bonus +10%', variant:'Single content', stopAfter:'1 channel', controlGroup:'off'}, next:['e4']},
@@ -1476,12 +1508,10 @@ const JOURNEYS = [
     {id:'e6',type:'exit',x:1000,y:40,label:'Goal reached',cfg:{action:'Activate offer → BSS (TMF622)'}, next:[]},
     {id:'e7',type:'delivery',x:1000,y:240,label:'Reminder push',cfg:{campaign:'3311 · Bonus reminder', channel:'push', content:'PSH-402 · Bonus reminder', variant:'Single content', stopAfter:'1 channel', controlGroup:'off'}, next:['e8']},
     {id:'e8',type:'exit',x:1190,y:240,label:'Exit',cfg:{action:'Apply invitation policy 20 days'}, next:[]},
-   ]},
-  {id:'JRN-07', name:'Churn prevention — prepaid', desc:'Balance-low trigger, top-up bonus, reminder, retention ticket', status:'Active', version:3, created:'2026-08-28', createdBy:DEMO_USERS.me,
-   entry:{segment:'ML-2201 · Prepaid churn risk ≥ 0.6', events:['balance_low','bundle_expired'], reentryDays:30, maxConcurrent:2},
-   exit:{goal:'offer_accepted', goalAction:'Activate offer via BSS', expireDays:14},
-   policy:{invitationDays:45, communicationDays:7, region:'All except Occupied territories'},
-   nodes:[
+   ]}], cur:1}),
+  jBlank({id:'JRN-07', name:'Churn prevention — prepaid', desc:'Balance-low trigger, top-up bonus, reminder, retention ticket', folder:'churn_reduction', phase:'Retain', priority:80, created:'2026-08-28', createdBy:DEMO_USERS.me,
+   entry:{reentryDays:30, maxConcurrent:2}, exit:{goal:'offer_accepted', goalAction:'Activate offer via BSS', expireDays:14},
+   versions:[{v:3,status:'Active',activatedAt:'2026-09-12 10:05',activatedBy:DEMO_USERS.approver,nodes:[
     {id:'n1',type:'entry',x:40,y:220,label:'Entry',cfg:{segment:'ML-2201 · Prepaid churn risk ≥ 0.6', events:'balance_low', mode:'Segment + event'}, next:['n2']},
     {id:'n2',type:'offer',x:260,y:220,label:'Present offer',cfg:{offer:'OFR-1042', priorityBoost:'+5 for 30 min after app open'}, next:['n3']},
     {id:'n3',type:'delivery',x:480,y:220,label:'SMS',cfg:{campaign:'3310 · Top-up bonus 10%', channel:'Preferred cascade (push → sms → email)', content:'Per-channel content set · Renewal', variant:'Dynamic content (rule on categorical attribute)', stopAfter:'2 channels', controlGroup:'5% per channel'}, next:['n4']},
@@ -1492,12 +1522,10 @@ const JOURNEYS = [
     {id:'n8',type:'ext',x:1140,y:430,label:'External call',cfg:{system:'CRM ticket API (REST)', payload:'queue=Retention, priority=High, offer=OFR-1060', store:'ticketId'}, next:['n10']},
     {id:'n9',type:'exit',x:1140,y:80,label:'Goal reached',cfg:{action:'Activate offer → BSS (TMF622)'}, next:[]},
     {id:'n10',type:'exit',x:1580,y:330,label:'Exit',cfg:{action:'Apply invitation policy 45 days'}, next:[]},
-   ]},
-  {id:'JRN-12', name:'Onboarding master — new subscribers', desc:'Parallel welcome + app adoption, then route by device', status:'Active', version:1, created:'2026-09-01', createdBy:DEMO_USERS.crm,
-   entry:{segment:'— (event only)', events:['subscription_activated'], reentryDays:365, maxConcurrent:1},
-   exit:{goal:'day_30_reached', goalAction:'Hand over to growth journey', expireDays:35},
-   policy:{invitationDays:0, communicationDays:2, region:'All'},
-   nodes:[
+   ]}], cur:3}),
+  jBlank({id:'JRN-12', name:'Onboarding master — new subscribers', desc:'Parallel welcome + app adoption, then route by device', folder:'free-trial', phase:'Onboard', created:'2026-09-01', createdBy:DEMO_USERS.crm,
+   entry:{reentryDays:365, maxConcurrent:1}, exit:{goal:'day_30_reached', goalAction:'Hand over to growth journey', expireDays:35},
+   versions:[{v:1,status:'Active',activatedAt:'2026-09-01 14:40',activatedBy:DEMO_USERS.approver2,nodes:[
     {id:'m1',type:'entry',x:40,y:220,label:'Entry',cfg:{segment:'— (event only)', events:'subscription_activated', mode:'Event only'}, next:['m2']},
     {id:'m2',type:'par',x:260,y:220,label:'Parallel',cfg:{branches:'2', join:'wait for all'}, next:[{to:'m3',label:'A'},{to:'m5',label:'B'}]},
     {id:'m3',type:'delivery',x:480,y:110,label:'Email',cfg:{campaign:'2001 · Welcome', channel:'email', content:'EML-201 · Welcome (banner)', variant:'A/B test (2 variants, winner by open rate)', stopAfter:'1 channel', controlGroup:'off'}, next:['m4']},
@@ -1509,10 +1537,34 @@ const JOURNEYS = [
     {id:'m9',type:'call',x:1360,y:110,label:'Call journey',cfg:{journey:'JRN-15 · 5G upsell', mode:'start and continue'}, next:['m11']},
     {id:'m10',type:'offer',x:1360,y:330,label:'Present offer',cfg:{offer:'OFR-1043', priorityBoost:'none'}, next:['m11']},
     {id:'m11',type:'exit',x:1580,y:220,label:'Exit',cfg:{action:'Hand over to growth journey'}, next:[]},
-   ]},
+   ]}], cur:1}),
 ];
+/* JRN-07 also carries the previous version, still Closing: a copy of v3 without the retention ticket branch. */
+{ const j=JOURNEYS[1], v3=j.versions[0]; const nodes=JSON.parse(JSON.stringify(v3.nodes)).filter(n=>n.id!=='n8'); nodes.find(n=>n.id==='n5').next=[{to:'n6',label:'yes'},{to:'n10',label:'no'}];
+  j.versions.unshift({v:2,status:'Closing',activatedAt:'2026-09-02 09:30',activatedBy:DEMO_USERS.approver,closingAt:'2026-09-12 10:05',nodes});
+  j.versions.unshift({v:1,status:'Closed',activatedAt:'2026-08-28 16:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-09-02 09:30',nodes:JSON.parse(JSON.stringify(nodes))}); }
+/* version helpers */
+const jVer=(j,v)=>j.versions.find(x=>x.v===v);
+const jCurV=j=>jVer(j,j.cur)||j.versions[j.versions.length-1];
+const jActive=j=>j.versions.find(x=>x.status==='Active');
+const jLiveVs=j=>j.versions.filter(x=>x.status==='Active'||x.status==='Closing');
+const jLatest=j=>j.versions[j.versions.length-1];
+function jStatus(j){ if(jLiveVs(j).length) return 'Live'; if(j.versions.some(v=>v.status==='Draft')) return 'Draft'; return j.versions.length?'Past':'Draft'; }
+const vLocked=V=>V.status!=='Draft';
+/* run context: the engine, the canvas and the monitor work on ONE version. The context looks like the old
+   journey object (id, nodes, status, entry) so the step engine did not have to change shape; its id is
+   "JRN-07@3" and is the key into sim[] and the log. */
+function ctxOf(j,V){ return {id:j.id+'@'+V.v, jid:j.id, v:V.v, V, j, get nodes(){ return V.nodes; }, set nodes(n){ V.nodes=n; }, get status(){ return V.status; }, get entry(){ return j.entry; }, get exit(){ return j.exit; }, get name(){ return j.name; }, get desc(){ return j.desc; }}; }
+const allCtx=()=>JOURNEYS.flatMap(j=>j.versions.map(V=>ctxOf(j,V)));
+const jById=id=>JOURNEYS.find(x=>x.id===id);
+function curCtx(){ const j=jById(curJ); return ctxOf(j,jCurV(j)); }
+/* the version the monitor and the list talk about: the Active one, else the most recent */
+const jMainV=j=>jActive(j)||jLiveVs(j)[0]||jLatest(j);
+const mainCtx=j=>ctxOf(j,jMainV(j));
+const jUsingSeg=id=>JOURNEYS.filter(j=>j.versions.some(V=>String(V.nodes[0].cfg.segment||'').startsWith(id))).map(j=>j.id);
+const simOf=C=>sim[C.id]||(sim[C.id]={parts:{},history:[{}]});
 
-/* synthetic reference data (mirrors what ECM would list from Campaign, Segmentation, Event-Trigger, Product Catalog) */
+/* synthetic reference data/* synthetic reference data (mirrors what ECM would list from Campaign, Segmentation, Event-Trigger, Product Catalog) */
 const CAMP_STATUS_CLS={Active:'ok',Draft:'grey','Pending approval':'warn',Paused:'warn',Expired:'bad',Stopped:'bad',Rejected:'bad',Ended:'grey'};
 const statusPill=st=>`<span class="pill ${CAMP_STATUS_CLS[st]||''}">${st}</span>`;
 /* tooltip helper — every field that needs explaining gets one (meeting 3) */
@@ -1650,7 +1702,6 @@ const NODE_META = {
 };
 
 /* ---------- DATAMART (30-row synthetic Kyivstar demo datamart — same rows as ECM_Demo_Datamart_Kyivstar.csv) ---------- */
-const TODAY='2026-09-14';
 const DATAMART_ROWS=[{"CUSTOMER_ID":"CUS-****7919","FIRST_NAME":"Oksana","MSISDN":"+90 5XX XXX 01 11","EMAIL":"test.oksana100001@example.com","PUSH_TOKEN":"tok_100001","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.4","CHURN_RISK":"0.72","REGION":"Kyiv","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"2.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6838","FIRST_NAME":"Andrii","MSISDN":"+90 5XX XXX 57 64","EMAIL":"test.andrii100002@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_UAH":"0.8","CHURN_RISK":"0.68","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"2.6","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5757","FIRST_NAME":"Kateryna","MSISDN":"+90 5XX XXX 78 72","EMAIL":"test.kateryna100003@example.com","PUSH_TOKEN":"tok_100003","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_UAH":"2.0","CHURN_RISK":"0.66","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"23.4","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4676","FIRST_NAME":"Dmytro","MSISDN":"+90 5XX XXX 62 25","EMAIL":"test.dmytro100004@example.com","PUSH_TOKEN":"tok_100004","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.3","CHURN_RISK":"0.71","REGION":"Lviv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.7","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3595","FIRST_NAME":"Olena","MSISDN":"+90 5XX XXX 46 13","EMAIL":"test.olena100005@example.com","PUSH_TOKEN":"tok_100005","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.7","CHURN_RISK":"0.79","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"1.9","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2514","FIRST_NAME":"Taras","MSISDN":"+90 5XX XXX 31 72","EMAIL":"test.taras100006@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-17","BALANCE_UAH":"2.8","CHURN_RISK":"0.75","REGION":"Dnipro","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"7.5","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1433","FIRST_NAME":"Iryna","MSISDN":"+90 5XX XXX 66 74","EMAIL":"test.iryna100007@example.com","PUSH_TOKEN":"tok_100007","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"2.7","CHURN_RISK":"0.64","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.0","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9352","FIRST_NAME":"Yurii","MSISDN":"+90 5XX XXX 87 44","EMAIL":"test.yurii100008@example.com","PUSH_TOKEN":"tok_100008","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-19","BALANCE_UAH":"1.5","CHURN_RISK":"0.77","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"10.4","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8271","FIRST_NAME":"Nataliia","MSISDN":"+90 5XX XXX 38 09","EMAIL":"test.nataliia100009@example.com","PUSH_TOKEN":"tok_100009","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"7.9","CHURN_RISK":"0.79","REGION":"Vinnytsia","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.7","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7190","FIRST_NAME":"Maksym","MSISDN":"+90 5XX XXX 88 29","EMAIL":"test.maksym100010@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"0.8","CHURN_RISK":"0.64","REGION":"Poltava","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.1","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6109","FIRST_NAME":"Anna","MSISDN":"+90 5XX XXX 66 11","EMAIL":"test.anna100011@example.com","PUSH_TOKEN":"tok_100011","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-11","BALANCE_UAH":"8.9","CHURN_RISK":"0.81","REGION":"Zaporizhzhia","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.6","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5028","FIRST_NAME":"Roman","MSISDN":"+90 5XX XXX 45 41","EMAIL":"test.roman100012@example.com","PUSH_TOKEN":"tok_100012","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_UAH":"3.2","CHURN_RISK":"0.9","REGION":"Chernihiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"5.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3947","FIRST_NAME":"Sofiia","MSISDN":"+90 5XX XXX 00 00","EMAIL":"test.sofiia100013@example.com","PUSH_TOKEN":"tok_100013","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_UAH":"110.8","CHURN_RISK":"0.21","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.1","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2866","FIRST_NAME":"Bohdan","MSISDN":"+90 5XX XXX 11 30","EMAIL":"test.bohdan100014@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-17","BALANCE_UAH":"105.0","CHURN_RISK":"0.38","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"16.5","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1785","FIRST_NAME":"Mariia","MSISDN":"+90 5XX XXX 47 29","EMAIL":"test.mariia100015@example.com","PUSH_TOKEN":"tok_100015","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"26.6","CHURN_RISK":"0.08","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"20.0","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9704","FIRST_NAME":"Ihor","MSISDN":"+90 5XX XXX 50 46","EMAIL":"test.ihor100016@example.com","PUSH_TOKEN":"tok_100016","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-16","BALANCE_UAH":"56.1","CHURN_RISK":"0.05","REGION":"Lviv","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8623","FIRST_NAME":"Viktoriia","MSISDN":"+90 5XX XXX 30 25","EMAIL":"test.viktoriia100017@example.com","PUSH_TOKEN":"tok_100017","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"105.8","CHURN_RISK":"0.23","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7542","FIRST_NAME":"Oleh","MSISDN":"+90 5XX XXX 24 65","EMAIL":"test.oleh100018@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"17.4","CHURN_RISK":"0.07","REGION":"Dnipro","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"4.3","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6461","FIRST_NAME":"Yana","MSISDN":"+90 5XX XXX 22 89","EMAIL":"test.yana100019@example.com","PUSH_TOKEN":"tok_100019","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-23","BALANCE_UAH":"72.3","CHURN_RISK":"0.09","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"1.1","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5380","FIRST_NAME":"Serhii","MSISDN":"+90 5XX XXX 82 29","EMAIL":"test.serhii100020@example.com","PUSH_TOKEN":"tok_100020","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-19","BALANCE_UAH":"79.8","CHURN_RISK":"0.2","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"3.4","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4299","FIRST_NAME":"Daryna","MSISDN":"+90 5XX XXX 78 90","EMAIL":"test.daryna100021@example.com","PUSH_TOKEN":"tok_100021","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-11","BALANCE_UAH":"44.3","CHURN_RISK":"0.24","REGION":"Vinnytsia","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3218","FIRST_NAME":"Vitalii","MSISDN":"+90 5XX XXX 26 88","EMAIL":"test.vitalii100022@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-16","BALANCE_UAH":"32.6","CHURN_RISK":"0.26","REGION":"Poltava","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2137","FIRST_NAME":"Alina","MSISDN":"+90 5XX XXX 69 03","EMAIL":"test.alina100023@example.com","PUSH_TOKEN":"tok_100023","CUSTOMER_TYPE":"postpaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"80.7","CHURN_RISK":"0.17","REGION":"Zaporizhzhia","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.1","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1056","FIRST_NAME":"Petro","MSISDN":"+90 5XX XXX 08 60","EMAIL":"test.petro100024@example.com","PUSH_TOKEN":"tok_100024","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"95.7","CHURN_RISK":"0.26","REGION":"Chernihiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.6","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8975","FIRST_NAME":"Liliia","MSISDN":"+90 5XX XXX 40 57","EMAIL":"test.liliia100025@example.com","PUSH_TOKEN":"tok_100025","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"100.0","CHURN_RISK":"0.37","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"12.1","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7894","FIRST_NAME":"Artem","MSISDN":"+90 5XX XXX 88 23","EMAIL":"test.artem100026@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-19","BALANCE_UAH":"61.9","CHURN_RISK":"0.37","REGION":"Kyiv","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"19.5","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6813","FIRST_NAME":"Tetiana","MSISDN":"+90 5XX XXX 66 33","EMAIL":"test.tetiana100027@example.com","PUSH_TOKEN":"tok_100027","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-17","BALANCE_UAH":"21.2","CHURN_RISK":"0.08","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"5.3","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5732","FIRST_NAME":"Vasyl","MSISDN":"+90 5XX XXX 23 46","EMAIL":"test.vasyl100028@example.com","PUSH_TOKEN":"tok_100028","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-19","BALANCE_UAH":"81.8","CHURN_RISK":"0.24","REGION":"Lviv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"18.9","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****4651","FIRST_NAME":"Kristina","MSISDN":"+90 5XX XXX 87 12","EMAIL":"test.kristina100029@example.com","PUSH_TOKEN":"tok_100029","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-11","BALANCE_UAH":"57.7","CHURN_RISK":"0.41","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****3570","FIRST_NAME":"Denys","MSISDN":"+90 5XX XXX 13 50","EMAIL":"test.denys100030@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-16","BALANCE_UAH":"28.7","CHURN_RISK":"0.34","REGION":"Dnipro","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"14.4","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"}];
 /* event (feedback) datamart: one row per delivery result, refreshed from the delivery_result table */
 const EVENT_ROWS=[{"CUSTOMER_ID":"CUS-****7919","MSISDN":"+90 5XX XXX 01 11","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****6838","MSISDN":"+90 5XX XXX 57 64","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****5757","MSISDN":"+90 5XX XXX 78 72","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****4676","MSISDN":"+90 5XX XXX 62 25","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****3595","MSISDN":"+90 5XX XXX 46 13","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****2514","MSISDN":"+90 5XX XXX 31 72","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****1433","MSISDN":"+90 5XX XXX 66 74","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****9352","MSISDN":"+90 5XX XXX 87 44","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"not delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****8271","MSISDN":"+90 5XX XXX 38 09","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****7190","MSISDN":"+90 5XX XXX 88 29","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"N","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****1785","MSISDN":"+90 5XX XXX 47 29","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****9704","MSISDN":"+90 5XX XXX 50 46","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"},{"CUSTOMER_ID":"CUS-****8623","MSISDN":"+90 5XX XXX 30 25","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"N","CLICKED":"N","RESPONSE_DATE":""},{"CUSTOMER_ID":"CUS-****7542","MSISDN":"+90 5XX XXX 24 65","CAMPAIGN_ID":"433","CAMPAIGN_NAME":"Package renewal — SMS","CHANNEL":"sms","DELIVERY_STATUS":"delivered","SENT_DATE":"2026-09-13","OPENED":"Y","CLICKED":"Y","RESPONSE_DATE":"2026-09-13"}];
@@ -1827,7 +1878,7 @@ function dmUsage(dmId){
   const segs=MLS.filter(m=>m.dm===d.key||m.dm2===d.key);
   const ids=new Set(segs.map(m=>m.id));
   const camps=[];
-  const jrns=JOURNEYS.filter(j=>(j.nodes||[]).some(n=>n.cfg&&ids.has(String(n.cfg.segment||'').split(' ')[0])));
+  const jrns=JOURNEYS.filter(j=>j.versions.some(V=>V.nodes.some(n=>n.cfg&&ids.has(String(n.cfg.segment||'').split(' ')[0]))));
   return {segments:segs,campaigns:camps,journeys:jrns};
 }
 function colUsage(dmId,colName){
@@ -1862,13 +1913,15 @@ const rnd = Math.random;
 
 function initSim(){
   day=0; log.length=0;
-  JOURNEYS.forEach(j=>{
+  allCtx().forEach(j=>{
     const parts={};
-    const pool = j.nodes[0].cfg.mode==='Event only' ? [] : mlCustomers(j.nodes[0].cfg.segment).filter(c=>!excludedCids().has(c.cid));
-    pool.forEach(c=>{ parts[c.id]={pos:[j.nodes[0].id],status:'active',since:0,visited:new Set([j.nodes[0].id]),opened:null,offers:[],timers:{}}; });
+    /* Active and Closing versions start with their segment loaded (a Closing one has customers still inside) */
+    const live=j.status==='Active'||j.status==='Closing';
+    const pool = (!live||j.nodes[0].cfg.mode==='Event only') ? [] : mlCustomers(j.nodes[0].cfg.segment).filter(c=>!excludedCids().has(c.cid));
+    pool.forEach((c,i)=>{ if(j.status==='Closing'&&i%3) return; parts[c.id]={pos:[j.nodes[0].id],status:'active',since:0,visited:new Set([j.nodes[0].id]),opened:null,offers:[],timers:{}}; });
     sim[j.id]={parts,history:[snapshot(parts)]};
   });
-  addLog('acc',`Simulator reset. ${JOURNEYS.filter(j=>j.nodes[0].cfg.mode!=='Event only').map(j=>`${j.id} pre-loaded from ${j.nodes[0].cfg.segment.split(' · ')[0]} (${Object.keys(sim[j.id].parts).length} customers, exclusion lists applied)`).join('; ')}; event-only journeys start empty — send an event to admit a customer.`,{kind:'system'});
+  addLog('acc',`Simulator reset. ${allCtx().filter(j=>Object.keys(sim[j.id].parts).length).map(j=>`${j.id} pre-loaded from ${j.nodes[0].cfg.segment.split(' · ')[0]} (${Object.keys(sim[j.id].parts).length} customers, exclusion lists applied)`).join('; ')}; event-only journeys start empty — send an event to admit a customer.`,{kind:'system'});
 }
 function snapshot(parts){ const o={}; for(const k in parts){ const p=parts[k]; o[k]={pos:[...p.pos],status:p.status,since:p.since,offers:[...p.offers]}; } return o; }
 function addLog(cls,msg,meta){ const m=meta||{}; if(m.j&&m.node) lit[m.j+'/'+m.node]=Date.now(); log.push(Object.assign({d:day,t:new Date().toTimeString().slice(0,8),cls,msg},m)); }
@@ -1879,10 +1932,12 @@ let minute=0; function clock(){ const h=9+Math.floor(minute/60)%24, m=minute%60;
 /* inject a business event for a customer: entry into event-driven journeys, or resolve a waiting step */
 function sendEvent(evName,cid){
   const cust=CUSTOMERS.find(c=>c.id===cid); if(!cust) return; let hits=0, paused=[];
-  JOURNEYS.forEach(j=>{
-    const S=sim[j.id]; const entry=j.nodes[0]; const evs=String(entry.cfg.events||'').split(/[,\s]+/).filter(Boolean);
+  allCtx().forEach(j=>{
+    const S=simOf(j); const entry=j.nodes[0]; const evs=String(entry.cfg.events||'').split(/[,\s]+/).filter(Boolean);
     const p=S.parts[cid];
-    if(j.status!=='Active'){ if(evs.includes(evName)||(p&&p.status==='active')){ paused.push(j.id); addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — journey is ${j.status} (activate it in Journey Builder)`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); } return; }
+    /* a Draft or Closed version ignores events; a Closing one still resolves the waits of contacts inside, but admits nobody */
+    if(j.status==='Draft'||j.status==='Closed'){ if(evs.includes(evName)&&j.status==='Draft'){ paused.push(j.id); addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — version is ${j.status} (activate it on the canvas)`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); } return; }
+    if(j.status==='Closing'&&!(p&&p.status==='active')){ if(evs.includes(evName)) addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — version is Closing, no new entries`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
     if(evs.includes(evName)&&!p&&excludedCids().has((CUSTOMERS.find(c=>c.id===cid)||{}).cid)){ addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — customer is on an exclusion list (excluded from all deliveries)`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
     // resolve a waiting step first
     if(p&&p.status==='active'){
@@ -1900,21 +1955,24 @@ function sendEvent(evName,cid){
   });
   if(!hits) addLog('',`${cid}  event ${evName} received — no journey listening`,{cid,kind:'event'});
   if(!quietInit) toast(hits?`Event ${evName} processed`:`Event ${evName} received`, hits?`${cid} — ${hits} journey step(s) reacted.`:paused.length?`${cid} — ${paused.join(', ')} listens for it but is not Active.`:`${cid} — no journey is listening for this event.`, hits?'':'warn');
-  JOURNEYS.forEach(j=>{ sim[j.id].history[sim[j.id].history.length-1]=snapshot(sim[j.id].parts); });
-  render();
+  allCtx().forEach(j=>{ const S=simOf(j); S.history[S.history.length-1]=snapshot(S.parts); });
+  autoClose(); render();
 }
 function node(j,id){ return j.nodes.find(n=>n.id===id); }
 function nextIds(n,label){ return n.next.map(x=> typeof x==='string' ? {to:x,label:''} : x).filter(x=>!label || x.label===label).map(x=>x.to); }
 
 function tick(){
   day++;
-  JOURNEYS.forEach(j=>{
-    const S=sim[j.id];
+  allCtx().forEach(j=>{
+    const S=simOf(j);
     for(const cid in S.parts){ processCustomer(j,S,cid,true); }
     S.history.push(snapshot(S.parts));
   });
-  render();
+  autoClose(); render();
 }
+/* a Closing version with nobody left inside becomes Closed on its own */
+function autoClose(){ allCtx().forEach(C=>{ if(C.status!=='Closing') return; const S=simOf(C); if(Object.values(S.parts).some(p=>p.status==='active')) return; C.V.status='Closed'; C.V.closedAt=stamp(); addLog('',`${C.id}  closed — last contact left the version`,{j:C.id,node:C.nodes[0].id,kind:'system'}); if(!quietInit) toast(`Closed · ${C.jid} v${C.v}`,'The Closing version emptied and closed itself.'); }); }
+const stamp=()=>{ const d=new Date(); return `${TODAY} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 /* run the customer's current steps once; advance=true means a day passed (timers/waits progress),
    advance=false means "now" (event just arrived): immediate steps run, timers/waits hold */
 function processCustomer(j,S,cid,advance){
@@ -1970,7 +2028,7 @@ function processCustomer(j,S,cid,advance){
 /* real-time loop: second-based timers/waits count down every second, then the customer's next immediate steps run */
 setInterval(()=>{
   let changed=false;
-  JOURNEYS.forEach(j=>{ const S=sim[j.id]; if(!S) return;
+  allCtx().forEach(j=>{ const S=sim[j.id]; if(!S) return;
     for(const cid in S.parts){ const p=S.parts[cid]; if(p.status!=='active') continue;
       p.sec=p.sec||{};
       const due=p.pos.filter(nid=>{ const n=node(j,nid); if(!n) return false; const secs=n.type==='timer'?secondsOf(n.cfg.duration):n.type==='wait'?secondsOf(n.cfg.timeout):null; if(secs===null) return false; p.sec[nid]=(p.sec[nid]||0)+1; changed=true; return p.sec[nid]>=secs; });
@@ -2022,7 +2080,8 @@ const view={x:24,y:24,k:1};
 let repModal=null;
 let drag=null; // {kind:'pan'|'node'|'link', ...}
 function renderCanvas(){
-  const j=JOURNEYS.find(x=>x.id===curJ), S=sim[j.id];
+  const j=curCtx(), S=simOf(j); const locked=vLocked(j.V), closed=j.status==='Closed';
+  document.getElementById('jb').classList.toggle('locked',locked);
   const counts={}; for(const cid in S.parts){ const p=S.parts[cid]; if(p.status==='active') p.pos.forEach(n=>counts[n]=(counts[n]||0)+1); }
   const svg=document.getElementById('canvas');
   const spot=S.parts[spotlight[j.id]]||null; const visited=spot?spot.visited:new Set(); const curPos=spot&&spot.status==='active'?spot.pos:[];
@@ -2048,13 +2107,13 @@ function renderCanvas(){
       <rect class="head" width="${NW}" height="30" fill="${tint}"/><rect width="${NW}" height="14" y="16" fill="${tint}"/>
       <text class="k" x="10" y="19" fill="${ink}">${meta.ic} ${esc(meta.k)}</text>
       <text class="id" x="${NW-(n.type==='entry'?8:26)}" y="19" text-anchor="end">${n.id}</text>
-      ${n.type!=='entry'?`<g class="ndel" data-del="${n.id}" transform="translate(${NW-12},13)"><title>Delete step</title><circle r="8" fill="#fff" stroke="#DFE1DF"/><path d="M-3,-3 L3,3 M3,-3 L-3,3" stroke="#6B6B80" stroke-width="1.6" stroke-linecap="round"/></g>`:''}
+      ${n.type!=='entry'&&!locked?`<g class="ndel" data-del="${n.id}" transform="translate(${NW-12},13)"><title>Delete step</title><circle r="8" fill="#fff" stroke="#DFE1DF"/><path d="M-3,-3 L3,3 M3,-3 L-3,3" stroke="#6B6B80" stroke-width="1.6" stroke-linecap="round"/></g>`:''}
       ${isDone?`<g transform="translate(${NW-30},9)"><circle r="7" fill="#2A7230"/><path d="M-3,0 L-1,2.5 L3.5,-2.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></g>`:''}
       ${isCur?`<g transform="translate(${NW-30},9)"><circle r="7" fill="#F58220"><animate attributeName="r" values="6;8;6" dur="1.2s" repeatCount="indefinite"/></circle><path d="M-2.5,-3.5 L3.5,0 L-2.5,3.5 Z" fill="#fff"/></g>`:''}
-      <foreignObject x="8" y="36" width="${NW-16}" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="nname"><input data-node="${n.id}" data-k="__label" value="${esc(n.label)}" aria-label="Step name"/></div></foreignObject>
-      ${flds.map((f,i)=>`<text class="lab" x="10" y="${72+i*40}">${esc(f.label)}</text><foreignObject x="10" y="${76+i*40}" width="${NW-20}" height="28"><div xmlns="http://www.w3.org/1999/xhtml" class="nsel"><select data-node="${n.id}" data-k="${f.key}" aria-label="${esc(f.label)}">${optionsHtml(f.opts,n.cfg[f.key],f.fmt)}</select></div></foreignObject>`).join('')}
-      ${n.type!=='entry'?`<circle class="port" cx="0" cy="${H/2}" r="4"/>`:''}
-      ${n.type!=='exit'?`<circle class="port out" cx="${NW}" cy="${H/2}" r="4"/>`:''}
+      <foreignObject x="8" y="36" width="${NW-16}" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="nname"><input data-node="${n.id}" data-k="__label" value="${esc(n.label)}" aria-label="Step name" ${closed?'disabled':''}/></div></foreignObject>
+      ${flds.map((f,i)=>`<text class="lab" x="10" y="${72+i*40}">${esc(f.label)}</text><foreignObject x="10" y="${76+i*40}" width="${NW-20}" height="28"><div xmlns="http://www.w3.org/1999/xhtml" class="nsel"><select data-node="${n.id}" data-k="${f.key}" aria-label="${esc(f.label)}" ${closed?'disabled':''}>${optionsHtml(f.opts,n.cfg[f.key],f.fmt)}</select></div></foreignObject>`).join('')}
+      ${n.type!=='entry'&&!locked?`<circle class="port" cx="0" cy="${H/2}" r="4"/>`:''}
+      ${n.type!=='exit'&&!locked?`<circle class="port out" cx="${NW}" cy="${H/2}" r="4"/>`:''}
       ${c?`<g class="badge" transform="translate(${NW-4},-2)"><circle r="10"/><text text-anchor="middle" y="3.5">${c}</text></g>`:''}
       ${remain!==null?`<g class="cd" transform="translate(${NW-34},${H-12})"><rect x="-6" y="-9" width="34" height="16" rx="8" fill="#FDF0E2" stroke="#F58220"/><text x="11" y="3" text-anchor="middle" style="font-size:10px;font-weight:700;fill:#9E560D;font-family:var(--mono)">${remain}s</text></g>`:''}
     </g>`;
@@ -2066,8 +2125,7 @@ function renderCanvas(){
   svg.querySelectorAll('.nsel select').forEach(s=>{ s.addEventListener('change',()=>{ const n=node(j,s.dataset.node); n.cfg[s.dataset.k]=s.value; if(s.dataset.k==='channel') n.cfg.content=contentsFor(s.value)[0]; selNode=n.id; renderCanvas(); renderNodePanel(); }); });
   svg.querySelectorAll('.nname input').forEach(i=>{ i.addEventListener('change',()=>{ const n=node(j,i.dataset.node); n.label=i.value; selNode=n.id; renderCanvas(); renderNodePanel(); }); i.addEventListener('keydown',e=>{ if(e.key==='Enter') i.blur(); e.stopPropagation(); }); });
   const active=Object.values(S.parts).filter(p=>p.status==='active').length, conv=Object.values(S.parts).filter(p=>p.status==='converted').length;
-  document.getElementById('jmeta').innerHTML=`<span class="pill ${(CAMP_STATUS_CLS[j.status]||'')}">${j.status}</span>${j.activatedAt?`<span class="pill" title="Activated">${j.activatedAt}</span>`:''}<span class="pill">v${j.version}</span><span class="pill acc">${active} active · ${conv} converted</span>`;
-  document.getElementById('j-name').value=j.name; document.getElementById('j-desc').value=j.desc||'';
+  renderVersionBar(j,active,conv);
   document.getElementById('daypill-j').textContent=`Day ${day}`; if(repModal&&!repModal.hidden) renderReport();
 }
 
@@ -2077,7 +2135,7 @@ function renderCanvas(){
   const toCanvas=(e)=>{ const r=svg.getBoundingClientRect(); return {x:(e.clientX-r.left-view.x)/view.k, y:(e.clientY-r.top-view.y)/view.k}; };
   svg.addEventListener('pointerdown',e=>{
     if(e.button!==0) return;
-    const j=JOURNEYS.find(x=>x.id===curJ);
+    const j=curCtx();
     const del=e.target.closest('.ndel'); if(del){ e.preventDefault(); deleteNode(del.dataset.del); return; }
     const cut=e.target.closest('.ecut'); if(cut){ const eg=cut.closest('.edge'); e.preventDefault(); removeEdge(eg.dataset.from,eg.dataset.to); toast('Connection removed',`${eg.dataset.from} → ${eg.dataset.to}`); return; }
     if(e.target.closest('select,input,button,option,textarea')){ const gg=e.target.closest('.node'); if(gg&&selNode!==gg.dataset.id){ selNode=gg.dataset.id; renderNodePanel(); svg.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.dataset.id===selNode)); } return; } // native control inside a step
@@ -2088,15 +2146,16 @@ function renderCanvas(){
     try{ svg.setPointerCapture(e.pointerId); }catch(_){} e.preventDefault();
   });
   svg.addEventListener('pointermove',e=>{
-    if(!drag) return; const j=JOURNEYS.find(x=>x.id===curJ);
+    if(!drag) return; const j=curCtx();
     if(drag.kind==='pan'){ view.x=drag.vx+(e.clientX-drag.sx); view.y=drag.vy+(e.clientY-drag.sy); const vp=document.getElementById('vp'); if(vp) vp.setAttribute('transform',`translate(${view.x},${view.y}) scale(${view.k})`); }
     else if(drag.kind==='node'){ if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>3) drag.moved=true; if(drag.moved){ const n=node(j,drag.id); const c=toCanvas(e); n.x=Math.round((c.x-drag.ox)/8)*8; n.y=Math.round((c.y-drag.oy)/8)*8; renderCanvas(); } }
     else if(drag.kind==='link'){ const c=toCanvas(e); drag.cx=c.x; drag.cy=c.y; renderCanvas(); }
   });
   const end=e=>{
-    if(!drag) return; const j=JOURNEYS.find(x=>x.id===curJ); const d=drag; drag=null; wrap.classList.remove('panning');
+    if(!drag) return; const j=curCtx(); const d=drag; drag=null; wrap.classList.remove('panning');
     if(d.kind==='node'&&!d.moved){ selNode=d.id; renderNodePanel(); }
-    if(d.kind==='link'){ const el=document.elementFromPoint(e.clientX,e.clientY); const g=el&&el.closest?el.closest('.node'):null;
+    if(d.kind==='link'&&vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: connections cannot change.`,'warn'); }
+    else if(d.kind==='link'){ const el=document.elementFromPoint(e.clientX,e.clientY); const g=el&&el.closest?el.closest('.node'):null;
       if(g&&g.dataset.id!==d.from){ const s=node(j,d.from); const already=s.next.some(x=>(typeof x==='string'?x:x.to)===g.dataset.id);
         if(!already){ const label=(s.type==='cond'||s.type==='wait'||s.type==='par')?(prompt('Branch label (e.g. yes / no, accepted / timeout):','')||''):''; s.next.push(label?{to:g.dataset.id,label}:g.dataset.id); } } }
     renderCanvas();
@@ -2117,14 +2176,15 @@ function renderCanvas(){
   window.paletteDown=(btn,type,e)=>{ pd={btn,type,sx:e.clientX,sy:e.clientY}; };
 })();
 function toast(title,msg,cls){ const t=document.getElementById('toast'); const d=document.createElement('div'); if(cls) d.className=cls; d.innerHTML=`<b>${esc(title)}</b>${esc(msg||'')}`; t.appendChild(d); setTimeout(()=>{ d.style.opacity='0'; d.style.transition='opacity .3s'; setTimeout(()=>d.remove(),320); },4200); }
-function deleteNode(id){ const j=JOURNEYS.find(x=>x.id===curJ); const n=node(j,id); if(!n||n.type==='entry') return;
+function deleteNode(id){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: steps cannot be added or removed. Copy to a new version to change the structure.`,'warn'); return; } const n=node(j,id); if(!n||n.type==='entry') return;
   j.nodes=j.nodes.filter(x=>x.id!==id); j.nodes.forEach(x=>x.next=x.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==id));
   const S=sim[j.id]; for(const cid in S.parts){ const p=S.parts[cid]; p.pos=p.pos.filter(x=>x!==id); if(p.pos.length===0&&p.status==='active') p.status='completed'; }
   if(selNode===id) selNode=null; renderCanvas(); renderNodePanel(); }
-function removeEdge(from,to){ const j=JOURNEYS.find(x=>x.id===curJ); const n=node(j,from); if(!n) return; n.next=n.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==to); renderCanvas(); }
-function fitView(){ const j=JOURNEYS.find(x=>x.id===curJ); const svg=document.getElementById('canvas'); const r=svg.getBoundingClientRect(); const minX=Math.min(...j.nodes.map(n=>n.x)), minY=Math.min(...j.nodes.map(n=>n.y)), maxX=Math.max(...j.nodes.map(n=>n.x))+NW, maxY=Math.max(...j.nodes.map(n=>n.y+nh(n))); const k=Math.min(1,Math.max(.45,Math.min((r.width-48)/(maxX-minX),(r.height-48)/(maxY-minY)))); view.k=k; view.x=24-minX*k; view.y=24-minY*k; renderCanvas(); }
+function removeEdge(from,to){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: connections cannot change. Copy to a new version first.`,'warn'); return; } const n=node(j,from); if(!n) return; n.next=n.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==to); renderCanvas(); }
+function fitView(){ const j=curCtx(); const svg=document.getElementById('canvas'); const r=svg.getBoundingClientRect(); const minX=Math.min(...j.nodes.map(n=>n.x)), minY=Math.min(...j.nodes.map(n=>n.y)), maxX=Math.max(...j.nodes.map(n=>n.x))+NW, maxY=Math.max(...j.nodes.map(n=>n.y+nh(n))); const k=Math.min(1,Math.max(.45,Math.min((r.width-48)/(maxX-minX),(r.height-48)/(maxY-minY)))); view.k=k; view.x=24-minX*k; view.y=24-minY*k; renderCanvas(); }
 function addNode(t,opt){
-  const j=JOURNEYS.find(x=>x.id===curJ); const m=NODE_META[t];
+  const j=curCtx(); const m=NODE_META[t];
+  if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: steps cannot be added. Copy to a new version to change the structure.`,'warn'); return; }
   const cfgs={delivery:Object.assign({channel:'sms',content:CONTENTS.sms[0],variant:'Single content',stopAfter:'1 channel',controlGroup:'off'},jPlanDefaults()),timer:{duration:'1 day',at:'10:00 local'},cond:{expr:EXPRS[0]},wait:{event:'offer_accepted',timeout:'3 days'},offer:{offer:OFFERS[1].id,priorityBoost:'none'},par:{branches:'2',join:'wait for all'},nbo:{source:NBO_SOURCES[0],scope:NBO_SCOPES[0],fallback:'OFR-1043',min:NBO_MIN[1]},exit:{action:EXITS[1]},call:{journey:CALLS[0],mode:CALLMODES[0]},ext:{system:SYSTEMS[0],payload:'{ "customerId": "{{customer.id}}" }',store:'response'}};
   const id='n'+(Date.now()%100000); const s=selNode?node(j,selNode):null;
   let x=opt.x, y=opt.y; if(x===undefined){ if(!s){ toast('Add step','Select a step first, or drag the component onto the canvas.','warn'); return; } x=s.x+NW+40; y=s.y+(s.next.length?130:0); }
@@ -2134,17 +2194,17 @@ function addNode(t,opt){
 }
 
 function renderNodePanel(){
-  const j=JOURNEYS.find(x=>x.id===curJ); const body=document.getElementById('jp-body');
-  if(!selNode){ body.innerHTML='<div class="empty">Select a step on the canvas.</div>'; document.getElementById('jp-type').textContent=''; document.getElementById('jp-title').textContent='Step details'; return; }
+  const j=curCtx(); const body=document.getElementById('jp-body'); renderJSettings(); const jset=document.getElementById('jset'); const locked=vLocked(j.V), closed=j.status==='Closed';
+  if(!selNode){ jset.open=true; body.innerHTML=`<div class="empty">Select a step on the canvas.${locked?`<br><span style="font-size:11.5px">v${j.v} is ${j.status}: ${closed?'read-only':'structure locked, step content editable'}.</span>`:''}</div>`; document.getElementById('jp-type').textContent=''; document.getElementById('jp-title').textContent='Step details'; return; }
+  jset.open=false;
   const n=node(j,selNode); if(!n){ selNode=null; renderNodePanel(); return; } const meta=NODE_META[n.type];
   document.getElementById('jp-title').textContent=`Step ${n.id} · ${meta.k}`;
-  const tp=document.getElementById('jp-type'); tp.textContent = meta.today===true?'exists today':meta.today==='partial'?'partially today':'proposed'; tp.className='pill '+(meta.today===true?'ok':meta.today==='partial'?'acc':'warn');
   const f=(k,label,val,type='text')=>`<div class="fld"><label for="f-${k}">${label}</label>${type==='ta'?`<textarea id="f-${k}" data-k="${k}">${esc(val)}</textarea>`:`<input id="f-${k}" data-k="${k}" value="${esc(val)}">`}</div>`;
   const sel=(k,label,opts,fmt)=>`<div class="fld"><label for="f-${k}">${label}</label><select id="f-${k}" data-k="${k}">${optionsHtml(opts,n.cfg[k],fmt)}</select></div>`;
   let html=`<div class="fld"><label for="f-label">Step name</label><input id="f-label" data-k="__label" value="${esc(n.label)}"></div>`;
   switch(n.type){
     case 'entry': html+=sel('mode','Entry mode',MODES)+sel('segment','Target audience (segment)',MLISTS_get())+f('events','Trigger events (BSS / app / partner)',n.cfg.events)
-      +`<div class="sec">Journey rules</div><dl class="kv"><dt>Re-entry</dt><dd>after ${j.entry.reentryDays} days</dd><dt>Concurrent</dt><dd>max ${j.entry.maxConcurrent} journeys</dd><dt>Goal</dt><dd>${esc(j.exit.goal)}</dd><dt>Expires</dt><dd>${j.exit.expireDays} days after entry</dd></dl><div class="note">Today: target audience is set on the campaign and event mapping on the Event-Trigger screen. This step shows both on the journey.</div>`; break;
+      +`<div class="sec">Journey rules</div><dl class="kv"><dt>Re-entry</dt><dd>after ${j.entry.reentryDays} days</dd><dt>Concurrent</dt><dd>max ${j.entry.maxConcurrent} journeys</dd><dt>Goal</dt><dd>${esc(j.exit.goal)}</dd><dt>Expires</dt><dd>${j.exit.expireDays} days after entry</dd></dl><div class="note">Re-entry and concurrency are journey rules; the segment and the events are this version's entry.</div>`; break;
     case 'delivery': { jPlanEnsure(n); const pc=n.cfg; const isAB=pc.variant.startsWith('A/B'), isDyn=pc.variant.startsWith('Dynamic');
       html+=`<div class="sec">Delivery — owned by <b>${j.id}</b></div><div style="font-size:11.5px;color:var(--ink-2)">Same as a campaign delivery, minus the schedule: <b>when</b> comes from the journey (the Timer / Wait before this step), <b>who</b> from the customer reaching it. Content (the text below) belongs to this journey; the template only gives the design. Reporting key: JOURNEY_ID ${j.id} · step ${n.id}.</div>`
       +sel('channel','Channel',CHANNELS)+sel('content',isAB?'Template A':'Template',contentsFor(n.cfg.channel))
@@ -2171,8 +2231,8 @@ function renderNodePanel(){
     case 'call': html+=sel('journey','Journey to start',CALLS)+sel('mode','Mode',CALLMODES); break;
     case 'ext': html+=sel('system','System / endpoint',SYSTEMS)+f('payload','Request',n.cfg.payload,'ta')+f('store','Store response as',n.cfg.store)+`<div class="note">Stored response fields become available in later conditions and content.</div>`; break;
   }
-  html+=`<div class="fld"><div class="row"><button class="btn sm outline" id="btn-disable">${n.label.startsWith('[off]')?'Enable step':'Disable step'}</button>${n.type!=='entry'?`<button class="btn sm outline" id="btn-delete-step" style="color:var(--bad)">Delete step</button>`:''}</div></div>`;
-  body.innerHTML=html;
+  html+=locked?'':`<div class="fld"><div class="row"><button class="btn sm outline" id="btn-disable">${n.label.startsWith('[off]')?'Enable step':'Disable step'}</button>${n.type!=='entry'?`<button class="btn sm outline" id="btn-delete-step" style="color:var(--bad)">Delete step</button>`:''}</div></div>`;
+  body.innerHTML=html; if(closed) body.querySelectorAll('input,select,textarea,button').forEach(el=>el.disabled=true);
   body.querySelectorAll('[data-k]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.k; if(k==='__label') n.label=el.value; else n.cfg[k]=el.value; if(k==='channel') n.cfg.content=contentsFor(el.value)[0]; if(k==='content'){ const id=String(el.value).split(' ·')[0]; n.cfg.text=contentTextOf(id); } renderCanvas(); if(el.tagName==='SELECT'&&(k==='offer'||k==='channel'||k==='variant'||k==='controlGroup'||k==='content'||k==='survey')) renderNodePanel(); }));
   body.querySelectorAll('[data-rule]').forEach(el=>el.onchange=()=>{ n.cfg.rules[el.dataset.rule][el.dataset.f]=el.checked; });
   body.querySelectorAll('[data-rk]').forEach(el=>el.onchange=()=>{ n.cfg[el.dataset.rk]=el.checked; renderNodePanel(); });
@@ -2181,7 +2241,7 @@ function renderNodePanel(){
   const bt=body.querySelector('#btn-addtest'); if(bt) bt.onclick=()=>{ n.cfg.tests.push('Test user '+(n.cfg.tests.length+1)); renderNodePanel(); };
   const bs=body.querySelector('#btn-testsend'); if(bs) bs.onclick=()=>toast('Test send',`${n.id} · ${String(n.cfg.content).split(' ·')[0]} rendered for ${n.cfg.tests.join(', ')} — test delivery is not enabled in this environment.`,'warn');
   const bd=body.querySelector('#btn-delete-step'); if(bd) bd.onclick=()=>deleteNode(n.id);
-  body.querySelector('#btn-disable').onclick=()=>{ n.label=n.label.startsWith('[off] ')?n.label.slice(6):'[off] '+n.label; renderCanvas(); renderNodePanel(); };
+  const bdis=body.querySelector('#btn-disable'); if(bdis) bdis.onclick=()=>{ n.label=n.label.startsWith('[off] ')?n.label.slice(6):'[off] '+n.label; renderCanvas(); renderNodePanel(); };
 }
 
 function buildPalette(){
@@ -2235,13 +2295,13 @@ function renderPolicies(){
 
 /* ---------- MONITOR ---------- */
 function renderMonitor(){
-  const jid=document.getElementById('msel').value||curJ; const j=JOURNEYS.find(x=>x.id===jid), S=sim[jid];
+  const jid=document.getElementById('msel').value||curJ; const j=mainCtx(jById(jid)), S=simOf(j);
   const parts=Object.values(S.parts); const n=parts.length, act=parts.filter(p=>p.status==='active').length, conv=parts.filter(p=>p.status==='converted').length, ex=parts.filter(p=>p.status==='exited'||p.status==='completed').length;
   document.getElementById('daypill').textContent=`Day ${day}`;
-  document.getElementById('mstats-title').textContent=`${j.id} · ${j.name} — v${j.version} · ${j.status}${j.activatedAt?' · activated '+j.activatedAt:''}`;
-  document.querySelector('#jtable tbody').innerHTML=JOURNEYS.map(x=>{ const ps=Object.values(sim[x.id].parts); const cls=(CAMP_STATUS_CLS[x.status]||''); const e=x.nodes[0].cfg; return `<tr class="row ${x.id===jid?'sel':''}" data-j="${x.id}"><td><b>${x.id}</b> · ${esc(x.name)}</td><td><span class="pill ${cls}">${x.status}</span></td><td class="num">v${x.version}</td><td class="num">${x.activatedAt||'—'}</td><td>${esc(e.mode)}${e.mode!=='Event only'?' · '+esc(String(e.segment).split(' · ')[0]):''}${e.mode!=='Segment only (scheduled)'?' · '+esc(e.events):''}</td><td class="num">${ps.length}</td><td class="num">${ps.filter(p=>p.status==='active').length}</td><td class="num">${ps.filter(p=>p.status==='converted').length}</td><td><button class="btn sm outline" data-act="${x.status==='Active'?'pause':'resume'}" data-j="${x.id}">${x.status==='Active'?'Pause':'Activate'}</button></td></tr>`; }).join('');
+  document.getElementById('mstats-title').textContent=`${j.jid} · ${j.name} — v${j.v} · ${j.status}${j.V.activatedAt?' · activated '+j.V.activatedAt:''}`;
+  document.querySelector('#jtable tbody').innerHTML=JOURNEYS.map(x=>{ const C=mainCtx(x), ps=Object.values(simOf(C).parts); const e=C.nodes[0].cfg; return `<tr class="row ${x.id===jid?'sel':''}" data-j="${x.id}"><td><b>${x.id}</b> · ${esc(x.name)}</td><td><span class="pill ${J_STATUS_CLS[jStatus(x)]}">${jStatus(x)}</span></td><td class="num">v${C.v} <span class="pill ${V_STATUS_CLS[C.status]}">${C.status}</span></td><td class="num">${fmtWhen(C.V.activatedAt)||'—'}</td><td>${esc(e.mode)}${e.mode!=='Event only'?' · '+esc(String(e.segment).split(' · ')[0]):''}${e.mode!=='Segment only (scheduled)'?' · '+esc(e.events):''}</td><td class="num">${ps.length}</td><td class="num">${ps.filter(p=>p.status==='active').length}</td><td class="num">${ps.filter(p=>p.status==='converted').length}</td><td><button class="btn sm outline" data-open="${x.id}">Open</button></td></tr>`; }).join('');
   document.querySelectorAll('#jtable tr.row').forEach(tr=>tr.onclick=e=>{ if(e.target.tagName==='BUTTON') return; document.getElementById('msel').value=tr.dataset.j; renderMonitor(); });
-  document.querySelectorAll('#jtable button[data-act]').forEach(b=>b.onclick=()=>{ const x=JOURNEYS.find(y=>y.id===b.dataset.j); if(b.dataset.act==='pause') pauseJourney(x); else activateJourney(x,false); });
+  document.querySelectorAll('#jtable button[data-open]').forEach(b=>b.onclick=()=>jOpen(b.dataset.open));
   document.getElementById('mstats').innerHTML=`<div class="stat"><div class="l">Participants</div><div class="v">${n}</div><div class="s">entered since day 0</div></div><div class="stat"><div class="l">Active now</div><div class="v">${act}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Goal reached</div><div class="v">${conv}</div><div class="s">${n?Math.round(conv/n*100):0}% conversion</div></div><div class="stat"><div class="l">Exited</div><div class="v">${ex}</div><div class="s">timeout / no conversion</div></div>`;
   document.getElementById('funnel').innerHTML=j.nodes.map(nd=>{ const c=parts.filter(p=>p.visited.has(nd.id)).length; return `<div class="frow"><div>${esc(nd.label)} <span class="mono" style="color:var(--ink-3)">${nd.id}</span></div><div class="bar"><i style="width:${n?c/n*100:0}%;background:var(--t-${nd.type}-i)"></i></div><div class="n">${c}</div></div>`; }).join('');
   const r=document.getElementById('ptime'); r.max=S.history.length-1; if(ptimeFollow||+r.value>+r.max) r.value=r.max;
@@ -2280,20 +2340,19 @@ document.getElementById('role-sel').onchange=e=>{ applyRole(e.target.value); };
 /* main menu collapse: icons stay, labels move to tooltips */
 document.querySelectorAll('.nav button .nl').forEach(l=>l.parentElement.title=l.textContent.trim());
 document.getElementById('btn-nav').onclick=()=>{ const app=document.querySelector('.app'); const closed=app.classList.toggle('nav-closed'); const b=document.getElementById('btn-nav'); b.classList.toggle('on',closed); b.title=closed?'Expand menu':'Collapse menu'; setTimeout(()=>{ if(document.getElementById('view-journeys').classList.contains('active')) fitView(); },170); };
-const jsel=document.getElementById('jsel'), msel=document.getElementById('msel');
-JOURNEYS.forEach(j=>{ jsel.add(new Option(`${j.id} · ${j.name}`,j.id)); msel.add(new Option(`${j.id} · ${j.name}`,j.id)); });
-jsel.onchange=()=>{ curJ=jsel.value; selNode=null; render(); fitView(); };
+const msel=document.getElementById('msel');
+JOURNEYS.forEach(j=>msel.add(new Option(`${j.id} · ${j.name}`,j.id)));
 const evName=document.getElementById('ev-name'), evCust=document.getElementById('ev-cust');
 BIZ_EVENTS.forEach(e=>evName.add(new Option(e,e))); CUSTOMERS.forEach(c=>evCust.add(new Option(`${c.id} · ${c.name} · ${c.seg} · churn ${c.attrs.churnRisk}`,c.id)));
 evName.value='balance_low'; evCust.value=CUSTOMERS[0].id;
 document.getElementById('btn-send-event').onclick=()=>sendEvent(evName.value,evCust.value);
 document.getElementById('btn-tick-j').onclick=tick;
 function renderReport(){
-  const j=JOURNEYS.find(x=>x.id===curJ), S=sim[j.id]; const parts=Object.entries(S.parts);
+  const j=curCtx(), S=simOf(j); const parts=Object.entries(S.parts);
   const rows=log.filter(l=>l.j===j.id).slice().reverse();
   const byEvent=parts.filter(([,p])=>p.enteredBy).length, conv=parts.filter(([,p])=>p.status==='converted').length, act=parts.filter(([,p])=>p.status==='active').length;
   const deliv=rows.filter(r=>r.kind==='delivered').length, nd=rows.filter(r=>r.kind==='not-delivered').length, rej=rows.filter(r=>r.kind==='entry-rejected').length;
-  document.getElementById('rep-sub').textContent=`${j.id} · ${j.name} · v${j.version}`;
+  document.getElementById('rep-sub').textContent=`${j.jid} · ${j.name} · v${j.v} · ${j.status}`;
   document.getElementById('rep-stats').innerHTML=`<div class="stat"><div class="l">Participants</div><div class="v">${parts.length}</div><div class="s">${byEvent} admitted by event · ${parts.length-byEvent} by segment</div></div><div class="stat"><div class="l">Active now</div><div class="v">${act}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Deliveries</div><div class="v">${deliv}</div><div class="s">${nd} not delivered</div></div><div class="stat"><div class="l">Goal reached</div><div class="v">${conv}</div><div class="s">${parts.length?Math.round(conv/parts.length*100):0}% conversion</div></div><div class="stat"><div class="l">Events rejected</div><div class="v">${rej}</div><div class="s">re-entry / concurrency rules</div></div>`;
   const resCls=k=>k==='delivered'||k==='goal'||k==='entry'?'ok':k==='not-delivered'||k==='entry-rejected'?'bad':k==='timeout'||k==='exit'?'':'acc';
   const resTxt=k=>({delivered:'Delivered','not-delivered':'Not delivered',goal:'Goal · BSS order',exit:'Exited',timeout:'Timeout',timer:'Timer elapsed',nbo:'Offer decided',event:'Event matched',entry:'Entered',"entry-rejected":'Rejected',offer:'Offer presented',condition:'Evaluated',external:'200 OK',call:'Started'})[k]||k;
@@ -2301,7 +2360,6 @@ function renderReport(){
   document.querySelector('#rep-table tbody').innerHTML=rows.map(r=>{ const n=node(j,r.node)||{label:'—',type:''}; const p=S.parts[r.cid]||{}; return `<tr><td class="num">d${String(r.d).padStart(2,'0')} · ${r.t||''}</td><td class="mono">${esc(r.cid||'')}</td><td>${p.enteredBy?`<span class="chip">${esc(p.enteredBy)}</span>`:'segment'}</td><td>${esc(n.label)} <span class="mono" style="color:var(--ink-3)">${r.node||''}</span></td><td>${esc((NODE_META[n.type]||{}).k||'')}</td><td>${esc(r.channel||'—')}</td><td><span class="pill ${resCls(r.kind)}">${esc(resTxt(r.kind))}</span>${r.opened?' <span class="chip">opened</span>':''}</td></tr>`; }).join('') || '<tr><td colspan="7" class="empty">No executions yet — send an event to admit a customer; timers and waits progress with "Advance 1 day".</td></tr>';
 }
 repModal=document.getElementById('rep-modal');
-document.getElementById('btn-report').onclick=()=>{ renderReport(); repModal.hidden=false; };
 document.getElementById('rep-close').onclick=document.getElementById('rep-close2').onclick=()=>{ repModal.hidden=true; };
 repModal.addEventListener('click',e=>{ if(e.target===repModal) repModal.hidden=true; });
 window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ repModal.hidden=true; const nl=document.getElementById('seg-nl-modal'); if(nl) nl.hidden=true; } });
@@ -2310,34 +2368,92 @@ document.getElementById('btn-pal').onclick=()=>{ document.getElementById('jb').c
 document.getElementById('btn-info').onclick=()=>{ document.getElementById('jsplit').classList.toggle('info-closed'); setTimeout(renderCanvas,160); };
 window.addEventListener('resize',()=>{ if(document.getElementById('view-journeys').classList.contains('active')) renderCanvas(); });
 msel.onchange=renderMonitor;
-document.getElementById('j-name').oninput=e=>{ JOURNEYS.find(x=>x.id===curJ).name=e.target.value; };
-document.getElementById('j-desc').oninput=e=>{ JOURNEYS.find(x=>x.id===curJ).desc=e.target.value; };
 document.getElementById('btn-tick').onclick=tick;
 document.getElementById('btn-tick5').onclick=()=>{ for(let i=0;i<5;i++) tick(); };
 document.getElementById('btn-reset').onclick=()=>{ initSim(); render(); };
 document.getElementById('ptime').oninput=()=>{ const r=document.getElementById('ptime'); ptimeFollow=(+r.value===+r.max); renderMonitor(); };
 document.getElementById('btn-clearlog').onclick=()=>{ log.length=0; renderMonitor(); };
 document.getElementById('btn-csv').onclick=()=>toast('Export','CSV export is not enabled in this environment — the participant list at the selected time would download here.','warn');
-document.getElementById('btn-validate').onclick=()=>{ const j=JOURNEYS.find(x=>x.id===curJ); const dangling=j.nodes.filter(n=>n.type!=='exit'&&n.next.length===0); if(dangling.length) toast('Validation',`${dangling.length} step(s) without an outgoing path: ${dangling.map(n=>n.label).join(', ')}.`,'warn'); else toast('Validation passed','Every path ends in an exit; the entry has a target audience or event; linked offers are Active.'); };
+document.getElementById('btn-validate').onclick=()=>{ const j=curCtx(); const r=jValidate(j), miss=r.items.filter(i=>!i.ok); if(miss.length) toast('Validation',miss.map(i=>i.l+(i.why?': '+i.why:'')).join(' · '),'warn'); else toast('Validation passed',`${r.total} checks green — v${j.v} can be activated.`); };
 document.getElementById('btn-del').onclick=()=>{ if(!selNode){ toast('Delete','Select a step first (click its header), then delete.','warn'); return; } deleteNode(selNode); };
 window.addEventListener('keydown',e=>{ if((e.key==='Delete'||e.key==='Backspace') && selNode && jMode==='canvas' && !e.target.closest('input,select,textarea') && document.getElementById('view-journeys').classList.contains('active')){ e.preventDefault(); deleteNode(selNode); } });
-function activateJourney(j,validate){
-  if(validate){ const dangling=j.nodes.filter(n=>n.type!=='exit'&&n.next.length===0); if(dangling.length){ toast('Cannot activate',`${dangling.length} step(s) have no outgoing path: ${dangling.map(n=>n.label).join(', ')}.`,'bad'); return; } }
-  const wasPaused=j.status==='Paused'; const republish=j.status==='Active'; if(republish) j.version=(j.version||1)+1; j.status='Active';
-  const d=new Date(); j.activatedAt=`${TODAY} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-  addLog('acc',`${j.id}  ${wasPaused?'resumed':'activated'} · v${j.version} · by ${DEMO_USERS.me} · entry: ${j.nodes[0].cfg.mode}${j.nodes[0].cfg.mode!=='Event only'?' · '+String(j.nodes[0].cfg.segment).split(' · ')[0]:''}`,{j:j.id,node:j.nodes[0].id,kind:'system'});
-  if(!wasPaused && j.nodes[0].cfg.mode!=='Event only'){ const S=sim[j.id]; let added=0; mlCustomers(j.nodes[0].cfg.segment).filter(c=>!excludedCids().has(c.cid)).forEach(c=>{ if(!S.parts[c.id]){ S.parts[c.id]={pos:nextIds(j.nodes[0]),status:'active',since:day,visited:new Set([j.nodes[0].id,...nextIds(j.nodes[0])]),opened:null,offers:[],timers:{}}; added++; runNow(j,S,c.id); } }); if(added) addLog('ok',`${j.id}  ${added} customer(s) admitted from ${String(j.nodes[0].cfg.segment).split(' · ')[0]} on activation — immediate steps executed`,{j:j.id,node:j.nodes[0].id,kind:'entry'}); S.history[S.history.length-1]=snapshot(S.parts); }
-  if(jsel.value===j.id) jsel.options[jsel.selectedIndex].text=`${j.id} · ${j.name}`;
-  render();
-  toast(wasPaused?`Resumed · ${j.id}`:`Activated · ${j.id} v${j.version}`, wasPaused?'The journey admits events again.':republish?`Previous version v${j.version-1} is kept for rollback. Status and activation time are visible in Journey Monitor.`:'First activation — the journey now admits customers from its entry rule. See Journey Monitor for status and activation time.');
+/* ---- version lifecycle ---- */
+function activateVersion(j,V){
+  const C=ctxOf(j,V); if(!jCanAct()){ toast('Approver needed','Only an approver or an admin activates a version.','warn'); return; }
+  if(V.status!=='Draft'){ toast('Not a draft',`v${V.v} is ${V.status}. Only a Draft version can be activated.`,'warn'); return; }
+  const r=jValidate(C); const miss=r.items.filter(i=>!i.ok); if(miss.length){ toast('Cannot activate',`Fix the validation first: ${miss.map(i=>i.l+(i.why?' ('+i.why+')':'')).join('; ')}.`,'bad'); return; }
+  const prev=jActive(j); if(prev){ prev.status='Closing'; prev.closingAt=stamp(); addLog('warn',`${j.id}@${prev.v}  closing — v${V.v} activated; contacts inside finish their steps, no new entries`,{j:j.id+'@'+prev.v,node:prev.nodes[0].id,kind:'system'}); }
+  V.status='Active'; V.activatedAt=stamp(); V.activatedBy=DEMO_USERS.me; j.updated=TODAY; j.cur=V.v;
+  addLog('acc',`${C.id}  activated · by ${DEMO_USERS.me} · entry: ${C.nodes[0].cfg.mode}${C.nodes[0].cfg.mode!=='Event only'?' · '+String(C.nodes[0].cfg.segment).split(' · ')[0]:''}`,{j:C.id,node:C.nodes[0].id,kind:'system'});
+  if(C.nodes[0].cfg.mode!=='Event only'){ const S=simOf(C); let added=0; mlCustomers(C.nodes[0].cfg.segment).filter(c=>!excludedCids().has(c.cid)).forEach(c=>{ if(!S.parts[c.id]){ S.parts[c.id]={pos:nextIds(C.nodes[0]),status:'active',since:day,visited:new Set([C.nodes[0].id,...nextIds(C.nodes[0])]),opened:null,offers:[],timers:{}}; added++; runNow(C,S,c.id); } }); if(added) addLog('ok',`${C.id}  ${added} customer(s) admitted from ${String(C.nodes[0].cfg.segment).split(' · ')[0]} on activation — immediate steps executed`,{j:C.id,node:C.nodes[0].id,kind:'entry'}); S.history[S.history.length-1]=snapshot(S.parts); }
+  autoClose(); render();
+  toast(`Activated · ${j.id} v${V.v}`, prev?`v${prev.v} is now Closing: no new entries, the contacts inside finish their steps, and it closes itself when empty.`:'First activation — the version admits contacts from its entry rule. Structure is locked from now on; step content stays editable.');
 }
-function pauseJourney(j){ j.status='Paused'; addLog('warn',`${j.id}  paused · v${j.version} · by ${DEMO_USERS.me} — active customers keep their state, no new entries or sends`,{j:j.id,node:j.nodes[0].id,kind:'system'}); render(); toast(`Paused · ${j.id}`,'Events for this journey are ignored until it is activated again.','warn'); }
-document.getElementById('btn-activate').onclick=()=>activateJourney(JOURNEYS.find(x=>x.id===curJ),true);
-document.getElementById('btn-pause').onclick=()=>{ const j=JOURNEYS.find(x=>x.id===curJ); if(j.status==='Paused') activateJourney(j,false); else pauseJourney(j); };
+function stopVersion(j,V,mode){
+  if(!jCanAct()){ toast('Approver needed','Only an approver or an admin stops a version.','warn'); return; }
+  if(V.status!=='Active'&&V.status!=='Closing'){ toast('Nothing to stop',`v${V.v} is ${V.status}.`,'warn'); return; }
+  const C=ctxOf(j,V), S=simOf(C); j.updated=TODAY;
+  if(mode==='closed'){ let n=0; Object.values(S.parts).forEach(p=>{ if(p.status==='active'){ p.status='exited'; p.pos=[]; n++; } }); V.status='Closed'; V.closedAt=stamp(); S.history[S.history.length-1]=snapshot(S.parts);
+    addLog('warn',`${C.id}  closed by ${DEMO_USERS.me} — ${n} contact(s) removed from the version`,{j:C.id,node:C.nodes[0].id,kind:'system'}); toast(`Closed · ${j.id} v${V.v}`,`${n} contact(s) inside were released. A Closed version cannot be reactivated — copy it to a new version instead.`,'warn'); }
+  else { V.status='Closing'; V.closingAt=stamp(); addLog('warn',`${C.id}  closing by ${DEMO_USERS.me} — no new entries, ${Object.values(S.parts).filter(p=>p.status==='active').length} contact(s) finish their steps`,{j:C.id,node:C.nodes[0].id,kind:'system'}); toast(`Closing · ${j.id} v${V.v}`,'No new entries. Contacts inside finish their steps; the version closes itself when empty.','warn'); }
+  autoClose(); render();
+}
+function copyVersion(j,V){ const nv=Math.max(...j.versions.map(x=>x.v))+1; const N={v:nv,status:'Draft',createdAt:stamp(),from:V.v,nodes:JSON.parse(JSON.stringify(V.nodes))}; j.versions.push(N); j.cur=nv; j.updated=TODAY; selNode=null; initVersionSim(j,N); addLog('',`${j.id}@${nv}  draft created from v${V.v}`,{j:j.id+'@'+nv,node:N.nodes[0].id,kind:'system'}); render(); toast(`v${nv} · Draft`,`A copy of v${V.v}. Edit the structure freely, then Activate — v${jActive(j)?jActive(j).v+' goes to Closing':'—'} when you do.`); return N; }
+/* version bar on top of the canvas */
+const fmtWhen=t=>t?String(t).replace(TODAY,'today'):'';
+function renderVersionBar(C,active,conv){
+  const j=C.j, V=C.V, bar=document.getElementById('vbar'); const live=V.status==='Active'||V.status==='Closing';
+  if(bar.querySelector('.pop:not([hidden])')) return; // a menu is open: the 1 s canvas refresh must not rebuild the bar under it
+  const vopt=j.versions.slice().reverse().map(x=>`<option value="${x.v}" ${x.v===V.v?'selected':''}>v${x.v} · ${x.status}${x.activatedAt?' · '+fmtWhen(x.activatedAt):''}</option>`).join('');
+  const who=V.status==='Draft'?`created ${fmtWhen(V.createdAt||j.created)}${V.from?' from v'+V.from:''}`:`activated by ${esc(V.activatedBy||'—')} · ${fmtWhen(V.activatedAt)}${V.status==='Closing'?' · closing since '+fmtWhen(V.closingAt):V.status==='Closed'?' · closed '+fmtWhen(V.closedAt):''}`;
+  bar.innerHTML=`<button class="btn sm outline" id="btn-jback" style="white-space:nowrap">‹ Journey list</button>
+    <span class="vb-name" title="${esc(j.desc||'')}"><b>${esc(j.name)}</b> <span class="mono" style="color:var(--ink-3)">${j.id}</span> <span class="pill ${J_STATUS_CLS[jStatus(j)]}">${jStatus(j)}</span></span>
+    <span class="vb-sep"></span>
+    <label for="vsel" style="color:var(--ink-2)">Version</label><select id="vsel" class="btn sm outline" style="background:#fff">${vopt}</select>
+    <span class="pill ${V_STATUS_CLS[V.status]}" data-tour="v-status">${V.status}</span><span class="vb-who">${who}</span>
+    ${live?`<span class="pill acc">${active} inside · ${conv} converted</span>`:''}
+    <div class="grow"></div>
+    ${V.status==='Draft'?`<button class="btn sm primary" id="btn-activate" ${jCanAct()?'':'disabled title="Only an approver or an admin activates a version"'}>Activate</button>`:''}
+    ${live?`<span class="dm-menu"><button class="btn sm outline" id="btn-stop" ${jCanAct()?'':'disabled title="Only an approver or an admin stops a version"'}>Stop ▾</button><div class="pop" hidden><button data-stop="closing" ${V.status==='Closing'?'disabled':''}>Closing — no new entries, contacts finish</button><button data-stop="closed" class="danger">Closed — release everyone now</button></div></span>`:''}
+    <button class="btn sm outline" id="btn-copyv" title="New Draft version with these steps">Copy to new version</button>
+    <span class="dm-menu"><button class="btn sm outline" id="btn-test">Test ▾</button><div class="pop" hidden><button data-test="count">Count matches of the entry</button><button data-test="first">Show first 10 matching contacts</button><button data-test="send">Test send every Delivery to the test users</button></div></span>
+    <button class="btn sm outline" id="btn-report">Execution report</button>`;
+  const q=x=>bar.querySelector(x);
+  q('#btn-jback').onclick=jToList;
+  q('#vsel').onchange=e=>{ j.cur=+e.target.value; selNode=null; render(); fitView(); };
+  const ba=q('#btn-activate'); if(ba) ba.onclick=()=>activateVersion(j,V);
+  q('#btn-copyv').onclick=()=>copyVersion(j,V);
+  q('#btn-report').onclick=()=>{ renderReport(); repModal.hidden=false; };
+  bar.querySelectorAll('.dm-menu > .btn').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const pop=b.nextElementSibling, was=!pop.hidden; document.querySelectorAll('.dm-menu .pop').forEach(p=>p.hidden=true); pop.hidden=was; if(!was){ const r=b.getBoundingClientRect(); pop.style.left=Math.max(8,Math.min(r.left,innerWidth-pop.offsetWidth-8))+'px'; pop.style.top=(r.bottom+4)+'px'; } });
+  bar.querySelectorAll('[data-stop]').forEach(b=>b.onclick=()=>{ b.closest('.pop').hidden=true; stopVersion(j,V,b.dataset.stop); });
+  bar.querySelectorAll('[data-test]').forEach(b=>b.onclick=()=>{ b.closest('.pop').hidden=true; jTest(C,b.dataset.test); });
+}
+/* Test actions (mock): entry match count, first 10 contacts, test send */
+function jTest(C,what){ const e=C.nodes[0].cfg; const pool=e.mode==='Event only'?[]:mlCustomers(e.segment).filter(c=>!excludedCids().has(c.cid));
+  if(what==='count') toast('Entry match count',e.mode==='Event only'?`Event entry (${e.events}) — contacts enter when the event arrives; nothing to count up front.`:`${pool.length} contact(s) match ${String(e.segment).split(' · ')[0]} right now, after exclusion lists.`);
+  else if(what==='first') toast('First matching contacts',pool.length?pool.slice(0,10).map(c=>c.id+' · '+c.name).join(', '):'No contact matches the entry right now.');
+  else { const ds=C.nodes.filter(n=>n.type==='delivery'); toast('Test send',`${ds.length} Delivery step(s) rendered for ${C.j.testUsers.join(', ')} — test delivery is not enabled in this environment.`,'warn'); } }
+document.addEventListener('click',e=>{ if(!e.target.closest('.dm-menu')) document.querySelectorAll('#vbar .dm-menu .pop').forEach(p=>p.hidden=true); });
+/* journey settings live on the right panel, above the step details */
+function renderJSettings(){ const j=jById(curJ), box=document.getElementById('jset-body'); if(!box||!j) return;
+  const sel=(k,label,opts,fmt)=>`<div class="fld"><label for="js-${k}">${label}</label><select id="js-${k}" data-js="${k}">${opts.map(o=>{ const [v,l]=Array.isArray(o)?o:[o,o]; return `<option value="${esc(v)}" ${String(j[k])===String(v)?'selected':''}>${esc(l)}</option>`; }).join('')}</select></div>`;
+  box.innerHTML=`<div class="fld"><label class="req" for="js-name">Name</label><input id="js-name" data-js="name" value="${esc(j.name)}"></div>
+    <div class="fld"><label for="js-desc">Description</label><input id="js-desc" data-js="desc" value="${esc(j.desc||'')}" placeholder="What this journey does, for your team"></div>
+    <div class="js-2">${sel('folder','Folder (project)',FOLDERS)}${sel('phase','Lifecycle phase',PHASES)}</div>
+    <div class="js-2"><div class="fld"><label for="js-priority">Priority <span style="color:var(--ink-3)">1–100</span></label><input id="js-priority" data-js="priority" type="number" min="1" max="100" value="${j.priority}"></div>
+      <div class="fld"><label for="js-endDate">End date</label><input id="js-endDate" data-js="endDate" type="date" value="${j.endDate||''}"></div></div>
+    ${sel('expiryAction','At the end date',EXPIRY_ACTIONS)}
+    <label class="ck"><input type="checkbox" id="js-ignoreUnsub" ${j.ignoreUnsub?'checked':''}> Ignore unsubscribe <span class="tip" data-tip="Service messages only. When on, each Delivery step still has to confirm 'send even if unsubscribed' on its own.">i</span></label>
+    <div class="sec">Test users</div><div class="chips">${j.testUsers.map((t,i)=>`<span class="chip">${esc(t)} <a data-tu-del="${i}" title="Remove" style="cursor:pointer;color:var(--ink-3)">×</a></span>`).join('')}<button class="btn sm outline" id="js-tu-add">+ Add</button></div>`;
+  box.querySelectorAll('[data-js]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.js; j[k]=k==='priority'?Math.max(1,Math.min(100,+el.value||1)):el.value; j.updated=TODAY; if(k==='name'||k==='folder'||k==='phase') renderCanvas(); }));
+  box.querySelector('#js-ignoreUnsub').onchange=e=>{ if(e.target.checked&&!confirm('Ignore unsubscribe is for service messages only. Every Delivery step of this journey will ask you to confirm "send even if unsubscribed" separately. Turn it on?')){ e.target.checked=false; return; } j.ignoreUnsub=e.target.checked; renderNodePanel(); };
+  box.querySelector('#js-tu-add').onclick=()=>{ const t=prompt('Test user (name or MSISDN):',''); if(t&&t.trim()){ j.testUsers.push(t.trim()); renderJSettings(); } };
+  box.querySelectorAll('[data-tu-del]').forEach(a=>a.onclick=()=>{ j.testUsers.splice(+a.dataset.tuDel,1); renderJSettings(); });
+}
 /* ---------- create / list journeys ---------- */
 function nextJourneyId(){ return 'JRN-'+(Math.max(...JOURNEYS.map(j=>parseInt(j.id.slice(4))||0))+1); }
-function initJourneySim(j){ const parts={}; if(j.nodes[0].cfg.mode!=='Event only'&&j.status==='Active') mlCustomers(j.nodes[0].cfg.segment).filter(c=>!excludedCids().has(c.cid)).forEach(c=>{ parts[c.id]={pos:nextIds(j.nodes[0]),status:'active',since:day,visited:new Set([j.nodes[0].id,...nextIds(j.nodes[0])]),opened:null,offers:[],timers:{}}; }); sim[j.id]={parts,history:[snapshot(parts)]}; }
-function registerJourney(j){ JOURNEYS.push(j); initJourneySim(j); jsel.add(new Option(`${j.id} · ${j.name}`,j.id)); msel.add(new Option(`${j.id} · ${j.name}`,j.id)); }
+function initVersionSim(j,V){ const C=ctxOf(j,V); const S={parts:{},history:[]}; S.history.push(snapshot(S.parts)); sim[C.id]=S; }
+function registerJourney(j){ JOURNEYS.push(j); j.versions.forEach(V=>initVersionSim(j,V)); msel.add(new Option(`${j.id} · ${j.name}`,j.id)); }
 function journeyTemplate(tpl,mode,seg,ev){
   const E=(x,y,next)=>({id:'e1',type:'entry',x,y,label:'Entry',cfg:{segment:seg,events:ev,mode},next});
   if(tpl==='renewal') return [E(53,245,['s2']),
@@ -2356,18 +2472,17 @@ function journeyTemplate(tpl,mode,seg,ev){
    Journey Builder opens on a list, like Campaign (decision J1): campaign and journey are equal
    top-level entities and a journey estate has to be searchable. The canvas opens when a journey is
    opened or created. Creation uses the same centred screen as campaigns (decision J2). */
-let jMode='list', jQ='', jStatusF='All', jAdv=false, jPage=1, jFitFor=null;
-const jFilter={program:'',trigger:'',channel:'',owner:'',datamart:'',from:'',to:''};
-const J_STATUSES=['Draft','Active','Paused','Ended'];
-function jTrigger(j){ const e=j.nodes[0].cfg, seg=String(e.segment||'').split(' · ').slice(1).join(' · ')||String(e.segment||''), ev=Array.isArray(e.events)?e.events.join(', '):String(e.events||'');
+let jMode='list', jQ='', jStatusF='All', jPage=1, jFitFor=null, jSel=new Set();
+const jFilter={folder:'',phase:'',trigger:''};
+const J_STATUSES=['Draft','Live','Past'];
+function jTrigger(j){ const e=jMainV(j).nodes[0].cfg, seg=String(e.segment||'').split(' · ').slice(1).join(' · ')||String(e.segment||''), ev=Array.isArray(e.events)?e.events.join(', '):String(e.events||'');
   if(e.mode==='Event only') return {k:'Event',sub:ev||'no event set'};
   if(e.mode==='Segment only (scheduled)') return {k:'Schedule',sub:`${seg}${e.schedule?' · '+e.schedule:''}`};
   return {k:'Segment entry',sub:seg+(ev?' · '+ev:'')}; }
-const jChannels=j=>[...new Set(j.nodes.filter(n=>n.type==='delivery').flatMap(n=>String(n.cfg.channel||'').startsWith('Preferred')?['push','sms','email']:[n.cfg.channel]).filter(Boolean))];
-const jDatamart=j=>{ const e=j.nodes[0].cfg; if(e.mode==='Event only') return 'Event DataMart'; const m=mlByLabel(e.segment); return m&&m.dm==='Event'?'Event DataMart':'Main DataMart'; };
-function jStats(j){ const ps=Object.values((sim[j.id]||{parts:{}}).parts); const conv=ps.filter(p=>p.status==='converted').length; return {inside:ps.filter(p=>p.status==='active').length,entered:ps.length,conv}; }
-/* the journey's Validate result, shown per row the way the campaign list shows readiness */
-function jValidate(j){ const ids=new Set(j.nodes.map(n=>n.id)), e=j.nodes[0].cfg, seen=new Set(), stack=[j.nodes[0].id];
+/* entered (30 d) = contacts admitted into any version; the Monitor shows the per-version split */
+function jStats(j){ let inside=0, entered=0, conv=0; j.versions.forEach(V=>{ const ps=Object.values((sim[j.id+'@'+V.v]||{parts:{}}).parts); entered+=ps.length; inside+=ps.filter(p=>p.status==='active').length; conv+=ps.filter(p=>p.status==='converted').length; }); return {inside,entered,conv}; }
+const jLastActivated=j=>j.versions.filter(v=>v.activatedAt).map(v=>v.activatedAt).sort().pop()||'';
+function jValidate(j){ if(j.versions) j=mainCtx(j); const ids=new Set(j.nodes.map(n=>n.id)), e=j.nodes[0].cfg, seen=new Set(), stack=[j.nodes[0].id];
   while(stack.length){ const id=stack.pop(); if(seen.has(id)) continue; seen.add(id); const n=node(j,id); if(n) nextIds(n).forEach(x=>ids.has(x)&&stack.push(x)); }
   const dangling=j.nodes.filter(n=>n.type!=='exit'&&n.next.length===0), noContent=j.nodes.filter(n=>n.type==='delivery'&&!String(n.cfg.content||'').trim());
   const badOffers=j.nodes.filter(n=>n.type==='offer'&&n.cfg.offer&&!(OFFERS.find(o=>o.id===String(n.cfg.offer).split(' ')[0])||{status:'Active'}).status.startsWith('Active'));
@@ -2380,66 +2495,68 @@ function jValidate(j){ const ids=new Set(j.nodes.map(n=>n.id)), e=j.nodes[0].cfg
   return {items,done:items.filter(i=>i.ok).length,total:items.length}; }
 function jValidHtml(j){ const r=jValidate(j), pct=Math.round(100*r.done/r.total), miss=r.items.filter(i=>!i.ok);
   return `<span class="mini" title="${esc(miss.length?miss.map(i=>'✕ '+i.l+(i.why?': '+i.why:'')).join(' · '):'Validation passed — every check is green')}"><i><b style="width:${pct}%"></b></i>${miss.length?'⚠ ':'✓ '}${r.done}/${r.total}</span>`; }
-const jCanAct=()=>ROLE==='approver'||ROLE==='admin';
 function jFiltered(){ const q=jQ.toLowerCase(), f=jFilter;
-  return JOURNEYS.filter(j=>(jStatusF==='All'||j.status===jStatusF)&&(!q||(j.id+' '+j.name).toLowerCase().includes(q))
-    &&(!f.trigger||jTrigger(j).k===f.trigger)&&(!f.channel||jChannels(j).includes(f.channel))
-    &&(!f.owner||j.createdBy===f.owner)&&(!f.datamart||jDatamart(j)===f.datamart)&&(!f.from||(j.updated||j.created)>=f.from)&&(!f.to||(j.updated||j.created)<=f.to)); }
+  return JOURNEYS.filter(j=>(jStatusF==='All'||jStatus(j)===jStatusF)&&(!q||(j.id+' '+j.name+' '+(j.desc||'')).toLowerCase().includes(q))
+    &&(!f.folder||j.folder===f.folder)&&(!f.phase||j.phase===f.phase)&&(!f.trigger||jTrigger(j).k===f.trigger)); }
 
 /* open a journey on the canvas; the first time a journey is shown it is fitted, later visits keep the pan and zoom */
-function jOpen(id,nodeId){ if(!JOURNEYS.some(j=>j.id===id)) return; curJ=id; selNode=nodeId||null; jsel.value=id; jMode='canvas';
+function jOpen(id,nodeId,v){ const j=jById(id); if(!j) return; curJ=id; if(v) j.cur=v; else if(!jVer(j,j.cur)) j.cur=jMainV(j).v; selNode=nodeId||null; jMode='canvas';
   if(curView!=='journeys') showView('journeys'); else render();
-  if(jFitFor!==id){ jFitFor=id; fitView(); setTimeout(fitView,200); } }
+  if(jFitFor!==id+'@'+j.cur){ jFitFor=id+'@'+j.cur; fitView(); setTimeout(fitView,200); } }
 function jToList(){ jMode='list'; if(curView!=='journeys') showView('journeys'); else render(); }
-function jCreate(){ jMode='create'; jcc={name:'',desc:'',trig:'event',ev:'balance_low',seg:(MLS.find(m=>!m.excl)?mlLabel(MLS.find(m=>!m.excl)):''),sched:'Daily · 10:00'}; if(curView!=='journeys') showView('journeys'); else render(); }
-function jCopy(id){ const src=JOURNEYS.find(x=>x.id===id); const j=JSON.parse(JSON.stringify(src)); j.id=nextJourneyId(); j.name=src.name+' (copy)'; j.status='Draft'; j.version=1; delete j.activatedAt; j.created=TODAY; j.updated=TODAY; j.createdBy=DEMO_USERS.me; registerJourney(j); toast(`Copied · ${j.id}`,`${j.name} created as Draft v1.`); jOpen(j.id); }
+function jCreate(){ jMode='create'; jcc={name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],trig:'event',ev:'balance_low',seg:(MLS.find(m=>!m.excl)?mlLabel(MLS.find(m=>!m.excl)):''),sched:'Daily · 10:00'}; if(curView!=='journeys') showView('journeys'); else render(); }
+/* Duplicate = a new journey whose v1 Draft is a copy of the source's main version */
+function jCopy(id,folder){ const src=jById(id); const V=jMainV(src); const j=jBlank({id:nextJourneyId(),name:src.name+' (copy)',desc:src.desc,folder:folder||src.folder,phase:src.phase,priority:src.priority,endDate:src.endDate,expiryAction:src.expiryAction,ignoreUnsub:src.ignoreUnsub,testUsers:[...src.testUsers],entry:Object.assign({},src.entry),exit:Object.assign({},src.exit),versions:[{v:1,status:'Draft',createdAt:stamp(),nodes:JSON.parse(JSON.stringify(V.nodes))}],cur:1}); registerJourney(j); return j; }
 
 function renderJourneysView(){ const lc=document.getElementById('jl-card'), sp=document.getElementById('jsplit'); if(!lc||!sp) return;
   sp.hidden=jMode!=='canvas'; lc.hidden=jMode==='canvas';
   if(curView==='journeys') setCrumb(jMode==='canvas'?curJ:jMode==='create'?'New journey':'');
   if(jMode==='list') renderJList(lc); else if(jMode==='create') renderJCreate(lc); }
 
+/* Lifecycle coverage: which phases have a live journey — the demo's "where are the gaps" strip */
+function coverageHtml(){ const live=JOURNEYS.filter(j=>jStatus(j)==='Live');
+  return `<div class="cover" data-tour="coverage"><div class="cv-l">Lifecycle coverage<small>live journeys per phase</small></div>${PHASES.map(p=>{ const n=live.filter(j=>j.phase===p).length, all=JOURNEYS.filter(j=>j.phase===p).length; return `<button class="cv ${n?'':'gap'} ${jFilter.phase===p?'on':''}" data-cvp="${p}" title="${n} live · ${all} in total — click to filter"><b>${n}</b><span>${p}</span>${n?'':'<em>no live journey</em>'}</button>`; }).join('')}</div>`; }
 function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, pages=Math.max(1,Math.ceil(rows.length/per)); if(jPage>pages) jPage=pages; const page=rows.slice((jPage-1)*per,jPage*per);
-  const owners=[...new Set(JOURNEYS.map(j=>j.createdBy).filter(Boolean))], chans=[...new Set(JOURNEYS.flatMap(jChannels))];
   const chip=(v)=>`<button class="fchip ${jStatusF===v?'on':''}" data-jst="${v}">${v}</button>`;
-  const sel=(k,label,opts)=>`<div class="fld"><label for="jf-${k}">${label}</label><select id="jf-${k}" data-jf="${k}"><option value="">Any</option>${opts.map(o=>{ const [v,l]=Array.isArray(o)?o:[o,o]; return `<option value="${esc(v)}" ${f[k]===v?'selected':''}>${esc(l)}</option>`; }).join('')}</select></div>`;
-  card.innerHTML=`<div class="card-h"><h2>Journey List</h2><div class="grow"></div><button class="btn primary sm" id="jl-new" style="white-space:nowrap">+ New journey</button>
-      <p>Journey = an entry (event, segment or schedule) + steps a customer moves through over time. Customers inside, entered and converted come from the journey simulation (day ${day}); in the product they are live.</p></div>
+  const sel=(k,label,opts)=>`<select data-jf="${k}" aria-label="${label}"><option value="">${label}: any</option>${opts.map(o=>`<option value="${esc(o)}" ${f[k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  const selN=jSel.size;
+  card.innerHTML=`<div class="card-h"><h2>Journeys</h2><div class="grow"></div><button class="btn primary sm" id="jl-new" style="white-space:nowrap">+ New journey</button>
+      <p>A journey is a container; its steps live in a version. Draft → Active → Closing → Closed per version; a journey is Live while a version is Active or Closing.</p></div>
+    ${coverageHtml()}
     <div class="toolrow" style="gap:8px">
-      <div class="search-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="jl-q" placeholder="Search by name or journey ID" value="${esc(jQ)}" aria-label="Search journeys"></div>
+      <div class="search-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="jl-q" placeholder="Search by name, description or journey ID" value="${esc(jQ)}" aria-label="Search journeys"></div>
       <div class="chipbar"><span style="color:var(--ink-3);font-size:11px">STATUS</span>${chip('All')}${J_STATUSES.map(chip).join('')}</div>
-      <button class="btn sm outline" id="jl-adv">${jAdv?'Hide':'Advanced'} filters</button>
+      ${sel('folder','Folder',FOLDERS)}${sel('phase','Phase',PHASES)}${sel('trigger','Entry type',['Event','Segment entry','Schedule'])}
       <span class="kpi"><b>${rows.length}</b> journeys</span>
     </div>
-    ${jAdv?`<div class="adv">
-      ${sel('trigger','Trigger type',['Event','Segment entry','Schedule'])}
-      ${sel('channel','Channel in a delivery step',chans.map(c=>[c,chName(c)]))}
-      ${sel('owner','Owner',owners)}
-      ${sel('datamart','Datamart',['Main DataMart','Event DataMart'])}
-      <div class="fld"><label for="jf-from">Updated from</label><input type="date" id="jf-from" data-jf="from" value="${f.from}"></div>
-      <div class="fld"><label for="jf-to">Updated to</label><input type="date" id="jf-to" data-jf="to" value="${f.to}"></div>
-    </div>`:''}
+    ${selN?`<div class="bulk"><b>${selN} selected</b><button class="btn sm outline" id="jl-bdup">Duplicate</button><label>Move to folder <select id="jl-bmove"><option value="">choose…</option>${FOLDERS.map(x=>`<option>${esc(x)}</option>`).join('')}</select></label><button class="btn sm outline" id="jl-bclear">Clear selection</button></div>`:''}
     <div class="padx" style="overflow:auto">
-    <table class="tbl" id="jl-table"><thead><tr><th>Journey</th><th>Status</th><th>Validation</th><th>Trigger</th><th class="num">Steps</th><th class="num">Version</th><th class="num" title="Customers currently inside the journey">Inside</th><th class="num">Entered</th><th class="num" title="Customers who reached the journey's goal">Conv.</th><th class="num">Conv. rate</th><th>Updated · owner</th><th>Actions</th></tr></thead>
-    <tbody>${page.map(j=>{ const t=jTrigger(j), s=jStats(j), can=jCanAct(), pr=j.status==='Active'||j.status==='Paused';
-      return `<tr class="row ${j.id===curJ&&jMode==='list'?'':''}" data-jid="${j.id}"><td><span class="lnk">${esc(j.name)}</span><br><span style="color:var(--ink-3);font-size:11px"><span class="mono">${j.id}</span></span></td>
-        <td>${statusPill(j.status)}</td><td>${jValidHtml(j)}</td>
-        <td><b style="font-weight:500">${t.k}</b><br><span style="color:var(--ink-3);font-size:11px">${esc(t.sub)}</span></td>
-        <td class="num">${j.nodes.length}</td><td class="num">v${j.version||1}</td><td class="num">${s.inside}</td><td class="num">${s.entered}</td><td class="num">${s.conv}</td><td class="num">${s.entered?Math.round(1000*s.conv/s.entered)/10+'%':'—'}</td>
-        <td class="num" style="white-space:nowrap">${j.updated||j.created||'—'}<br><span style="color:var(--ink-3)" title="Owner">${esc(j.createdBy||'—')}</span></td>
+    <table class="tbl" id="jl-table"><thead><tr><th style="width:28px"><input type="checkbox" id="jl-all" aria-label="Select all on this page" ${page.length&&page.every(j=>jSel.has(j.id))?'checked':''}></th><th>Journey</th><th>Folder</th><th>Phase</th><th>Status</th><th>Active version</th><th class="num" title="Contacts admitted in the last 30 days">Entered (30d)</th><th>Last activated</th><th>Actions</th></tr></thead>
+    <tbody>${page.map(j=>{ const t=jTrigger(j), s=jStats(j), st=jStatus(j), A=jActive(j), cl=j.versions.filter(v=>v.status==='Closing'), D=j.versions.filter(v=>v.status==='Draft');
+      return `<tr class="row" data-jid="${j.id}"><td><input type="checkbox" data-jsel="${j.id}" ${jSel.has(j.id)?'checked':''} aria-label="Select ${esc(j.name)}"></td>
+        <td><span class="lnk">${esc(j.name)}</span><br><span style="color:var(--ink-3);font-size:11px"><span class="mono">${j.id}</span> · ${t.k}${t.sub?' · '+esc(t.sub):''}</span></td>
+        <td><span class="chip">${esc(j.folder)}</span></td><td>${esc(j.phase)}</td>
+        <td><span class="pill ${J_STATUS_CLS[st]}">${st}</span></td>
+        <td>${A?`<b>v${A.v}</b>`:'<span style="color:var(--ink-3)">—</span>'}${cl.length?` <span class="pill warn" title="Closing: no new entries, contacts finish">v${cl.map(v=>v.v).join(', v')} closing</span>`:''}${D.length?` <span class="pill grey">v${D.map(v=>v.v).join(', v')} draft</span>`:''}</td>
+        <td class="num">${s.entered}${s.inside?` <span style="color:var(--ink-3);font-size:11px">· ${s.inside} inside</span>`:''}</td>
+        <td class="num" style="white-space:nowrap">${fmtWhen(jLastActivated(j))||'—'}</td>
         <td><span class="act"><button class="btn sm outline" data-jopen="${j.id}">Open</button><span class="dm-menu"><button class="btn sm outline" data-jmore="${j.id}" aria-haspopup="true" title="More actions">More ▾</button>
-          <div class="pop" hidden><button data-jmon="${j.id}">Monitor</button><button data-jrep="${j.id}">Execution report</button><button data-jcopy="${j.id}">Copy</button>
-          ${pr?`<hr><button data-jpause="${j.id}" ${can?'':'disabled title="Only an approver or an admin can pause or resume a journey"'}>${j.status==='Paused'?'Resume':'Pause'}</button>`:''}</div></span></span></td></tr>`; }).join('')
-      ||`<tr><td colspan="12" class="empty">No journey matches that. Clear the filters, or start a new one — the canvas opens with the entry step in place.<div style="margin-top:10px;display:flex;gap:8px;justify-content:center"><button class="btn sm outline" id="jl-clear">Clear filters</button><button class="btn sm primary" id="jl-new2">+ New journey</button></div></td></tr>`}</tbody></table></div>
+          <div class="pop" hidden><button data-jmon="${j.id}">Monitor</button><button data-jrep="${j.id}">Execution report</button><button data-jcopy="${j.id}">Duplicate</button><hr>${FOLDERS.filter(x=>x!==j.folder).map(x=>`<button data-jmove="${j.id}" data-to="${esc(x)}">Move to ${esc(x)}</button>`).join('')}</div></span></span></td></tr>`; }).join('')
+      ||`<tr><td colspan="9" class="empty">No journey matches that. Clear the filters, or start a new one — the canvas opens with the entry step in place.<div style="margin-top:10px;display:flex;gap:8px;justify-content:center"><button class="btn sm outline" id="jl-clear">Clear filters</button><button class="btn sm primary" id="jl-new2">+ New journey</button></div></td></tr>`}</tbody></table></div>
     <div class="pager">${Array.from({length:pages},(_,i)=>`<button class="${i+1===jPage?'on':''}" data-jp="${i+1}">${i+1}</button>`).join('')}</div>`;
   const q=s=>card.querySelector(s);
   q('#jl-q').oninput=e=>{ jQ=e.target.value; jPage=1; const v=jQ; renderJList(card); const i=q('#jl-q'); i.focus(); i.setSelectionRange(v.length,v.length); };
   card.querySelectorAll('[data-jst]').forEach(b=>b.onclick=()=>{ jStatusF=b.dataset.jst; jPage=1; renderJList(card); });
   card.querySelectorAll('[data-jf]').forEach(el=>el.onchange=()=>{ jFilter[el.dataset.jf]=el.value; jPage=1; renderJList(card); });
-  q('#jl-adv').onclick=()=>{ jAdv=!jAdv; renderJList(card); };
+  card.querySelectorAll('[data-cvp]').forEach(b=>b.onclick=()=>{ jFilter.phase=jFilter.phase===b.dataset.cvp?'':b.dataset.cvp; jPage=1; renderJList(card); });
   q('#jl-new').onclick=jCreate; if(q('#jl-new2')) q('#jl-new2').onclick=jCreate;
   if(q('#jl-clear')) q('#jl-clear').onclick=()=>{ jQ=''; jStatusF='All'; Object.keys(jFilter).forEach(k=>jFilter[k]=''); jPage=1; renderJList(card); };
-  card.querySelectorAll('#jl-table tr[data-jid]').forEach(tr=>tr.onclick=e=>{ if(e.target.closest('button,.pop')) return; jOpen(tr.dataset.jid); });
+  q('#jl-all').onchange=e=>{ page.forEach(j=>e.target.checked?jSel.add(j.id):jSel.delete(j.id)); renderJList(card); };
+  card.querySelectorAll('[data-jsel]').forEach(c=>c.onchange=()=>{ c.checked?jSel.add(c.dataset.jsel):jSel.delete(c.dataset.jsel); renderJList(card); });
+  const bd=q('#jl-bdup'); if(bd) bd.onclick=()=>{ const ids=[...jSel]; ids.forEach(id=>jCopy(id)); jSel.clear(); toast('Duplicated',`${ids.length} journey(s) copied as new Drafts (v1).`); renderJList(card); };
+  const bm=q('#jl-bmove'); if(bm) bm.onchange=()=>{ const to=bm.value; if(!to) return; let n=0; jSel.forEach(id=>{ const j=jById(id); if(j.folder!==to){ j.folder=to; j.updated=TODAY; n++; } }); jSel.clear(); toast('Moved',`${n} journey(s) moved to ${to}.`); renderJList(card); };
+  const bc=q('#jl-bclear'); if(bc) bc.onclick=()=>{ jSel.clear(); renderJList(card); };
+  card.querySelectorAll('#jl-table tr[data-jid]').forEach(tr=>tr.onclick=e=>{ if(e.target.closest('button,.pop,input')) return; jOpen(tr.dataset.jid); });
   card.querySelectorAll('[data-jopen]').forEach(b=>b.onclick=()=>jOpen(b.dataset.jopen));
   /* the menu is placed against the viewport, so the table's scroll box never clips it */
   const place=(b,pop)=>{ const r=b.getBoundingClientRect(), h=pop.offsetHeight, w=pop.offsetWidth; pop.style.left=Math.max(8,r.right-w)+'px'; pop.style.top=(r.bottom+4+h>innerHeight-8?r.top-4-h:r.bottom+4)+'px'; };
@@ -2447,9 +2564,9 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
   const follow=()=>card.querySelectorAll('.dm-menu .pop:not([hidden])').forEach(p=>place(p.previousElementSibling,p));
   const tw=card.querySelector('#jl-table'); if(tw) tw.parentElement.onscroll=follow; card.onscroll=follow;
   card.querySelectorAll('[data-jmon]').forEach(b=>b.onclick=()=>{ msel.value=b.dataset.jmon; showView('monitor'); });
-  card.querySelectorAll('[data-jrep]').forEach(b=>b.onclick=()=>{ curJ=b.dataset.jrep; jsel.value=curJ; renderReport(); repModal.hidden=false; card.querySelectorAll('.dm-menu .pop').forEach(p=>p.hidden=true); });
-  card.querySelectorAll('[data-jcopy]').forEach(b=>b.onclick=()=>jCopy(b.dataset.jcopy));
-  card.querySelectorAll('[data-jpause]').forEach(b=>b.onclick=()=>{ const j=JOURNEYS.find(x=>x.id===b.dataset.jpause); if(!j||!jCanAct()) return; j.updated=TODAY; if(j.status==='Paused') activateJourney(j,false); else pauseJourney(j); });
+  card.querySelectorAll('[data-jrep]').forEach(b=>b.onclick=()=>{ curJ=b.dataset.jrep; renderReport(); repModal.hidden=false; card.querySelectorAll('.dm-menu .pop').forEach(p=>p.hidden=true); });
+  card.querySelectorAll('[data-jcopy]').forEach(b=>b.onclick=()=>{ const j=jCopy(b.dataset.jcopy); toast(`Duplicated · ${j.id}`,`${j.name} created as Draft v1.`); jOpen(j.id); });
+  card.querySelectorAll('[data-jmove]').forEach(b=>b.onclick=()=>{ const j=jById(b.dataset.jmove); j.folder=b.dataset.to; j.updated=TODAY; toast('Moved',`${j.name} → ${j.folder}`); renderJList(card); });
   card.querySelectorAll('[data-jp]').forEach(b=>b.onclick=()=>{ jPage=+b.dataset.jp; renderJList(card); });
 }
 document.addEventListener('click',e=>{ if(curView==='journeys'&&jMode==='list'&&!e.target.closest('.dm-menu')) document.querySelectorAll('#jl-card .dm-menu .pop').forEach(p=>p.hidden=true); });
@@ -2471,31 +2588,30 @@ function renderJCreate(card){ const c=jcc; const ic=d=>`<svg viewBox="0 0 24 24"
     <div class="cc-hd"><h2>Create your journey</h2><p>Name it and choose what starts it — you build the steps on the canvas next.</p></div>
     <div class="fld cc-name"><label for="jc-name" class="req">Journey name</label><input id="jc-name" maxlength="100" value="${esc(c.name)}" placeholder="e.g. Package expiring — renewal nudge" autocomplete="off"></div>
     <div class="fld"><label for="jc-desc">Description</label><input id="jc-desc" value="${esc(c.desc)}" placeholder="What this journey does, for your team"></div>
+    <div class="jc-2"><div class="fld"><label for="jc-folder">Folder (project)</label><select id="jc-folder">${FOLDERS.map(x=>`<option ${c.folder===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div><div class="fld"><label for="jc-phase">Lifecycle phase</label><select id="jc-phase">${PHASES.map(x=>`<option ${c.phase===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div></div>
     <div class="cc-sec"><div class="cc-l">What starts it?</div><div class="cc-trig">${JC_TRIG.map(([k,t,d,svg])=>`<button type="button" class="cc-card ${c.trig===k?'on':''}" data-trig="${k}" aria-pressed="${c.trig===k}">${ic(svg)}<b>${t}</b><span>${d}</span></button>`).join('')}</div>
       <div class="jc-follow">${follow}</div></div>
     <div class="cc-go"><button class="btn primary" id="jc-start">Start building</button></div>
     <div class="cc-tpl"><div class="cc-l">Start from a template <small>— a copy of an existing journey</small></div>
-      <div class="cc-tpls">${recent.map(x=>`<button type="button" class="cc-t" data-jctpl="${x.id}"><b>${esc(x.name)}</b><span>${x.id} · ${jTrigger(x).k} · ${x.nodes.length} steps</span><em>Use a copy ›</em></button>`).join('')}</div></div>
+      <div class="cc-tpls">${recent.map(x=>`<button type="button" class="cc-t" data-jctpl="${x.id}"><b>${esc(x.name)}</b><span>${x.id} · ${jTrigger(x).k} · ${jMainV(x).nodes.length} steps</span><em>Use a copy ›</em></button>`).join('')}</div></div>
   </div>`;
   const q=s=>card.querySelector(s), nm=q('#jc-name');
   nm.oninput=()=>{ c.name=nm.value; }; nm.onkeydown=e=>{ if(e.key==='Enter') q('#jc-start').click(); };
   q('#jc-desc').oninput=e=>{ c.desc=e.target.value; };
   if(!card.contains(document.activeElement)) setTimeout(()=>{ if(jMode==='create'&&document.body.contains(nm)&&!document.querySelector('.tour-card')) nm.focus(); },0);
   card.querySelectorAll('[data-trig]').forEach(b=>b.onclick=()=>{ c.trig=b.dataset.trig; renderJCreate(card); q('#jc-name')&&card.querySelector('#jc-name').blur(); });
-  ['ev','seg','sched'].forEach(k=>{ const el=q('#jc-'+k); if(el) el.onchange=()=>{ c[k]=el.value; }; });
+  ['ev','seg','sched','folder','phase'].forEach(k=>{ const el=q('#jc-'+k); if(el) el.onchange=()=>{ c[k]=el.value; }; });
   q('#jc-back').onclick=jToList;
-  card.querySelectorAll('[data-jctpl]').forEach(b=>b.onclick=()=>jCopy(b.dataset.jctpl));
+  card.querySelectorAll('[data-jctpl]').forEach(b=>b.onclick=()=>{ const j=jCopy(b.dataset.jctpl); toast(`Copied · ${j.id}`,`${j.name} created as Draft v1.`); jOpen(j.id); });
   q('#jc-start').onclick=()=>{ if(!c.name.trim()){ toast('Name is required','Give the journey a name your team will recognise.','bad'); nm.focus(); return; }
     const mode=c.trig==='event'?'Event only':c.trig==='segment'?'Segment entry':'Segment only (scheduled)';
     const seg=c.trig==='event'?'— (event only)':c.seg, ev=c.trig==='event'?c.ev:'';
-    const j={id:nextJourneyId(),name:c.name.trim(),desc:c.desc.trim(),status:'Draft',version:1,created:TODAY,updated:TODAY,createdBy:DEMO_USERS.me,
-      entry:{segment:seg,events:ev?[ev]:[],reentryDays:30,maxConcurrent:1},exit:{goal:'offer_accepted',goalAction:EXITS[0],expireDays:14},policy:{invitationDays:45,communicationDays:1,region:'All'},nodes:journeyTemplate('',mode,seg,ev)};
-    if(c.trig==='schedule') j.nodes[0].cfg.schedule=c.sched;
-    registerJourney(j); addLog('',`${j.id}  journey created · ${j.name} · Draft v1 · entry: ${mode}${seg!=='— (event only)'?' · '+seg.split(' · ')[0]:''}${ev?' · '+ev:''}`,{j:j.id,node:'e1',kind:'system'});
+    const nodes=journeyTemplate('',mode,seg,ev); if(c.trig==='schedule') nodes[0].cfg.schedule=c.sched;
+    const j=jBlank({id:nextJourneyId(),name:c.name.trim(),desc:c.desc.trim(),folder:c.folder,phase:c.phase,versions:[{v:1,status:'Draft',createdAt:stamp(),nodes}],cur:1});
+    registerJourney(j); addLog('',`${j.id}@1  journey created · ${j.name} · Draft v1 · entry: ${mode}${seg!=='— (event only)'?' · '+seg.split(' · ')[0]:''}${ev?' · '+ev:''}`,{j:j.id+'@1',node:'e1',kind:'system'});
     jOpen(j.id,'e1'); toast(`Created · ${j.id}`,`${j.name} is a Draft with its entry step in place. Add steps from the palette, then Activate.`); };
 }
-document.getElementById('btn-jnew').onclick=jCreate;
-document.getElementById('btn-jback').onclick=document.getElementById('btn-back').onclick=jToList;
+
 
 /* ---------- delivery = channel + content + rules + schedule, kept per channel behind the scenes; the user just fills campaign steps ---------- */
 const PLAN_CHANNELS=[['sms','SMS'],['isms','Interactive SMS'],['mms','MMS'],['email','Email'],['push','Mobile Push'],['webpush','Web Push'],['tm','Telemarketing'],['inapp','In-App'],['wsc','WSC'],['chatbot','Chatbot']];
@@ -2597,7 +2713,7 @@ function renderSegForm(){
   g('seg-exclwrap').hidden=!segDraft.excl;
   g('seg-exclch').innerHTML=SEG_CHANNELS.map(([k,n])=>`<button type="button" class="${segDraft.exclCh.includes(k)?'on':''}" data-ch="${k}">${n}</button>`).join('');
   document.querySelectorAll('#seg-exclch button').forEach(b=>b.onclick=()=>{ const k=b.dataset.ch; const i=segDraft.exclCh.indexOf(k); if(i>=0) segDraft.exclCh.splice(i,1); else segDraft.exclCh.push(k); renderSegForm(); });
-  const ub=g('seg-usedby'); if(ub){ const u=segEdit?JOURNEYS.filter(j=>String(j.nodes[0].cfg.segment).startsWith(segEdit)).map(j=>j.id):[]; ub.innerHTML=u.map(x=>`<span class="chip">${x}</span>`).join('')||'<span style="color:var(--ink-3);font-size:12px">not used yet</span>'; }
+  const ub=g('seg-usedby'); if(ub){ const u=segEdit?jUsingSeg(segEdit):[]; ub.innerHTML=u.map(x=>`<span class="chip">${x}</span>`).join('')||'<span style="color:var(--ink-3);font-size:12px">not used yet</span>'; }
   renderSegInsight();
 }
 /* concept: natural-language → filters (rule-based stand-in for the assistant) */
@@ -2658,7 +2774,7 @@ function renderSegRows(res,m){ const tbl=document.getElementById('seg-prev'); if
 function renderSegPreview(){ renderSegInsight(); }
 const exclLabel=m=>!m.excl?'—':`<span class="pill warn" title="${m.exclCh&&m.exclCh.length?'Excluded from: '+m.exclCh.map(k=>chanIcon[k]||k).join(', '):'Excluded from all channels'}">excl. · ${m.exclCh&&m.exclCh.length?m.exclCh.map(k=>chanIcon[k]||k).join(', '):'all channels'}</span>`;
 function renderSegList(){
-  const used=id=>JOURNEYS.filter(j=>String(j.nodes[0].cfg.segment).startsWith(id)).map(j=>j.id);
+  const used=jUsingSeg;
   const groups=[...new Set(MLS.map(m=>m.group))]; const q=segQ.toLowerCase();
   const rows=MLS.filter(m=>(!q||m.name.toLowerCase().includes(q)||m.id.toLowerCase().includes(q)||m.group.toLowerCase().includes(q)||(m.desc||'').toLowerCase().includes(q)));
   document.getElementById('seg-kpi').innerHTML=`<b>${rows.length}</b> of ${MLS.length} segments`;
@@ -2707,7 +2823,7 @@ function renderSegmentation(){ renderSegList(); if(curView==='segmentation') set
   segShow('list'); renderSegList(); segDraft=segBlank();
 })();
 
-JOURNEYS.forEach(j=>j.nodes.forEach(n=>{ n.y=Math.round(n.y*1.75); n.x=Math.round(n.x*1.32); }));
+JOURNEYS.forEach(j=>j.versions.forEach(V=>V.nodes.forEach(n=>{ n.y=Math.round(n.y*1.75); n.x=Math.round(n.x*1.32); })));
 
 buildPalette(); initSim(); selNode=null;
 for(let i=0;i<3;i++) tick();

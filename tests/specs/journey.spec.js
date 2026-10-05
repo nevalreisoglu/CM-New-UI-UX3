@@ -15,7 +15,7 @@ test.describe('journey builder and monitor', () => {
     await expect(app.locator('#jsplit')).toBeHidden();
     await expect(app.locator('#crumb .cur')).toHaveText('Journeys');
     const heads = await app.$$eval('#jl-table thead th', (t) => t.map((x) => x.textContent.trim()));
-    expect(heads).toEqual(expect.arrayContaining(['Journey', 'Status', 'Validation', 'Trigger', 'Steps', 'Version', 'Entered', 'Conv. rate', 'Actions']));
+    expect(heads).toEqual(expect.arrayContaining(['Journey', 'Folder', 'Phase', 'Status', 'Active version', 'Entered (30d)', 'Last activated', 'Actions']));
     // the old modal and its List button are gone
     await expect(app.locator('#jlist-modal, #jnew-modal, #btn-jlist')).toHaveCount(0);
   });
@@ -23,7 +23,7 @@ test.describe('journey builder and monitor', () => {
   test('a journey opens on the canvas and ‹ Journey list returns', async ({ app }) => {
     await openJourney(app, 'JRN-07');
     await expect(app.locator('#crumb .cur')).toHaveText('JRN-07');
-    await expect(app.locator('#jsel')).toHaveValue('JRN-07');
+    await expect(app.locator('#vbar .vb-name')).toContainText('JRN-07');
     await app.locator('#btn-jback').click();
     await expect(app.locator('#jl-card')).toBeVisible();
     await expect(app.locator('#crumb .cur')).toHaveText('Journeys');
@@ -43,7 +43,7 @@ test.describe('journey builder and monitor', () => {
     await app.locator('#jc-name').fill('Package expiring — renewal nudge');
     await app.locator('#jc-start').click();
     await expect(app.locator('#jsplit')).toBeVisible();
-    const j = await app.evaluate(() => { const x = JOURNEYS.find((y) => y.id === curJ); return { name: x.name, status: x.status, entry: x.nodes[0].type, mode: x.nodes[0].cfg.mode }; });
+    const j = await app.evaluate(() => { const x = JOURNEYS.find((y) => y.id === curJ); const n = x.versions[0].nodes; return { name: x.name, status: jStatus(x), entry: n[0].type, mode: n[0].cfg.mode }; });
     expect(j).toEqual({ name: 'Package expiring — renewal nudge', status: 'Draft', entry: 'entry', mode: 'Segment entry' });
     await expect(app.locator('#canvas .node').first()).toBeVisible();
   });

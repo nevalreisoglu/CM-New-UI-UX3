@@ -2,6 +2,16 @@
 
 Version numbers follow the published artifact versions.
 
+## v59 — 5 Oct 2026
+**Journey Studio, phase (b): journey model with versions.**
+- A journey is a container (name, description, folder, lifecycle phase, priority, end date + expiry action, ignore-unsubscribe flag, test users); its steps live in a **version**. Version statuses Draft → Active → Closing → Closed; one Active version per journey, activating a Draft puts the current Active into Closing; a Closing version admits nobody, lets the contacts inside finish and closes itself when empty; Closed is final. Journey status is derived: Draft / Live / Past.
+- Canvas: a **version bar** replaces the old header — version dropdown with status and activated by/when, Activate (approver/admin, blocked by validation), Stop ▾ (Closing or Closed), Copy to new version, Test ▾ (entry match count, first 10 contacts, test send), Execution report. Active/Closing versions lock the structure (no add/delete/relink; content editable); Closed is read-only.
+- Right panel: **Journey settings** (collapsible) above the step details; the old Name/Description fields and Back/Pause/Activate buttons are gone.
+- Journey list: columns name · folder · phase · status · active version · entered (30d) · last activated; filters status / folder / phase / entry type; bulk duplicate and move to folder; a **Lifecycle coverage** strip (live journeys per phase, empty phases highlighted, click to filter).
+- Create your journey asks for folder and lifecycle phase.
+- Engine: the simulation runs per version (`sim['JRN-07@3']`) through a run context, so the Monitor and the stats can tell versions apart. Sample data: JRN-07 has v3 Active, v2 Closing, v1 Closed.
+- Tests: `versions.spec.js` (derived status, coverage strip, locked structure, activate/closing/closed, settings, create); `jlist.js` retired.
+
 ## v58 — 5 Oct 2026
 **Journey Studio, phase (a): journey-only navigation.** The prototype becomes a standalone Journey Studio for the Fizz demo.
 - Navigation is **Journeys · Journey Monitor · Segments · Policies**; the role switcher keeps Marketer / Approver / Admin (CMO dropped — it had no page left). Boot view is the journey list.
