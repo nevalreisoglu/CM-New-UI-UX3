@@ -2,6 +2,50 @@
 
 Version numbers follow the published artifact versions.
 
+## v62 — 5 Oct 2026
+**Journey Studio, phase (e): Fizz sample data, scale, docs.**
+- Demo datamart is Fizz-flavoured: FR/EN first names, Québec cities, Fizz-like plan names, `fr`/`en` language, `+1 5XX` numbers, CAD. Signed-in users are bilingual fictional names. The chrome reads "Etiya · Journey Studio".
+- **Scale**: one simulated contact stands for ≈6,500 real ones (`DEMO_K`; 1.96 M contacts in total) in the list, the version bar, the stats strip and the monitor; the simulation strips say so. The list header counts contacts, folders and live journeys.
+- Docs rewritten for the Journey Studio: `CLAUDE.md` (architecture page), `README.md`, `docs/product-description.md`, `docs/user-manual.md` (re-embedded), `docs/decisions.md` (J-A … J-K, incl. the four assumptions to confirm), `tests/README.md`; `tests/brand-audit.js` walks the four pages and the new deep states.
+
+## v61 — 5 Oct 2026
+**Journey Studio, phase (d): validation panel, Journey Monitor, anomalies.**
+- **Validation panel** above the canvas: Validate toggles it, a refused Activate opens it; every check listed, failing ones name the step and select it on click.
+- **Journey Monitor** rebuilt per journey. *General*: entered / active / exited / conversions, channel totals (sent · opened · clicked · converted), **Anomaly alerts** from the Marketing Agent (2–3 steps whose daily volume deviates from the 30-day baseline, with confidence, Open step / Dismiss), the versions table (status, activated by/when, entry, counters, View version, Step export) and the participant list at a point in time. *View version*: the read-only canvas with the stats strip and alert markers, a steps table, Open in builder.
+- **Step export** (mock download) with strategy: entered / exited / was in / entered and exited; opened from a step on the monitor canvas or the tables.
+- **Time range** (7 / 30 / 90 days / all) scales what the monitor shows; the simulation strip drives the same counters as the builder's stats strip.
+- Tests: `monitor.spec.js` (General, View version, export, time range + simulation, validation panel).
+
+## v60 — 5 Oct 2026
+**Journey Studio, phase (c): the step inventory.**
+- Palette grouped **Entry · Message · Wait · Split · Action**. Exactly one Entry step per version; the Entry group swaps its type: Segment (segment, evaluation frequency, time slot), Date attribute (attribute, offset before/after/on, yearly), Event (API/BSS) (event picker, payload fields, create-contact flag, **API code** sample), Joins list, Unengaged (channel, days), Digital Twin signal (CM), Agent suggestion (CM, read-only card). Common: include project segment, re-entry rule (never / after N days / always).
+- Message: Delivery keeps channel, template, content text, A/B and dynamic variants, control group; Communication rules become a **policy picker**; "send even if unsubscribed" appears only when the journey flag is on and asks for confirmation.
+- Wait: duration (minutes/hours/days), until date (weekdays / day of month / date), for event (accepted · rejected · timeout, with the webhook / release-URL explainer), for segment match (matched · timeout), Priority (allowed · denied).
+- Split: Engagement (bound to a previous Delivery; opened/clicked/converted/bounced + Remaining), Segment (ordered list, top-down, + Remaining), Shuffle (weights, Set equal).
+- Action: Set attribute (static value or timestamp), Call external (labelled webhook / MCP tool), Control group (hold-out, export, build a segment), Audience sync (Meta / Google), Exit (optionally a goal).
+- Canvas: cards show type, name, a one-line summary and — on Active/Closing versions — a **stats strip** (entered · waiting · exited; Delivery: sent / opened / clicked / conv). Path labels are type-driven: dragging from a port takes the next free path; the panel lists each path and its target; paths may merge. A Delivery added after a Delivery gets a 1-day Wait slipped in between.
+- Validation (Validate button and Activate): entry set up, every wait has a duration/date, every segment split names a segment, every engagement split is bound to a Delivery, every path ends in an Exit, every step reachable, every Delivery has content, shuffle weights add to 100.
+- Engine: scheduled entries admit new matches on Advance 1 day; event entries on Send event; deliveries produce engagement for the Engagement split; a contact's route through a split is deterministic.
+- Policies page is data-driven (`POLICIES`) and shows which journeys pick each policy.
+- Sample data: seven Fizz-flavoured journeys (Device order flow abandonment v13 Active / v12 Closing, Free trial – communication après la fin, Birthday reward, Winback – unengaged 90d, Loyalty level up, Payment failed – dunning as Draft, Summer referral push as Past). Numbers and the datamart get their Fizz pass in phase (e).
+- Tests: `nodes.spec.js` (palette order, entry swap + API code, wait paths and next-free-path connect, auto Wait between deliveries, engagement split binding, validation blocking Activate, shuffle weights).
+
+## v59 — 5 Oct 2026
+**Journey Studio, phase (b): journey model with versions.**
+- A journey is a container (name, description, folder, lifecycle phase, priority, end date + expiry action, ignore-unsubscribe flag, test users); its steps live in a **version**. Version statuses Draft → Active → Closing → Closed; one Active version per journey, activating a Draft puts the current Active into Closing; a Closing version admits nobody, lets the contacts inside finish and closes itself when empty; Closed is final. Journey status is derived: Draft / Live / Past.
+- Canvas: a **version bar** replaces the old header — version dropdown with status and activated by/when, Activate (approver/admin, blocked by validation), Stop ▾ (Closing or Closed), Copy to new version, Test ▾ (entry match count, first 10 contacts, test send), Execution report. Active/Closing versions lock the structure (no add/delete/relink; content editable); Closed is read-only.
+- Right panel: **Journey settings** (collapsible) above the step details; the old Name/Description fields and Back/Pause/Activate buttons are gone.
+- Journey list: columns name · folder · phase · status · active version · entered (30d) · last activated; filters status / folder / phase / entry type; bulk duplicate and move to folder; a **Lifecycle coverage** strip (live journeys per phase, empty phases highlighted, click to filter).
+- Create your journey asks for folder and lifecycle phase.
+- Engine: the simulation runs per version (`sim['JRN-07@3']`) through a run context, so the Monitor and the stats can tell versions apart. Sample data: JRN-07 has v3 Active, v2 Closing, v1 Closed.
+- Tests: `versions.spec.js` (derived status, coverage strip, locked structure, activate/closing/closed, settings, create); `jlist.js` retired.
+
+## v58 — 5 Oct 2026
+**Journey Studio, phase (a): journey-only navigation.** The prototype becomes a standalone Journey Studio for the Fizz demo.
+- Navigation is **Journeys · Journey Monitor · Segments · Policies**; the role switcher keeps Marketer / Approver / Admin (CMO dropped — it had no page left). Boot view is the journey list.
+- Removed, code and markup: Dashboard, Getting started and guided tours, Program, Campaign, Offers, Surveys, Reports, Operation analysis, Decision API, Datamart page, Templates (design) admin page, Parameters, Release & licences. The Delivery step keeps its template picker and content editor; segments keep the datamart catalogue they query; Policies (hidden since X6) is visible again as a read-only list.
+- Tests: campaign / dashboard / tour specs and the ops, srv, dm and tour scripts are gone; navigation and roles specs rewritten; screenshots refreshed. User manual rewritten for the four pages (to be completed with the new journey model).
+
 ## v57 — 24 Sept 2026
 **Guided tours for Journey and Program** (decision X7).
 - **Build your first journey** (marketer, admin; 15 steps): *Create your journey* with `balance_low` → the canvas → a Delivery with the journey's own SMS text → a Wait for event (`offer_accepted`, 1 day) → an *accepted* branch to the goal and a *timeout* branch to a push reminder → Validate → Activate → a test event in the simulation strip → Journey Monitor.

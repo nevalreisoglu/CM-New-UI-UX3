@@ -15,8 +15,7 @@ const URL = 'file://' + path.resolve(__dirname, '..', 'index.html') + '?notour';
 const SHOTS = path.join(__dirname, 'shots');
 const AA = 4.5, AA_LARGE = 3.0;
 
-const VIEWS = ['dashboard', 'start', 'programs', 'campaigns', 'journeys', 'monitor',
-  'segmentation', 'surveys', 'reports', 'opsan', 'datamart', 'content', 'parameters', 'about', 'api'];
+const VIEWS = ['journeys', 'monitor', 'segmentation', 'policies'];
 
 const probe = () => {
   const lum = (rgb) => {
@@ -120,32 +119,18 @@ const probe = () => {
   await page.goto(URL); await page.waitForSelector('.view.active');
   await page.selectOption('#role-sel', 'admin');
   const deep = [
-    ['campaign-create', async () => { await page.click('.nav button[data-view="campaigns"]'); await page.click('#camp-new'); await page.click('[data-obj="Retention"]'); }],
-    ['campaign-editor', async () => { await page.click('#cc-skip'); }],
-    ['campaign-stepper-states', async () => { await page.fill('#camp-card input[data-k="name"]', 'Audit'); await page.click('.stepper button[data-step="1"]'); await page.click('.stepper button[data-step="3"]'); await page.click('#camp-goalchip'); }],
-    ['campaign-rules-standard', async () => { await page.keyboard.press('Escape'); await page.click('.stepper button[data-step="4"]'); await page.click('[data-rmode="standard"]'); }],
-    ['campaign-schedule-choice', async () => { await page.click('.stepper button[data-step="5"]'); }],
-    ['campaign-summary-missing', async () => { await page.click('.stepper button[data-step="3"]'); await page.click('.stepper button[data-step="7"]'); }],
-    ['campaign-submit-dialog', async () => { await page.click('.stepper button[data-step="6"]'); await page.click('#camp-activate'); }],
-    ['campaign-list-empty', async () => { await page.keyboard.press('Escape'); await page.click('#camp-back'); await page.fill('#camp-q', 'no such campaign'); }],
-    ['dashboard-campaign-detail', async () => { await page.click('.nav button[data-view="dashboard"]'); await page.evaluate(() => { CAMPAIGNS.find((c) => c.status === 'Draft').status = 'Pending approval'; renderDashboard(); }); await page.click('#db-card [data-dbc]'); }],
-    ['segment-workbench', async () => { await page.click('.nav button[data-view="segmentation"]'); await page.click('#seg-new'); await page.click('#seg-search'); }],
-    ['program-detail', async () => { await page.click('.nav button[data-view="programs"]'); await page.click('#prg-card tbody tr', { timeout: 5000 }); }],
-    ['datamart-columns', async () => { await page.click('.nav button[data-view="datamart"]'); await page.click('#dm-card tr[data-dm="DM-1"] [data-open]'); await page.click('[data-dmtab="columns"]'); }],
-    ['ops-eliminations', async () => { await page.click('.nav button[data-view="opsan"]'); await page.click('[data-opt="elim"]'); await page.click('.ops-rule[data-rule="Channel cooldown"]'); }],
-    ['ops-promotions-panel', async () => { await page.click('[data-opt="promo"]'); await page.click('#ops-active'); await page.click('#ops-grid tbody tr[data-oid]'); await page.waitForTimeout(250); }],
-    ['ops-advanced-filter', async () => { await page.keyboard.press('Escape'); await page.click('[data-opt="del"]'); await page.click('#ops-advbtn'); await page.click('#ops-colsbtn'); }],
-    ['ops-empty', async () => { await page.keyboard.press('Escape'); await page.evaluate(() => { opsScope.camp = '436'; renderOpsan(); }); }],
-    ['ops-surveys', async () => { await page.keyboard.press('Escape'); await page.click('#ops-reset'); await page.click('[data-opt="srv"]'); }],
-    ['ops-survey-response', async () => { await page.click('#ops-grid tbody tr[data-oid]'); await page.waitForTimeout(250); }],
-    ['survey-editor', async () => { await page.keyboard.press('Escape'); await page.click('.nav button[data-view="surveys"]'); await page.click('[data-srvopen="SRV-01"]'); }],
-    ['survey-editor-web', async () => { await page.click('[data-dev="web"]'); await page.click('[data-plang="uk"]'); }],
-    ['survey-attach-pull', async () => { await page.click('.nav button[data-view="campaigns"]'); await page.click('#camp-new'); await page.fill('#cc-name', 'Audit'); await page.click('#cc-start'); await page.evaluate(() => { campDraft.channels = ['wsc']; syncPlans(campDraft); campDraft.plans[0].survey = 'SRV-02'; campStep = 3; renderCampaigns(); }); }],
-    ['dashboard-executive', async () => { await page.selectOption('#role-sel', 'cmo'); await page.click('.nav button[data-view="dashboard"]'); }],
-    ['dashboard-marketer', async () => { await page.selectOption('#role-sel', 'marketer'); await page.click('.nav button[data-view="dashboard"]'); await page.click('#db-card .db-hd .tile[data-dbc]'); }],
-    ['journey-list-advanced', async () => { await page.keyboard.press('Escape'); await page.selectOption('#role-sel', 'admin'); await page.click('.nav button[data-view="journeys"]'); await page.click('#jl-adv'); await page.click('[data-jmore="JRN-07"]'); }],
-    ['journey-create', async () => { await page.click('#jl-new'); await page.click('[data-trig="schedule"]'); }],
-    ['journey-report', async () => { await page.selectOption('#role-sel', 'admin'); await page.click('.nav button[data-view="journeys"]'); await page.click('#jl-table [data-jopen="JRN-20"]'); await page.click('#btn-report', { timeout: 5000 }); }],
+    ['journey-canvas-live', async () => { await page.click('.nav button[data-view="journeys"]'); await page.click('#jl-table [data-jopen="JRN-04"]'); await page.click('#canvas .node[data-id="s4"]'); }],
+    ['journey-canvas-draft-validation', async () => { await page.click('#btn-jback'); await page.click('#jl-table [data-jopen="JRN-06"]'); await page.click('#btn-validate'); await page.click('#canvas .node[data-id="s3"]'); }],
+    ['journey-delivery-panel', async () => { await page.click('#canvas .node[data-id="s2"]'); }],
+    ['journey-entry-panel', async () => { await page.click('#canvas .node[data-id="e1"]'); await page.click('#btn-apicode'); }],
+    ['journey-version-closed', async () => { await page.click('#btn-jback'); await page.click('#jl-table [data-jopen="JRN-01"]'); await page.selectOption('#vsel', '11'); }],
+    ['journey-list-filtered', async () => { await page.click('#btn-jback'); await page.click('.cover .cv[data-cvp="Grow"]'); await page.click('#jl-all'); }],
+    ['journey-create', async () => { await page.click('#jl-bclear'); await page.click('#jl-new'); await page.click('[data-trig="dateAttr"]'); }],
+    ['journey-report', async () => { await page.click('#jc-back'); await page.click('#jl-table [data-jopen="JRN-03"]'); await page.click('#btn-report'); }],
+    ['monitor-general', async () => { await page.keyboard.press('Escape'); await page.click('.nav button[data-view="monitor"]'); await page.selectOption('#msel', 'JRN-04'); }],
+    ['monitor-version', async () => { await page.click('#mon-tabs [data-mt="version"]'); }],
+    ['monitor-export', async () => { await page.click('#mcanvas .node[data-id="s2"]'); }],
+    ['segment-workbench', async () => { await page.keyboard.press('Escape'); await page.click('.nav button[data-view="segmentation"]'); await page.click('#seg-new'); await page.click('#seg-search'); }],
   ];
   for (const [name, go] of deep) {
     try { await go(); } catch (e) { console.log('skip', name, e.message.slice(0, 50)); continue; }

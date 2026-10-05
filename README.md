@@ -1,30 +1,43 @@
-# ECM Journey Studio — UX/UI redesign prototype
+# Etiya Journey Studio — prototype
 
-Single-file, click-through prototype of the redesigned Etiya Campaign Management (ECM) user experience.
-Iterated after each UX/UI redesign meeting (16–18 Sept 2026) and the follow-up sessions.
+Single-file, click-through prototype of the **Journey Studio**: the journey-only descendant of the Etiya Campaign
+Management redesign prototype, scoped for a product demo to **Fizz** (Canadian telco, FR/EN, email-heavy, ~2 M contacts).
+It covers every journey capability of Symplify and keeps the CM capabilities Symplify lacks.
 
 **Open it:** download `index.html` and open it in a browser — no build, no server, no external calls (fonts are optional).
-On the first visit per role a welcome card offers a guided tour. Append **`?notour`** to the URL to suppress the welcome card
-and the resume prompt — useful for demos, screenshots and automated runs (automation is detected and suppressed anyway).
-With GitHub Pages enabled on this repo it is served at the repo's Pages URL.
+Append **`?notour`** to the URL for a clean start in demos and automated runs.
 
-## What is in the prototype (v41)
+**Deploy:** it is a static file. On Vercel, import the repository with no framework preset and no build command; the
+root `index.html` is served as is. GitHub Pages works the same way.
 
-- **Roles:** Marketer · Approver (maker/checker) · Admin · CMO/Executive — pages and actions follow the role.
-- **Dashboard** with role presets, 8 headline KPIs, live counters, "needs attention", funnel & eliminations, control-group uplift.
-- **Program** as a business initiative: goal, period, owner, contact cap, members (campaigns + journeys), roll-up results, Gantt timeline.
-- **Campaign** in 8 steps: Info (push/pull channels, configurable fields) · Targeting (two-column segment picker) · Offer / NBO · Channel & content (template = design, content = slots; A/B and dynamic; live render) · Communication rules · Schedule · Approval · Summary; non-blocking readiness panel.
-- **Journey Builder** with journey-owned delivery steps; Journey Monitor.
-- **Segments** workbench: definition + query builder + live audience insight; channel-scoped exclusion lists; Segment Groups in Parameters.
-- **Templates (design)** per channel — admin only; content is written inside deliveries.
-- **Datamart** (admin) as a data catalogue: what data exists, how fresh it is, what each column means, how datamarts relate and who depends on them — with profiling computed from the rows and privacy masking.
-- **Reports**, **Parameters** (campaign form switches, rule defaults, channels & senders), **Release & licences**.
-- **Getting started** checklist per role, and **guided tours** with spotlight coachmarks — the campaign tour is interactive and ends with a real campaign waiting for approval.
+## What is in the prototype (v62)
+
+- **Journeys** — the list (name · folder · lifecycle phase · status · active version · entered 30d · last activated;
+  filters by status / folder / phase / entry type; bulk duplicate and move to folder) under a **Lifecycle coverage**
+  strip (live journeys per phase, gaps highlighted). *Create your journey*: name, folder, phase, entry type.
+- **Journey model** — a journey is a container; its steps live in a **version**: Draft → Active → Closing → Closed.
+  One Active version per journey; activating a Draft puts the current Active into Closing (no new entries, contacts
+  inside finish, auto-Closed when empty). Journey status Draft / Live / Past is derived. Settings: folder, phase,
+  priority 1–100, end date + expiry action, ignore unsubscribe (per-step confirmation), test users.
+- **Canvas** — grouped palette **Entry · Message · Wait · Split · Action**; one Entry step per version with seven entry
+  types (Segment, Date attribute, Event with an API code sample, Joins list, Unengaged, Digital Twin signal, Agent
+  suggestion); Delivery with template, FR/EN text, A/B and dynamic variants, control group, policy picker; waits
+  (duration, until date, for event with accepted · rejected · timeout, for segment match, Priority); splits
+  (Engagement bound to a Delivery, Segment top-down, Shuffle with weights); actions (Set attribute, Call external as
+  webhook / MCP tool, Control group, Audience sync, Exit). Cards show type, name, a one-line summary and — on live
+  versions — a **stats strip**. Paths are type-driven and may merge. A **version bar** (version dropdown, Activate,
+  Stop ▾ Closing / Closed, Copy to new version, Test ▾, Execution report) and a **validation panel** that blocks
+  Activate.
+- **Journey Monitor** — per journey: *General* (entered / active / exited / conversions, channel totals, **Marketing
+  Agent anomaly alerts** with confidence, versions table, participants at a point in time) and *View version* (read-only
+  canvas with the stats strip); **step export** with four strategies (mock download); a time range filter.
+- **Segments** (workbench, read-mostly) and **Policies** (read-only list picked by Delivery steps) — kept from CM.
+- **Roles**: Marketer · Approver · Admin — the same pages; the approver/admin activates and stops versions.
+- **Simulation strip** (demo only): send an event, advance the clock; it drives every counter. One simulated contact
+  stands for ≈6,500 real ones.
 - **User manual** behind a button in the top bar — embedded in the file, so it works offline.
-- **Etiya brand kit** — navy and lilac primary, orange as accent, turquoise as action, Roboto throughout. Palette, token map and contrast rules in [`docs/brand.md`](docs/brand.md); `tests/brand-audit.js` checks every rendered text node against AA.
-- Tooltips on every meaningful field.
 
-Demo data only (30 customers, 18 campaigns, 3 journeys). Nothing is sent.
+Demo data only (Fizz-flavoured, fictional names, 7 journeys, 30 simulated contacts). Nothing is sent.
 
 ## Repository layout
 
@@ -32,23 +45,22 @@ Demo data only (30 customers, 18 campaigns, 3 journeys). Nothing is sent.
 index.html                        the prototype (single file)
 docs/product-description.md       what it is, who uses it, why each screen is shaped that way
 docs/user-manual.md               how to drive it, screen by screen (also embedded in the prototype)
-docs/meetings/                    meeting notes (Turkish) that drove each iteration
+docs/decisions.md                 every product decision with its reason
+docs/brand.md                     palette, token map, type scale, contrast rules
+docs/meetings/                    meeting notes (Turkish) of the earlier CM redesign
 tests/specs/                      Playwright regression specs
 tests/screenshots/                reference screenshots of the main screens
+tests/brand-audit.js              AA contrast of every rendered text node
 tests/README.md                   how to run them and what they cover
-docs/brand.md                     palette, token map, type scale, contrast rules
 tools/embed-manual.js             copies the user manual into index.html
-tests/tour.js                     standalone regression run for the guided tours
-tests/tour-journey.js             the journey tour, end to end and by hand
-tests/tour-program.js             the program tours, end to end, by hand and per role
-tests/dm.js                       standalone regression run for the Datamart catalogue
 CHANGELOG.md
 ```
 
 ## Working on it
 
 The prototype is one HTML file with inline CSS and vanilla JS. Data lives in constants near the top of the script
-(`CAMPAIGNS`, `JOURNEYS`, `MLS` segments, `TEMPLATES`, `PROGRAMS`, `DATAMART_ROWS`, `EVENT_ROWS`).
+(`JOURNEYS`, `POLICIES`, `MLS` segments, `TEMPLATES`, `CONTENT_ITEMS`, `DATAMART_ROWS`). `CLAUDE.md` is the
+architecture page.
 
 After a change, run the regression suite (see `tests/README.md` for what it covers):
 
@@ -57,26 +69,4 @@ cd tests && npm install && npm test
 ```
 
 It opens `index.html` over `file://`, so there is nothing to build or serve. `npm run shots` refreshes
-`tests/screenshots/`.
-
-The guided tours have their own end-to-end run, which drives the whole campaign tour and writes its screenshots to
-`tests/shots/`:
-
-```bash
-cd tests && node tour.js && node tour-journey.js && node tour-program.js
-```
-
-The Datamart module has its own run, which documents a column and checks the segment builder picks it up:
-
-```bash
-cd tests && node dm.js
-```
-
-The brand audit measures the rendered contrast of every text node on every page:
-
-```bash
-cd tests && node brand-audit.js
-```
-
-`docs/user-manual.md` is embedded in the prototype. After editing it, run `node tools/embed-manual.js`
-to copy it back into `index.html` — the test suite fails if the two drift apart.
+`tests/screenshots/`; `node brand-audit.js` measures the rendered contrast of every text node on every page.

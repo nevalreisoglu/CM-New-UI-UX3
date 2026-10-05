@@ -2,31 +2,31 @@
 const { test, expect } = require('./fixtures');
 
 /** Journey Builder opens on its list; the canvas is one Open away. */
-async function openJourney(app, id = 'JRN-20') {
+async function openJourney(app, id = 'JRN-04') {
   await app.locator('.nav button[data-view="journeys"]').click();
   await app.locator(`#jl-table [data-jopen="${id}"]`).click();
   await expect(app.locator('#jsplit')).toBeVisible();
 }
 
 test.describe('journey builder and monitor', () => {
-  test('Journey Builder opens on the list, like Campaign', async ({ app }) => {
+  test('Journeys opens on the list', async ({ app }) => {
     await app.locator('.nav button[data-view="journeys"]').click();
     await expect(app.locator('#jl-card')).toBeVisible();
     await expect(app.locator('#jsplit')).toBeHidden();
-    await expect(app.locator('#crumb .cur')).toHaveText('Journey Builder');
+    await expect(app.locator('#crumb .cur')).toHaveText('Journeys');
     const heads = await app.$$eval('#jl-table thead th', (t) => t.map((x) => x.textContent.trim()));
-    expect(heads).toEqual(expect.arrayContaining(['Journey', 'Status', 'Validation', 'Trigger', 'Steps', 'Version', 'Entered', 'Conv. rate', 'Actions']));
+    expect(heads).toEqual(expect.arrayContaining(['Journey', 'Folder', 'Phase', 'Status', 'Active version', 'Entered (30d)', 'Last activated', 'Actions']));
     // the old modal and its List button are gone
     await expect(app.locator('#jlist-modal, #jnew-modal, #btn-jlist')).toHaveCount(0);
   });
 
   test('a journey opens on the canvas and ‹ Journey list returns', async ({ app }) => {
-    await openJourney(app, 'JRN-07');
-    await expect(app.locator('#crumb .cur')).toHaveText('JRN-07');
-    await expect(app.locator('#jsel')).toHaveValue('JRN-07');
+    await openJourney(app, 'JRN-02');
+    await expect(app.locator('#crumb .cur')).toHaveText('JRN-02');
+    await expect(app.locator('#vbar .vb-name')).toContainText('JRN-02');
     await app.locator('#btn-jback').click();
     await expect(app.locator('#jl-card')).toBeVisible();
-    await expect(app.locator('#crumb .cur')).toHaveText('Journey Builder');
+    await expect(app.locator('#crumb .cur')).toHaveText('Journeys');
   });
 
   test('Create your journey: a centred screen, then the canvas with the entry step', async ({ app }) => {
@@ -35,7 +35,7 @@ test.describe('journey builder and monitor', () => {
     await expect(app.locator('#jl-card .cc-hd h2')).toHaveText('Create your journey');
     await expect(app.locator('#jsplit')).toBeHidden();
     await expect(app.locator('#jc-name')).toBeFocused();
-    await expect(app.locator('#jl-card [data-trig]')).toHaveCount(3);
+    await expect(app.locator('#jl-card [data-trig]')).toHaveCount(7);
     await app.locator('[data-trig="segment"]').click();
     await expect(app.locator('#jc-seg')).toBeVisible();
     await app.locator('#jc-start').click();
@@ -43,8 +43,8 @@ test.describe('journey builder and monitor', () => {
     await app.locator('#jc-name').fill('Package expiring — renewal nudge');
     await app.locator('#jc-start').click();
     await expect(app.locator('#jsplit')).toBeVisible();
-    const j = await app.evaluate(() => { const x = JOURNEYS.find((y) => y.id === curJ); return { name: x.name, status: x.status, entry: x.nodes[0].type, mode: x.nodes[0].cfg.mode }; });
-    expect(j).toEqual({ name: 'Package expiring — renewal nudge', status: 'Draft', entry: 'entry', mode: 'Segment entry' });
+    const j = await app.evaluate(() => { const x = JOURNEYS.find((y) => y.id === curJ); const n = x.versions[0].nodes; return { name: x.name, status: jStatus(x), entry: n[0].type, kind: n[0].cfg.kind, exit: n[1].type }; });
+    expect(j).toEqual({ name: 'Package expiring — renewal nudge', status: 'Draft', entry: 'entry', kind: 'segment', exit: 'exit' });
     await expect(app.locator('#canvas .node').first()).toBeVisible();
   });
 
@@ -56,12 +56,12 @@ test.describe('journey builder and monitor', () => {
   });
 
   test('the canvas is fitted the first time the builder is opened', async ({ app }) => {
-    // The prototype boots on the Dashboard, so the canvas is measured and fitted
+    // The prototype boots on the journey list, so the canvas is measured and fitted
     // when the builder is first shown — not at boot, where the hidden SVG
-    // measures 0x0. fitView has a zoom floor of 0.45, so a wide journey can
+    // measures 0x0. fitView has a zoom floor of 0.6, so a wide journey can
     // still run off the right edge; what must hold is that the journey starts
     // at the top left of the viewport rather than somewhere off screen.
-    await expect(app.locator('.view.active')).toHaveId('view-dashboard');
+    await expect(app.locator('.view.active')).toHaveId('view-journeys');
     await openJourney(app);
 
     const placed = await app.evaluate(() => {
