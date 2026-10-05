@@ -87,7 +87,7 @@ test.describe('step inventory', () => {
     await openDraft(app);
     // the sample draft has an unconnected "rejected" path
     await app.locator('#btn-validate').click();
-    await expect(app.locator('#toast')).toContainText('Every path ends in an Exit: Paid?');
+    await expect(app.locator('#jvalid')).toContainText('Every path ends in an Exit: Paid?');
     await app.locator('#btn-activate').click();
     await expect(app.locator('#toast')).toContainText('Cannot activate');
     expect(await app.evaluate(() => JOURNEYS.find((j) => j.id === 'JRN-06').versions[0].status)).toBe('Draft');

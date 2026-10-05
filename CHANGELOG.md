@@ -2,6 +2,14 @@
 
 Version numbers follow the published artifact versions.
 
+## v61 — 5 Oct 2026
+**Journey Studio, phase (d): validation panel, Journey Monitor, anomalies.**
+- **Validation panel** above the canvas: Validate toggles it, a refused Activate opens it; every check listed, failing ones name the step and select it on click.
+- **Journey Monitor** rebuilt per journey. *General*: entered / active / exited / conversions, channel totals (sent · opened · clicked · converted), **Anomaly alerts** from the Marketing Agent (2–3 steps whose daily volume deviates from the 30-day baseline, with confidence, Open step / Dismiss), the versions table (status, activated by/when, entry, counters, View version, Step export) and the participant list at a point in time. *View version*: the read-only canvas with the stats strip and alert markers, a steps table, Open in builder.
+- **Step export** (mock download) with strategy: entered / exited / was in / entered and exited; opened from a step on the monitor canvas or the tables.
+- **Time range** (7 / 30 / 90 days / all) scales what the monitor shows; the simulation strip drives the same counters as the builder's stats strip.
+- Tests: `monitor.spec.js` (General, View version, export, time range + simulation, validation panel).
+
 ## v60 — 5 Oct 2026
 **Journey Studio, phase (c): the step inventory.**
 - Palette grouped **Entry · Message · Wait · Split · Action**. Exactly one Entry step per version; the Entry group swaps its type: Segment (segment, evaluation frequency, time slot), Date attribute (attribute, offset before/after/on, yearly), Event (API/BSS) (event picker, payload fields, create-contact flag, **API code** sample), Joins list, Unengaged (channel, days), Digital Twin signal (CM), Agent suggestion (CM, read-only card). Common: include project segment, re-entry rule (never / after N days / always).
