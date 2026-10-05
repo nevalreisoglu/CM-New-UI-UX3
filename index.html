@@ -151,7 +151,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 .note{background:var(--warn-soft);border-radius:4px;padding:8px 10px;font-size:12px;color:var(--sec-ink)}
 .empty{color:var(--ink-3);padding:24px;text-align:center}
 /* journey builder */
-.jb{display:grid;grid-template-columns:120px 1fr;flex:1;min-height:0;transition:grid-template-columns .15s}
+.jb{display:grid;grid-template-columns:168px 1fr;flex:1;min-height:0;transition:grid-template-columns .15s}
 .jb.pal-closed{grid-template-columns:44px 1fr}
 .palette{border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:8px;overflow:auto}
 .palette .pt{font-weight:600;font-size:13px;display:flex;align-items:center}
@@ -252,6 +252,33 @@ svg.canvas{display:block;width:100%;height:100%;user-select:none}
 .log .ok{color:var(--ok)} .log .warn{color:var(--warn)} .log .bad{color:var(--bad)} .log .acc{color:var(--acc)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 20px 16px}
 .padx{padding:0 20px 16px}
+/* step cards, grouped palette, entry types, path lists (Journey Studio) */
+.node text.sum{font-size:10px;fill:var(--ink-2)}
+.node text.stat{font-size:9.5px;fill:var(--ink-3)}
+.node text.stat tspan{fill:var(--ink);font-weight:600}
+.palette .pg{display:flex;flex-direction:column;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-top:6px}
+.palette .pg small{text-transform:none;letter-spacing:0;font-weight:400;font-size:10px}
+.palette button span em{font-style:normal;font-size:9px;padding:0 4px;border-radius:3px;background:var(--acc-soft);color:var(--cta-hover);vertical-align:middle}
+.jb.pal-closed .palette .pg{display:none}
+.etype{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.etype button{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:5px;padding:5px 7px;font-size:11.5px;text-align:left;cursor:pointer}
+.etype button i{font-style:normal;color:var(--t-entry-i)}
+.etype button small{margin-left:auto;font-size:9px;padding:0 4px;border-radius:3px;background:var(--acc-soft);color:var(--cta-hover)}
+.etype button.on{border-color:var(--cta-bright);background:var(--cta-soft)}
+.etype button[disabled]{opacity:.6;cursor:not-allowed}
+.paths,.seglist{display:flex;flex-direction:column;gap:4px}
+.path{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 8px;border:1px solid var(--line-2);border-radius:5px;background:var(--surface-2)}
+.path b{min-width:64px}.path span{flex:1;color:var(--ink-2)}.path em{color:var(--warn);font-style:normal}
+.path a{cursor:pointer;color:var(--ink-3);padding:0 4px}.path a:hover{color:var(--bad)}
+.path input{border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:12px}
+.agentcard{border:1px solid var(--line);border-left:3px solid var(--cta-bright);border-radius:6px;padding:10px 12px;background:var(--surface-2)}
+.agentcard .ac-h{font-weight:600;font-size:12.5px;color:var(--cta-hover)}.agentcard p{margin:6px 0;font-size:12.5px}.agentcard .ac-f{font-size:11px;color:var(--ink-3)}
+.apicode{font-size:11px;white-space:pre-wrap;background:var(--surface-2);border:1px solid var(--line-2);border-radius:6px;padding:10px;margin:0}
+.pols{display:flex;flex-direction:column;gap:4px}.pols .ck small{color:var(--ink-3);margin-left:4px}
+.ck.warn{background:var(--warn-soft);padding:6px 8px;border-radius:5px}
+.cc-trig.ek{grid-template-columns:repeat(4,1fr)}
+.cc-trig.ek .cc-card i{font-style:normal;font-size:20px;color:var(--t-entry-i)}
+.cc-trig.ek .cc-card b small{font-size:9px;padding:0 4px;border-radius:3px;background:var(--acc-soft);color:var(--cta-hover);vertical-align:middle}
 /* version bar + journey settings + list extras (Journey Studio) */
 .vbar{flex-wrap:wrap;row-gap:6px}
 .vbar .vb-name{display:inline-flex;align-items:center;gap:6px;font-size:13px;max-width:380px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1156,7 +1183,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
         <div class="card left">
           <div class="jb" id="jb">
             <div class="palette" id="palette">
-              <div class="pt"><span>Palette</span><button class="tog" id="btn-pal" title="Collapse palette" aria-label="Collapse palette"><i></i></button></div><div class="ps">Drag onto canvas, or click to add after the selected step</div>
+              <div class="pt"><span>Palette</span><button class="tog" id="btn-pal" title="Collapse palette" aria-label="Collapse palette"><i></i></button></div><div class="ps">Drag onto the canvas, or click to add after the selected step. Entry types swap the entry step.</div>
             </div>
             <div class="cright">
               <div class="ctool vbar" id="vbar" style="background:var(--surface-2)"></div>
@@ -1184,7 +1211,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
               </div>
               <div class="canvas-wrap" id="cwrap">
                 <svg class="canvas" id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
-                <div class="legend">✓ executed · ▶ current step · ● customers at step · drag to pan / move · orange port → connect · × on a step or Delete key removes it · click a link's label to remove the connection</div>
+                <div class="legend">✓ executed · ▶ current step · ● contacts at step · drag to pan / move · orange port → connect (next free path) · × on a step or Delete key removes it · click a path label to disconnect · paths may merge</div>
               </div>
             </div>
           </div>
@@ -1205,7 +1232,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
     <section class="view" id="view-policies">
       <div class="split">
         <div class="card left">
-          <div class="card-h"><h2>Policies</h2><p>Policies are objects attached to offers, journeys or groups of them — not global parameters. Existing communication rules (consent, overlap, cooldown, pre-sent) keep running underneath at delivery time.</p></div>
+          <div class="card-h"><h2>Policies</h2><p>Read-only list. A policy is attached to a journey's Delivery step (Communication rules); consent and exclusion lists always apply underneath. Kept from CM — Symplify has no equivalent.</p></div>
           <div id="pol-left"></div>
         </div>
         <aside class="card panel">
@@ -1321,7 +1348,7 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
           </div>
           <div class="padx">
           <table class="tbl" id="ptable">
-            <thead><tr><th>Customer</th><th>Segment</th><th>Current step(s)</th><th>Status</th><th>Open offers</th><th>Preferred channels</th><th>Since</th></tr></thead>
+            <thead><tr><th>Contact</th><th>Segment</th><th>Current step(s)</th><th>Status</th><th>Entered by</th><th>Preferred channels</th><th>Since</th></tr></thead>
             <tbody></tbody>
           </table></div>
         </div>
@@ -1464,85 +1491,123 @@ const DEMO_USERS={me:'Ayşe Demir',approver:'Mert Yıldız',approver2:'Selin Kay
 document.getElementById('me-name').textContent=DEMO_USERS.me;
 const TODAY='2026-09-14';
 /* ---------- DATA ---------- */
-const OFFERS = [
-  {id:'OFR-1042', name:'10% bonus on next top-up', catalog:'PO-88231 · Bonus Top-up 10%', params:{bonusPct:10, validityDays:7}, priority:20, tags:['Mobile','Prepaid','Retention','Bonus'], status:'Active',
-   eligibility:[['customerType','equals','prepaid'],['churnRisk','greater and equal',0.6],['balance','lower','30']],
-   content:{sms:{uk:'Поповніть рахунок сьогодні та отримайте +10% бонусу.', en:'Top up today and get +10% bonus.'}, push:{en:'Your +10% bonus is waiting — top up now.'}, app:{en:'Top-up bonus: +10% for 7 days'}},
-   stageContent:{presented:'Top-up bonus: +10%', accepted:'Bonus active until {{expiry}}'}, activation:'TMF622 ProductOrder → add PO-88231 with bonusPct=10', journeys:['JRN-07','JRN-20']},
-  {id:'OFR-1043', name:'5GB extra data, 30 days', catalog:'PO-88240 · Data Add-on 5GB', params:{gb:5, validityDays:30}, priority:14, tags:['Mobile','Prepaid','Upsell','Data'], status:'Active',
-   eligibility:[['dataUsageGb','greater','4'],['plan','not equals','Unlimited']],
-   content:{push:{en:'5 GB extra for 30 days — one tap to add.'}, app:{en:'Add 5 GB for 30 days'}, sms:{en:'Reply YES to add 5 GB for 30 days.'}},
-   stageContent:{presented:'5 GB extra, 30 days', accepted:'5 GB active'}, activation:'TMF622 ProductOrder → add PO-88240', journeys:['JRN-07','JRN-12']},
-  {id:'OFR-1051', name:'5G upgrade, first month free', catalog:'PO-90012 · 5G Access', params:{trialDays:30}, priority:9, tags:['Mobile','Postpaid','Upsell','5G'], status:'Active',
-   eligibility:[['device5g','equals','true'],['region','not equals','Occupied']],
-   content:{email:{en:'Try 5G free for a month.'}, push:{en:'5G is ready on your device — first month free.'}, app:{en:'Upgrade to 5G — 30 days free'}},
-   stageContent:{presented:'5G — first month free', accepted:'5G active, trial ends {{expiry}}'}, activation:'TMF622 ProductOrder → add PO-90012 trial', journeys:['JRN-12']},
-  {id:'OFR-1060', name:'Retention call — personal offer', catalog:'— (ticket, no catalog item)', params:{queue:'Retention', priority:'High'}, priority:30, tags:['Mobile','Retention','Assisted'], status:'Active',
-   eligibility:[['churnRisk','greater and equal',0.8]],
-   content:{tm:{en:'Script: RET-07 personal offer'}}, stageContent:{presented:'Callback scheduled', accepted:'Retention offer applied by agent'}, activation:'Ticket → CRM REST (queue=Retention, priority=High)', journeys:['JRN-07']},
-  {id:'OFR-1071', name:'Welcome pack: 1GB + 100 min', catalog:'PO-77001 · Welcome Pack', params:{validityDays:14}, priority:12, tags:['Mobile','Onboarding','Gift'], status:'Draft',
-   eligibility:[['tenureDays','lower and equal','14']],
-   content:{sms:{en:'Welcome! Your 1 GB + 100 min gift is active for 14 days.'}, email:{en:'Welcome to the network.'}}, stageContent:{presented:'Welcome gift', accepted:'Gift active'}, activation:'TMF622 ProductOrder → add PO-77001', journeys:['JRN-12']},
-];
-
 /* Journey model: a journey is a container (name, folder, lifecycle phase, settings); the steps live in a
    journey VERSION. Version statuses: Draft → Active → Closing → Closed. One Active version per journey;
    activating a new one puts the current Active into Closing (no new entries, contacts finish their steps,
    auto-Closed when empty). Journey status is derived: Draft / Live / Past (jStatus). */
+/* ---- entry: one node per version, cfg.kind picks the entry type ---- */
+const ENTRY_KINDS={
+  segment:{k:'Segment',ic:'◉',d:'Contacts matching a segment, evaluated on a schedule.'},
+  dateAttr:{k:'Date attribute',ic:'📅',d:'N days before / after a date on the contact — birthday, trial end, contract end.'},
+  event:{k:'Event (API / BSS)',ic:'⚡',d:'Immediate: an event arrives from the API or the BSS.'},
+  joinsList:{k:'Joins list',ic:'⊕',d:'Immediate: a contact is added to a list or datamart.'},
+  unengaged:{k:'Unengaged',ic:'◌',d:'No engagement on a channel for N days.'},
+  twin:{k:'Digital Twin signal',ic:'✦',d:'A score or community change from Digital Twin.',cm:true},
+  agent:{k:'Agent suggestion',ic:'✧',d:'Proposed by the Marketing Agent, with its rationale.',cm:true},
+};
+const DATE_ATTRS=['BIRTHDAY','TRIAL_END_DATE','CONTRACT_END_DATE','PLAN_ANNIVERSARY','LAST_PAYMENT_DATE','PORT_IN_DATE'];
+const EVENT_NAMES=['order_abandoned','account_created','plan_changed','payment_failed','payment_received','level_up','referral_sent','data_topup','trial_ended','sim_activated','plan_cancel_requested','support_ticket_closed'];
+const EVENT_PAYLOADS={order_abandoned:{orderId:'ORD-5521',plan:'Mobile 20 GB',step:'payment',language:'fr'},account_created:{accountId:'ACC-91022',language:'en',referralCode:'FIZZ-A1B2'},plan_changed:{from:'Mobile 8 GB',to:'Mobile 20 GB'},payment_failed:{invoiceId:'INV-20339',amount:42.5,reason:'card_declined'},payment_received:{invoiceId:'INV-20339',amount:42.5},level_up:{from:3,to:4,perk:'10 GB bonus'},referral_sent:{code:'FIZZ-A1B2',channel:'sms'},data_topup:{gb:5},trial_ended:{plan:'Home Internet 60'},sim_activated:{msisdn:'+1 5XX …'},plan_cancel_requested:{reason:'price'},support_ticket_closed:{ticket:'TCK-7742',csat:4}};
+const LISTS=['Newsletter opt-ins','Imported leads · Q3','Referral programme members','Beta console users'];
+const UNENG_CHANNELS=[['email','Email'],['push','Push'],['sms','SMS'],['any','Any channel']];
+const TWIN_SIGNALS=['Churn propensity ↑','CLV tier change','Community change'];
+const EVAL_FREQ=['daily','weekly','monthly'];
+const EVAL_SLOTS=['06:00','09:00','12:00','18:00'];
+const REENTRY=['never','after N days','always'];
+function entryDefaults(kind){ const base={kind,includeProject:true,reentry:'after N days',reentryDays:30};
+  const per={segment:{segment:(MLS.find(m=>!m.excl)?mlLabel(MLS.find(m=>!m.excl)):''),freq:'daily',slot:'09:00'},
+    dateAttr:{attr:'BIRTHDAY',offset:0,dir:'on',yearly:true},
+    event:{event:'order_abandoned',payload:'orderId, plan, language',createContact:false},
+    joinsList:{list:LISTS[0],source:'any'},
+    unengaged:{channel:'email',days:90},
+    twin:{signal:TWIN_SIGNALS[0],threshold:0.7},
+    agent:{rationale:'Contacts whose data use fell 40% in 30 days and who opened no email since — the Agent proposes a winback nudge before the next invoice.'}};
+  return Object.assign(base,per[kind]||{}); }
 const PHASES=['Acquire','Onboard','Grow','Retain','Winback'];
 const FOLDERS=['churn_reduction','free-trial','loyalty','console-marketing'];
 const EXPIRY_ACTIONS=[['closing','Closing — no new entries, contacts inside finish'],['closed','Closed — stop everything']];
 const jCanAct=()=>ROLE==='approver'||ROLE==='admin';
 const V_STATUS_CLS={Draft:'grey',Active:'ok',Closing:'warn',Closed:''};
 const J_STATUS_CLS={Draft:'grey',Live:'ok',Past:''};
-function jBlank(o){ return Object.assign({id:'',name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],priority:50,endDate:'',expiryAction:'closing',ignoreUnsub:false,testUsers:[DEMO_USERS.me+' (test MSISDN)'],created:TODAY,updated:TODAY,createdBy:DEMO_USERS.me,entry:{reentryDays:30,maxConcurrent:1},exit:{goal:'offer_accepted',goalAction:'Activate offer via BSS',expireDays:14},versions:[],cur:1},o); }
+function jBlank(o){ return Object.assign({id:'',name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],priority:50,endDate:'',expiryAction:'closing',ignoreUnsub:false,testUsers:[DEMO_USERS.me+' (test MSISDN)'],created:TODAY,updated:TODAY,createdBy:DEMO_USERS.me,versions:[],cur:1},o); }
+/* step builders for the sample data — coordinates are canvas pixels */
+const E=(kind,cfg,x,y,next)=>({id:'e1',type:'entry',x,y,label:(ENTRY_KINDS[kind]||{}).k||'Entry',cfg:Object.assign({kind,includeProject:true,reentry:'after N days',reentryDays:30},cfg),next});
+const D=(id,label,ch,content,x,y,next,extra)=>({id,type:'delivery',x,y,label,cfg:Object.assign({channel:ch,content,variant:'Single content',stopAfter:'1 channel',controlGroup:'off',contentB:'',abSplit:20,dyn:'LANGUAGE',policies:['POL-C1'],sendUnsub:false},extra||{}),next});
+const X=(id,label,x,y,goal)=>({id,type:'exit',x,y,label,cfg:{goal:!!goal},next:[]});
+const N=(id,type,label,cfg,x,y,next)=>({id,type,x,y,label,cfg,next});
+const L=(to,label)=>({to,label});
+/* Fizz-flavoured sample journeys (mock, no real person). Contacts ≈ 1.96 M; the 30-row demo datamart drives the
+   simulation and the big numbers are display-scaled in the list and the monitor. */
 const JOURNEYS = [
-  jBlank({id:'JRN-20', name:'Balance low — instant top-up nudge', desc:'Event-only demo journey with second-based timers', folder:'loyalty', phase:'Grow', created:'2026-09-10', createdBy:DEMO_USERS.me,
-   entry:{reentryDays:1, maxConcurrent:1}, exit:{goal:'offer_accepted', goalAction:'Activate offer via BSS', expireDays:1},
-   versions:[{v:1,status:'Active',activatedAt:'2026-09-10 09:12',activatedBy:DEMO_USERS.approver,nodes:[
-    {id:'e1',type:'entry',x:40,y:140,label:'Entry',cfg:{segment:'— (event only)', events:'balance_low', mode:'Event only'}, next:['e2']},
-    {id:'e2',type:'nbo',x:230,y:140,label:'Pick best offer',cfg:{source:'Digital Twin NBO (API)', scope:'Tag: Mobile › Prepaid', fallback:'OFR-1042', min:'score ≥ 0.5'}, next:['e3']},
-    {id:'e3',type:'delivery',x:420,y:140,label:'SMS',cfg:{campaign:'3310 · Top-up bonus 10%', channel:'sms', content:'SMS-302 · Top-up bonus +10%', variant:'Single content', stopAfter:'1 channel', controlGroup:'off'}, next:['e4']},
-    {id:'e4',type:'timer',x:610,y:140,label:'Wait 10 s',cfg:{duration:'10 seconds', at:'immediately'}, next:['e5']},
-    {id:'e5',type:'wait',x:800,y:140,label:'Accepted?',cfg:{event:'offer_accepted', timeout:'20 seconds'}, next:[{to:'e6',label:'accepted'},{to:'e7',label:'timeout'}]},
-    {id:'e6',type:'exit',x:1000,y:40,label:'Goal reached',cfg:{action:'Activate offer → BSS (TMF622)'}, next:[]},
-    {id:'e7',type:'delivery',x:1000,y:240,label:'Reminder push',cfg:{campaign:'3311 · Bonus reminder', channel:'push', content:'PSH-402 · Bonus reminder', variant:'Single content', stopAfter:'1 channel', controlGroup:'off'}, next:['e8']},
-    {id:'e8',type:'exit',x:1190,y:240,label:'Exit',cfg:{action:'Apply invitation policy 20 days'}, next:[]},
-   ]}], cur:1}),
-  jBlank({id:'JRN-07', name:'Churn prevention — prepaid', desc:'Balance-low trigger, top-up bonus, reminder, retention ticket', folder:'churn_reduction', phase:'Retain', priority:80, created:'2026-08-28', createdBy:DEMO_USERS.me,
-   entry:{reentryDays:30, maxConcurrent:2}, exit:{goal:'offer_accepted', goalAction:'Activate offer via BSS', expireDays:14},
-   versions:[{v:3,status:'Active',activatedAt:'2026-09-12 10:05',activatedBy:DEMO_USERS.approver,nodes:[
-    {id:'n1',type:'entry',x:40,y:220,label:'Entry',cfg:{segment:'ML-2201 · Prepaid churn risk ≥ 0.6', events:'balance_low', mode:'Segment + event'}, next:['n2']},
-    {id:'n2',type:'offer',x:260,y:220,label:'Present offer',cfg:{offer:'OFR-1042', priorityBoost:'+5 for 30 min after app open'}, next:['n3']},
-    {id:'n3',type:'delivery',x:480,y:220,label:'SMS',cfg:{campaign:'3310 · Top-up bonus 10%', channel:'Preferred cascade (push → sms → email)', content:'Per-channel content set · Renewal', variant:'Dynamic content (rule on categorical attribute)', stopAfter:'2 channels', controlGroup:'5% per channel'}, next:['n4']},
-    {id:'n4',type:'wait',x:700,y:220,label:'Wait for event',cfg:{event:'offer_accepted', timeout:'3 days'}, next:[{to:'n9',label:'accepted'},{to:'n5',label:'timeout'}]},
-    {id:'n5',type:'cond',x:920,y:330,label:'Condition',cfg:{expr:'delivery.opened equals true'}, next:[{to:'n6',label:'yes'},{to:'n8',label:'no'}]},
-    {id:'n6',type:'delivery',x:1140,y:240,label:'Push',cfg:{campaign:'3311 · Bonus reminder', channel:'push', content:'PSH-402 · Bonus reminder', variant:'Single content', stopAfter:'1 channel', controlGroup:'off'}, next:['n7']},
-    {id:'n7',type:'wait',x:1360,y:240,label:'Wait for event',cfg:{event:'offer_accepted', timeout:'2 days'}, next:[{to:'n9',label:'accepted'},{to:'n10',label:'timeout'}]},
-    {id:'n8',type:'ext',x:1140,y:430,label:'External call',cfg:{system:'CRM ticket API (REST)', payload:'queue=Retention, priority=High, offer=OFR-1060', store:'ticketId'}, next:['n10']},
-    {id:'n9',type:'exit',x:1140,y:80,label:'Goal reached',cfg:{action:'Activate offer → BSS (TMF622)'}, next:[]},
-    {id:'n10',type:'exit',x:1580,y:330,label:'Exit',cfg:{action:'Apply invitation policy 45 days'}, next:[]},
-   ]}], cur:3}),
-  jBlank({id:'JRN-12', name:'Onboarding master — new subscribers', desc:'Parallel welcome + app adoption, then route by device', folder:'free-trial', phase:'Onboard', created:'2026-09-01', createdBy:DEMO_USERS.crm,
-   entry:{reentryDays:365, maxConcurrent:1}, exit:{goal:'day_30_reached', goalAction:'Hand over to growth journey', expireDays:35},
-   versions:[{v:1,status:'Active',activatedAt:'2026-09-01 14:40',activatedBy:DEMO_USERS.approver2,nodes:[
-    {id:'m1',type:'entry',x:40,y:220,label:'Entry',cfg:{segment:'— (event only)', events:'subscription_activated', mode:'Event only'}, next:['m2']},
-    {id:'m2',type:'par',x:260,y:220,label:'Parallel',cfg:{branches:'2', join:'wait for all'}, next:[{to:'m3',label:'A'},{to:'m5',label:'B'}]},
-    {id:'m3',type:'delivery',x:480,y:110,label:'Email',cfg:{campaign:'2001 · Welcome', channel:'email', content:'EML-201 · Welcome (banner)', variant:'A/B test (2 variants, winner by open rate)', stopAfter:'1 channel', controlGroup:'off'}, next:['m4']},
-    {id:'m4',type:'timer',x:700,y:110,label:'Timer',cfg:{duration:'1 day', at:'10:00 local'}, next:['m7']},
-    {id:'m5',type:'cond',x:480,y:330,label:'Condition',cfg:{expr:'appInstalled equals true'}, next:[{to:'m7',label:'yes'},{to:'m6',label:'no'}]},
-    {id:'m6',type:'delivery',x:700,y:420,label:'SMS',cfg:{campaign:'2002 · Get the app', channel:'sms', content:'SMS-310 · Get the app link', variant:'Single content', stopAfter:'1 channel', controlGroup:'off'}, next:['m7']},
-    {id:'m7',type:'par',x:920,y:220,label:'Join',cfg:{branches:'2', join:'wait for all'}, next:['m8']},
-    {id:'m8',type:'cond',x:1140,y:220,label:'Condition',cfg:{expr:'device5g equals true'}, next:[{to:'m9',label:'5G device'},{to:'m10',label:'other'}]},
-    {id:'m9',type:'call',x:1360,y:110,label:'Call journey',cfg:{journey:'JRN-15 · 5G upsell', mode:'start and continue'}, next:['m11']},
-    {id:'m10',type:'offer',x:1360,y:330,label:'Present offer',cfg:{offer:'OFR-1043', priorityBoost:'none'}, next:['m11']},
-    {id:'m11',type:'exit',x:1580,y:220,label:'Exit',cfg:{action:'Hand over to growth journey'}, next:[]},
-   ]}], cur:1}),
+  jBlank({id:'JRN-01', name:'Device order flow abandonment', desc:'A contact leaves the device checkout: route by language and account age, nudge once, exit.', folder:'console-marketing', phase:'Acquire', priority:70, created:'2026-03-02', createdBy:DEMO_USERS.growth, cur:13,
+   versions:(()=>{ const nodes=()=>[
+     E('event',{event:'order_abandoned',payload:'orderId, plan, language',createContact:true,reentry:'after N days',reentryDays:7},40,200,['s2']),
+     N('s2','splitSeg','Language × account age',{segments:['ML-2511 · FR · new account ≤ 30 days','ML-2512 · EN · new account ≤ 30 days','ML-2501 · Language · FR']},300,200,[L('s3','ML-2511'),L('s4','ML-2512'),L('s5','ML-2501'),L('s6','Remaining')]),
+     D('s3','Email FR · nouveau compte','email','EML-301 · Finish your order (FR)',560,40,['s8']),
+     D('s4','Email EN · new account','email','EML-302 · Finish your order (EN)',560,180,['s8']),
+     D('s5','Email FR','email','EML-303 · Your cart is waiting (FR)',560,320,['s8']),
+     D('s6','Email EN','email','EML-304 · Your cart is waiting (EN)',560,460,['s8']),
+     N('s8','waitDur','Hold 3 days',{n:3,unit:'days'},820,250,['s7']),
+     X('s7','Exit',1080,250)];
+     const vs=[]; for(let v=1;v<=11;v++) vs.push({v,status:'Closed',activatedAt:`2026-0${3+Math.floor((v-1)/4)}-${String(2+((v-1)%4)*7).padStart(2,'0')} 10:00`,activatedBy:v%2?DEMO_USERS.approver:DEMO_USERS.approver2,closedAt:`2026-0${3+Math.floor(v/4)}-${String(2+(v%4)*7).padStart(2,'0')} 10:00`,nodes:nodes()});
+     vs.push({v:12,status:'Closing',activatedAt:'2026-09-01 10:00',activatedBy:DEMO_USERS.approver,closingAt:'2026-09-12 09:40',nodes:nodes()});
+     vs.push({v:13,status:'Active',activatedAt:'2026-09-12 09:40',activatedBy:DEMO_USERS.approver,nodes:nodes()});
+     return vs; })()}),
+  jBlank({id:'JRN-02', name:'Free trial – communication après la fin', desc:'The day after a trial ends: an email in the contact\'s language, a reminder by SMS when it is not opened.', folder:'free-trial', phase:'Onboard', priority:60, created:'2026-06-14', createdBy:DEMO_USERS.me, cur:2,
+   versions:[{v:1,status:'Closed',activatedAt:'2026-06-15 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-08-20 09:00',nodes:[E('dateAttr',{attr:'TRIAL_END_DATE',offset:1,dir:'after',yearly:false},40,120,['s2']),D('s2','Email · après l\'essai','email','EML-311 · Votre essai est terminé (FR/EN)',300,120,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),X('s3','Exit',560,120)]},
+    {v:2,status:'Active',activatedAt:'2026-08-20 09:00',activatedBy:DEMO_USERS.approver2,nodes:[
+     E('dateAttr',{attr:'TRIAL_END_DATE',offset:1,dir:'after',yearly:false},40,160,['s2']),
+     D('s2','Email · après l\'essai','email','EML-311 · Votre essai est terminé (FR/EN)',300,160,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),
+     N('s3','waitDur','Wait 3 days',{n:3,unit:'days'},560,160,['s4']),
+     N('s4','splitEng','Opened?',{delivery:'s2',interactions:['opened']},820,160,[L('s6','opened'),L('s5','Remaining')]),
+     D('s5','SMS rappel','sms','SMS-321 · Rappel essai (FR/EN)',1080,280,['s6'],{variant:'Dynamic content (rule on categorical attribute)'}),
+     X('s6','Exit',1340,160)]}]}),
+  jBlank({id:'JRN-03', name:'Birthday reward', desc:'A bonus on the contact\'s birthday, every year.', folder:'loyalty', phase:'Grow', priority:40, created:'2026-01-20', createdBy:DEMO_USERS.crm, cur:1,
+   versions:[{v:1,status:'Active',activatedAt:'2026-01-22 11:15',activatedBy:DEMO_USERS.approver,nodes:[
+     E('dateAttr',{attr:'BIRTHDAY',offset:0,dir:'on',yearly:true,reentry:'after N days',reentryDays:300},40,120,['s2']),
+     N('s2','setAttr','Flag the reward',{attr:'LAST_NUDGE_AT',mode:'timestamp',value:''},300,120,['s3']),
+     D('s3','Email · bonne fête','email','EML-331 · Joyeux anniversaire · 2 GB (FR/EN)',560,120,['s4'],{variant:'Dynamic content (rule on categorical attribute)'}),
+     X('s4','Exit',820,120)]}]}),
+  jBlank({id:'JRN-04', name:'Winback – unengaged 90d', desc:'No email engagement for 90 days: a winback email, then an SMS for those who did not open or click.', folder:'churn_reduction', phase:'Winback', priority:85, created:'2026-04-08', createdBy:DEMO_USERS.me, cur:4,
+   versions:[{v:3,status:'Closed',activatedAt:'2026-07-01 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-09-05 09:00',nodes:[E('unengaged',{channel:'email',days:90},40,160,['s2']),D('s2','Email winback','email','EML-341 · We miss you (FR/EN)',300,160,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),X('s3','Exit',560,160)]},
+    {v:4,status:'Active',activatedAt:'2026-09-05 09:00',activatedBy:DEMO_USERS.approver,nodes:[
+     E('unengaged',{channel:'email',days:90,reentry:'after N days',reentryDays:180},40,200,['s2']),
+     D('s2','Email winback','email','EML-341 · We miss you (FR/EN)',300,200,['s3'],{variant:'A/B test (2 variants, winner by open rate)',contentB:'EML-342 · 10 GB on us (FR/EN)',abSplit:30,controlGroup:'5% per channel'}),
+     N('s3','waitDur','Wait 5 days',{n:5,unit:'days'},560,200,['s4']),
+     N('s4','splitEng','Engaged?',{delivery:'s2',interactions:['clicked','opened']},820,200,[L('s7','clicked'),L('s6','opened'),L('s5','Remaining')]),
+     D('s5','SMS fallback','sms','SMS-351 · Winback SMS (FR/EN)',1080,340,['s6'],{variant:'Dynamic content (rule on categorical attribute)',policies:['POL-C1','POL-C3']}),
+     X('s6','Exit',1340,200),
+     X('s7','Won back',1080,60,true)]}]}),
+  jBlank({id:'JRN-05', name:'Loyalty level up', desc:'A contact reaches a new loyalty level: store the tier, congratulate by push.', folder:'loyalty', phase:'Grow', priority:30, created:'2026-05-11', createdBy:DEMO_USERS.crm, cur:1,
+   versions:[{v:1,status:'Active',activatedAt:'2026-05-12 15:30',activatedBy:DEMO_USERS.approver2,nodes:[
+     E('event',{event:'level_up',payload:'from, to, perk',createContact:false,reentry:'always'},40,120,['s2']),
+     N('s2','setAttr','Store the tier',{attr:'LOYALTY_TIER',mode:'static',value:'{{payload.to}}'},300,120,['s3']),
+     D('s3','Push · niveau supérieur','push','PSH-361 · Level up! (FR/EN)',560,120,['s4'],{variant:'Dynamic content (rule on categorical attribute)',policies:[]}),
+     X('s4','Exit',820,120)]}]}),
+  jBlank({id:'JRN-06', name:'Payment failed – dunning', desc:'Draft: a card is declined — ask for a new one, wait for the payment, remind by SMS.', folder:'churn_reduction', phase:'Retain', priority:95, created:'2026-09-10', createdBy:DEMO_USERS.me, cur:1,
+   versions:[{v:1,status:'Draft',createdAt:'2026-09-10 16:20',nodes:[
+     E('event',{event:'payment_failed',payload:'invoiceId, amount, reason',createContact:false,reentry:'always'},40,160,['s2']),
+     D('s2','Email · paiement refusé','email','EML-371 · Payment declined (FR/EN)',300,160,['s3'],{variant:'Dynamic content (rule on categorical attribute)',policies:[]}),
+     N('s3','waitEvent','Paid?',{event:'payment_received',timeoutN:3,timeoutUnit:'days'},560,160,[L('s6','accepted'),L('s4','timeout')]),
+     D('s4','SMS rappel paiement','sms','SMS-381 · Payment reminder (FR/EN)',820,300,['s5'],{policies:[]}),
+     X('s5','Exit',1080,300),
+     X('s6','Paid',820,40,true)]}]}),
+  jBlank({id:'JRN-07', name:'Summer referral push', desc:'Past: a monthly referral nudge to active members over the summer.', folder:'console-marketing', phase:'Grow', priority:20, endDate:'2026-08-31', created:'2026-05-28', createdBy:DEMO_USERS.growth, cur:1,
+   versions:[{v:1,status:'Closed',activatedAt:'2026-06-01 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-08-31 23:59',nodes:[
+     E('segment',{segment:'ML-2520 · Active members · 6+ months',freq:'monthly',slot:'09:00',reentry:'after N days',reentryDays:30},40,120,['s2']),
+     D('s2','Email · parrainage','email','EML-391 · Refer a friend (FR/EN)',300,120,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),
+     X('s3','Exit',560,120)]}]}),
 ];
-/* JRN-07 also carries the previous version, still Closing: a copy of v3 without the retention ticket branch. */
-{ const j=JOURNEYS[1], v3=j.versions[0]; const nodes=JSON.parse(JSON.stringify(v3.nodes)).filter(n=>n.id!=='n8'); nodes.find(n=>n.id==='n5').next=[{to:'n6',label:'yes'},{to:'n10',label:'no'}];
-  j.versions.unshift({v:2,status:'Closing',activatedAt:'2026-09-02 09:30',activatedBy:DEMO_USERS.approver,closingAt:'2026-09-12 10:05',nodes});
-  j.versions.unshift({v:1,status:'Closed',activatedAt:'2026-08-28 16:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-09-02 09:30',nodes:JSON.parse(JSON.stringify(nodes))}); }
+/* communication and invitation policies — read-only list, picked on the Delivery step */
+const POLICIES=[
+  {id:'POL-C1',kind:'Communication',name:'Marketing cap',rule:'max 2 marketing messages / 7 days',level:'Contact',window:'Rolling',applies:'All marketing journeys'},
+  {id:'POL-C2',kind:'Communication',name:'Quiet hours',rule:'no SMS or push 21:00–09:00 local',level:'Contact',window:'Daily',applies:'SMS, push'},
+  {id:'POL-C3',kind:'Communication',name:'Winback frequency',rule:'max 1 winback message / 30 days',level:'Contact',window:'Rolling',applies:'Folder churn_reduction'},
+  {id:'POL-C4',kind:'Communication',name:'Email daily cap',rule:'max 1 marketing email / day',level:'Contact',window:'Daily',applies:'Email'},
+  {id:'POL-I1',kind:'Invitation',name:'Winback quiet period',rule:'45 days out of winback journeys after an exit',level:'Contact',window:'Rolling',applies:'Folder churn_reduction'},
+  {id:'POL-I2',kind:'Invitation',name:'Trial follow-up once',rule:'365 days after the trial follow-up',level:'Account',window:'Fixed',applies:'JRN-02'},
+  {id:'POL-I3',kind:'Invitation',name:'Birthday once a year',rule:'300 days after the birthday reward',level:'Contact',window:'Rolling',applies:'JRN-03'},
+];
 /* version helpers */
 const jVer=(j,v)=>j.versions.find(x=>x.v===v);
 const jCurV=j=>jVer(j,j.cur)||j.versions[j.versions.length-1];
@@ -1561,12 +1626,10 @@ function curCtx(){ const j=jById(curJ); return ctxOf(j,jCurV(j)); }
 /* the version the monitor and the list talk about: the Active one, else the most recent */
 const jMainV=j=>jActive(j)||jLiveVs(j)[0]||jLatest(j);
 const mainCtx=j=>ctxOf(j,jMainV(j));
-const jUsingSeg=id=>JOURNEYS.filter(j=>j.versions.some(V=>String(V.nodes[0].cfg.segment||'').startsWith(id))).map(j=>j.id);
+const jUsingSeg=id=>JOURNEYS.filter(j=>j.versions.some(V=>V.nodes.some(n=>String(n.cfg.segment||'').startsWith(id)||(n.cfg.segments||[]).some(x=>String(x).startsWith(id))))).map(j=>j.id);
 const simOf=C=>sim[C.id]||(sim[C.id]={parts:{},history:[{}]});
 
 /* synthetic reference data/* synthetic reference data (mirrors what ECM would list from Campaign, Segmentation, Event-Trigger, Product Catalog) */
-const CAMP_STATUS_CLS={Active:'ok',Draft:'grey','Pending approval':'warn',Paused:'warn',Expired:'bad',Stopped:'bad',Rejected:'bad',Ended:'grey'};
-const statusPill=st=>`<span class="pill ${CAMP_STATUS_CLS[st]||''}">${st}</span>`;
 /* tooltip helper — every field that needs explaining gets one (meeting 3) */
 const tip=t=>`<span class="tip" data-tip="${esc(t)}">i</span>`;
 const MLS=[
@@ -1576,6 +1639,11 @@ const MLS=[
   {id:'ML-2210',name:'Kharkiv region — exclusion',desc:'Regulatory: no outbound SMS/push in Kharkiv oblast',group:'Exclusions',dm:'Main',method:'Dynamic query',logic:'AND',excl:true,exclCh:['sms','push'],status:'Active',created:'2026-09-08',by:DEMO_USERS.me,filters:[{col:'REGION',op:'equals',val:'Kharkiv'}]},
   {id:'ML-2301',name:'New subscribers ≤ 14 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-08-20',by:DEMO_USERS.me,filters:[{col:'TENURE_DAYS',op:'lower and equal',val:'14'}]},
   {id:'ML-2402',name:'5G-ready device, no unlimited plan',group:'Upsell',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-08-20',by:DEMO_USERS.me,filters:[{col:'DEVICE_5G',op:'equals',val:'Y'},{col:'PLAN',op:'not equals',val:'Unlimited'}]},
+  {id:'ML-2501',name:'Language · FR',desc:'Contacts whose preferred language is French',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'uk'}]},
+  {id:'ML-2502',name:'Language · EN',desc:'Contacts whose preferred language is English',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'en'}]},
+  {id:'ML-2511',name:'FR · new account ≤ 30 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'uk'},{col:'TENURE_DAYS',op:'lower and equal',val:'30'}]},
+  {id:'ML-2512',name:'EN · new account ≤ 30 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'en'},{col:'TENURE_DAYS',op:'lower and equal',val:'30'}]},
+  {id:'ML-2520',name:'Active members · 6+ months',group:'Upsell',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-05-20',by:DEMO_USERS.growth,filters:[{col:'TENURE_DAYS',op:'greater and equal',val:'180'}]},
 ];
 const mlLabel=m=>`${m.id} · ${m.name}`;
 const MLISTS_get=()=>['— (event only)',...MLS.filter(m=>!m.excl).map(mlLabel)];
@@ -1607,13 +1675,6 @@ const mlCustomers=label=>{ const m=mlByLabel(label); if(!m) return []; return ev
 /* exclusion lists: an all-channel list removes the customer everywhere; a channel-scoped list only blocks deliveries on those channels (applied at delivery time). channels = the campaign's channels; when omitted, only all-channel lists count. */
 const exclApplies=(m,channels)=>!(m.exclCh&&m.exclCh.length)||(channels&&channels.length&&channels.every(ch=>m.exclCh.includes(ch==='isms'?'sms':ch)));
 const excludedCids=(channels)=>new Set(MLS.filter(m=>m.excl&&m.status==='Active'&&exclApplies(m,channels)).flatMap(m=>evalML(m).ids));
-const EVENTS = {
-  'Delivery feedback':['Sent','Delivered','Opened','Clicked','Not Delivered'],
-  'Business events (BSS / app / partner)':['offer_accepted','offer_liked','balance_low','bundle_expired','package_expiring','package_renewed','subscription_activated','payment_failed','roaming_activated','app_login','ticket_closed','partner_offer_used'],
-};
-const TIMERS = ['Immediately','5 seconds','10 seconds','30 seconds','1 hour','6 hours','1 day','2 days','3 days','7 days','14 days','2 days before bundle expiry','1 day after last step','Next Monday 10:00','Every 7 days at 12:00'];
-const TIMEOUTS = ['10 seconds','20 seconds','60 seconds','1 hour','6 hours','1 day','2 days','3 days','7 days','14 days'];
-const EXPRS = ['delivery.opened equals true','delivery.clicked equals true','appInstalled equals true','device5g equals true','customerType equals prepaid','churnRisk greater and equal 0.8','balance lower 10','region not equals Occupied','lang equals uk','tenureDays lower and equal 14','dataUsageGb between 4 and 20','lastTopUp in last 30 days','external.ticketStatus equals closed','journey.var.attempts greater 2'];
 const CONTENT_CHANNELS=[{k:'survey',n:'Survey',ic:'M4 5h16v11H8l-4 4z'},{k:'sms',n:'SMS',ic:'M4 5h16v11H8l-4 4zM8 9h8M8 12h5'},{k:'mms',n:'MMS',ic:'M4 5h16v14H4zM4 15l4-4 3 3 5-5 4 4M9 9h.5'},{k:'email',n:'Email',ic:'M3 6h18v12H3zM3 7l9 6 9-6'},{k:'webpush',n:'Web Push Notification',ic:'M3 5h18v12H3zM8 21h8M12 17v4'},{k:'push',n:'Mobile Push Notification',ic:'M7 3h10v18H7zM11 18h2'},{k:'inapp',n:'In-App Notification',ic:'M7 3h10v18H7zM9 8h6M9 11h4'},{k:'chatbot',n:'Chatbot',ic:'M5 8h14v9H9l-4 4zM9 12h1M14 12h1'},{k:'wsc',n:'WSC',ic:'M3 5h18v14H3zM3 9h18'},{k:'banner',n:'Banner Studio',ic:'M3 6h18v8H3zM6 18h12'},{k:'tm',n:'Telemarketing',ic:'M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2'},{k:'isms',n:'Interactive SMS',ic:'M4 5h16v11H8l-4 4zM9 10l2 2 4-4'}];
 /* ---------- TEMPLATE = design skeleton (layout, brand blocks, slots) — no campaign text. CONTENT = the slots filled, owned by a delivery. (meeting 3 follow-up) ---------- */
 const SLOT_DEFS={email:[['subject','Subject','line'],['preheader','Preheader','line'],['headline','Headline','line'],['lead','Lead','line'],['body','Body','text'],['cta','Button','line']],
@@ -1678,6 +1739,9 @@ const CONTENTS = {order:['— no content (order only)']};
 ['sms','email','push','wsc','chatbot','tm'].forEach(ch=>{ CONTENTS[ch]=tplFor(ch).map(t=>`${t.id} · ${t.name}`); });
 CONTENTS.whatsapp=tplFor('chatbot').map(t=>`${t.id} · ${t.name}`);
 CONTENTS.sms=CONTENTS.sms.concat(tplFor('isms').map(t=>`${t.id} · ${t.name}`));
+/* sample journeys name their copy in the content field; give each Delivery the channel's default template and keep the copy as text */
+const SAMPLE_COPY={'EML-301':'Votre commande vous attend — finalisez-la en 2 minutes et recevez votre carte SIM gratuitement.','EML-302':'Your order is waiting — finish it in 2 minutes and get your SIM card free.','EML-303':'Votre panier vous attend. Besoin d\'aide pour choisir votre forfait ?','EML-304':'Your cart is waiting. Need help picking a plan?','EML-311':'Votre essai est terminé. Gardez la connexion : votre forfait continue à {{PLAN}} dès aujourd\'hui. / Your trial has ended — keep the connection: your plan continues as {{PLAN}} from today.','SMS-321':'Fizz: votre essai est terminé. Continuez sans interruption: fizz.ca/continuer / Your trial ended. Keep going: fizz.ca/continue','EML-331':'Joyeux anniversaire {{FIRST_NAME}}! 2 Go de bonus vous attendent dans votre compte. / Happy birthday {{FIRST_NAME}}! 2 GB of bonus data is waiting in your account.','EML-341':'Ça fait longtemps, {{FIRST_NAME}}. Voici ce qui a changé chez Fizz — et une offre pour revenir. / It\'s been a while, {{FIRST_NAME}}. Here is what changed at Fizz — and an offer to come back.','EML-342':'10 Go offerts pour votre retour, {{FIRST_NAME}}. / 10 GB on us for coming back, {{FIRST_NAME}}.','SMS-351':'Fizz: 10 Go offerts si vous revenez ce mois-ci. fizz.ca/retour / 10 GB on us if you come back this month. fizz.ca/back','PSH-361':'Niveau {{LOYALTY_TIER}} atteint! Votre récompense est prête. / Level {{LOYALTY_TIER}} reached! Your perk is ready.','EML-371':'Votre paiement a été refusé. Mettez à jour votre carte pour garder votre forfait actif. / Your payment was declined. Update your card to keep your plan active.','SMS-381':'Fizz: paiement en attente — mettez à jour votre carte: fizz.ca/paiement / Payment pending — update your card: fizz.ca/payment','EML-391':'Parrainez un ami: 25 $ pour vous, 25 $ pour lui. / Refer a friend: $25 for you, $25 for them.'};
+JOURNEYS.forEach(j=>j.versions.forEach(V=>V.nodes.forEach(n=>{ if(n.type!=='delivery') return; const fix=k=>{ const v=String(n.cfg[k]||''); const id=v.split(' ·')[0]; if(SAMPLE_COPY[id]){ if(k==='content') n.cfg.text=SAMPLE_COPY[id]; else n.cfg.textB=SAMPLE_COPY[id]; const t=tplOf(tplDefault(n.cfg.channel)); n.cfg[k]=t?`${t.id} · ${t.name}`:v; } }; fix('content'); if(n.cfg.contentB) fix('contentB'); })));
 const PARAMS=['FIRST_NAME','MSISDN','PLAN','PACKAGE_EXPIRY_DATE','BALANCE_UAH','DATA_USAGE_GB','TENURE_DAYS','REGION'];
 function resolveParams(t,cust,mark){ const r=cust?cust.row:null; return String(t||'').replace(/\{\{(\w+)\}\}/g,(m,k)=>{ const v=r&&r[k]!==undefined?r[k]:(k==='AGENT'?'Olena':null); if(v===null) return mark?`<span class="param">{{${k}}}</span>`:m; const out=k==='PACKAGE_EXPIRY_DATE'||k.endsWith('_DATE')?String(v).split('-').reverse().join('.'):v; return mark?`<b class="rv">${esc(out)}</b>`:out; }); }
 function pickVariant(item,cust){ const vs=item.variants||{}; if(item.dyn==='LANGUAGE'&&cust&&vs[cust.row.LANGUAGE]) return cust.row.LANGUAGE; return Object.keys(vs)[0]||'en'; }
@@ -1685,22 +1749,6 @@ const contentsFor=ch=>{ if(String(ch).startsWith('Preferred')) return ['Per-chan
 const CHANNELS = ['Preferred cascade (push → sms → email)','sms','push','email','whatsapp','tm','wsc','chatbot','order'];
 const STOPS = ['1 channel','2 channels','3 channels','all preferred channels'];
 const CGS = ['off','5% per channel','10% per channel','exact 2,000 per channel','uploaded list CG-11'];
-const JOINS = ['wait for all','first branch wins'];
-const EXITS = ['Activate offer → BSS (TMF622)','Apply invitation policy 45 days','Apply invitation policy 20 days','Hand over to JRN-21 Win-back','Hand over to growth journey','Add to exclusion list EX-07','End journey (no action)'];
-const CALLS = ['JRN-15 · 5G upsell','JRN-21 · Win-back','JRN-30 · B2B onboarding','JRN-07 · Churn prevention — prepaid','JRN-12 · Onboarding master'];
-const CALLMODES = ['start and continue','start and wait for it to finish','trigger step n2 of target'];
-const SYSTEMS = ['CRM ticket API (REST)','Billing balance lookup (REST)','Network usage API (SOAP)','Partner offer API (REST)','Digital Twin NBO score (REST)','Kafka topic: bss.events'];
-const NBO_SOURCES=['Digital Twin NBO (API)','ECM offer rules (priority + eligibility)'];
-const NBO_SCOPES=['All active offers','Tag: Retention','Tag: Upsell','Tag: Mobile › Prepaid','Tag: Mobile › Postpaid'];
-const NBO_MIN=['no minimum','score ≥ 0.5','score ≥ 0.7'];
-const MODES = ['Segment entry','Segment + event','Segment only (scheduled)','Event only'];
-const PRIO = ['none','+5 for 30 min after app open','+10 for 30 min after offer_liked','×1.5 for 7 days after accepted','set = Digital Twin nbo.rank'];
-const NODE_META = {
-  entry:{k:'Entry',ic:'⇥',today:false}, delivery:{k:'Delivery',ic:'✉',today:true}, timer:{k:'Timer',ic:'◷',today:true},
-  wait:{k:'Wait for event',ic:'⚡',today:'partial'}, cond:{k:'Condition',ic:'⑂',today:false}, offer:{k:'Offer',ic:'◈',today:false},
-  nbo:{k:'Next best offer',ic:'✦',today:'partial'}, par:{k:'Parallel',ic:'⫴',today:false}, exit:{k:'Exit / goal',ic:'◎',today:false}, call:{k:'Call journey',ic:'↷',today:false}, ext:{k:'External call',ic:'⇄',today:false}
-};
-
 /* ---------- DATAMART (30-row synthetic Kyivstar demo datamart — same rows as ECM_Demo_Datamart_Kyivstar.csv) ---------- */
 const DATAMART_ROWS=[{"CUSTOMER_ID":"CUS-****7919","FIRST_NAME":"Oksana","MSISDN":"+90 5XX XXX 01 11","EMAIL":"test.oksana100001@example.com","PUSH_TOKEN":"tok_100001","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.4","CHURN_RISK":"0.72","REGION":"Kyiv","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"2.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6838","FIRST_NAME":"Andrii","MSISDN":"+90 5XX XXX 57 64","EMAIL":"test.andrii100002@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_UAH":"0.8","CHURN_RISK":"0.68","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"2.6","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5757","FIRST_NAME":"Kateryna","MSISDN":"+90 5XX XXX 78 72","EMAIL":"test.kateryna100003@example.com","PUSH_TOKEN":"tok_100003","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-16","BALANCE_UAH":"2.0","CHURN_RISK":"0.66","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"23.4","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4676","FIRST_NAME":"Dmytro","MSISDN":"+90 5XX XXX 62 25","EMAIL":"test.dmytro100004@example.com","PUSH_TOKEN":"tok_100004","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.3","CHURN_RISK":"0.71","REGION":"Lviv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.7","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3595","FIRST_NAME":"Olena","MSISDN":"+90 5XX XXX 46 13","EMAIL":"test.olena100005@example.com","PUSH_TOKEN":"tok_100005","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-23","BALANCE_UAH":"1.7","CHURN_RISK":"0.79","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"1.9","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2514","FIRST_NAME":"Taras","MSISDN":"+90 5XX XXX 31 72","EMAIL":"test.taras100006@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-17","BALANCE_UAH":"2.8","CHURN_RISK":"0.75","REGION":"Dnipro","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"7.5","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1433","FIRST_NAME":"Iryna","MSISDN":"+90 5XX XXX 66 74","EMAIL":"test.iryna100007@example.com","PUSH_TOKEN":"tok_100007","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"2.7","CHURN_RISK":"0.64","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.0","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9352","FIRST_NAME":"Yurii","MSISDN":"+90 5XX XXX 87 44","EMAIL":"test.yurii100008@example.com","PUSH_TOKEN":"tok_100008","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-19","BALANCE_UAH":"1.5","CHURN_RISK":"0.77","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"10.4","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8271","FIRST_NAME":"Nataliia","MSISDN":"+90 5XX XXX 38 09","EMAIL":"test.nataliia100009@example.com","PUSH_TOKEN":"tok_100009","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"7.9","CHURN_RISK":"0.79","REGION":"Vinnytsia","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.7","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7190","FIRST_NAME":"Maksym","MSISDN":"+90 5XX XXX 88 29","EMAIL":"test.maksym100010@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-16","BILLING_DATE":"2026-09-11","BALANCE_UAH":"0.8","CHURN_RISK":"0.64","REGION":"Poltava","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.1","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6109","FIRST_NAME":"Anna","MSISDN":"+90 5XX XXX 66 11","EMAIL":"test.anna100011@example.com","PUSH_TOKEN":"tok_100011","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-11","BALANCE_UAH":"8.9","CHURN_RISK":"0.81","REGION":"Zaporizhzhia","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.6","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5028","FIRST_NAME":"Roman","MSISDN":"+90 5XX XXX 45 41","EMAIL":"test.roman100012@example.com","PUSH_TOKEN":"tok_100012","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_UAH":"3.2","CHURN_RISK":"0.9","REGION":"Chernihiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"5.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3947","FIRST_NAME":"Sofiia","MSISDN":"+90 5XX XXX 00 00","EMAIL":"test.sofiia100013@example.com","PUSH_TOKEN":"tok_100013","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-16","BALANCE_UAH":"110.8","CHURN_RISK":"0.21","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"11.1","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2866","FIRST_NAME":"Bohdan","MSISDN":"+90 5XX XXX 11 30","EMAIL":"test.bohdan100014@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-12","BILLING_DATE":"2026-09-17","BALANCE_UAH":"105.0","CHURN_RISK":"0.38","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"16.5","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1785","FIRST_NAME":"Mariia","MSISDN":"+90 5XX XXX 47 29","EMAIL":"test.mariia100015@example.com","PUSH_TOKEN":"tok_100015","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"26.6","CHURN_RISK":"0.08","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"20.0","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****9704","FIRST_NAME":"Ihor","MSISDN":"+90 5XX XXX 50 46","EMAIL":"test.ihor100016@example.com","PUSH_TOKEN":"tok_100016","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-16","BALANCE_UAH":"56.1","CHURN_RISK":"0.05","REGION":"Lviv","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8623","FIRST_NAME":"Viktoriia","MSISDN":"+90 5XX XXX 30 25","EMAIL":"test.viktoriia100017@example.com","PUSH_TOKEN":"tok_100017","CUSTOMER_TYPE":"prepaid","PLAN":"Family 50GB","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"105.8","CHURN_RISK":"0.23","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7542","FIRST_NAME":"Oleh","MSISDN":"+90 5XX XXX 24 65","EMAIL":"test.oleh100018@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Unlimited","PACKAGE_EXPIRY_DATE":"2026-09-15","BILLING_DATE":"2026-09-19","BALANCE_UAH":"17.4","CHURN_RISK":"0.07","REGION":"Dnipro","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"4.3","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6461","FIRST_NAME":"Yana","MSISDN":"+90 5XX XXX 22 89","EMAIL":"test.yana100019@example.com","PUSH_TOKEN":"tok_100019","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-23","BALANCE_UAH":"72.3","CHURN_RISK":"0.09","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"1.1","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5380","FIRST_NAME":"Serhii","MSISDN":"+90 5XX XXX 82 29","EMAIL":"test.serhii100020@example.com","PUSH_TOKEN":"tok_100020","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-19","BALANCE_UAH":"79.8","CHURN_RISK":"0.2","REGION":"Kharkiv","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"3.4","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****4299","FIRST_NAME":"Daryna","MSISDN":"+90 5XX XXX 78 90","EMAIL":"test.daryna100021@example.com","PUSH_TOKEN":"tok_100021","CUSTOMER_TYPE":"prepaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-11","BALANCE_UAH":"44.3","CHURN_RISK":"0.24","REGION":"Vinnytsia","LANGUAGE":"en","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"8.6","TENURE_DAYS":"12","LAST_TOPUP_DATE":"2026-08-26","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****3218","FIRST_NAME":"Vitalii","MSISDN":"+90 5XX XXX 26 88","EMAIL":"test.vitalii100022@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"prepaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-17","BILLING_DATE":"2026-09-16","BALANCE_UAH":"32.6","CHURN_RISK":"0.26","REGION":"Poltava","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"16.7","TENURE_DAYS":"3","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-06-07","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****2137","FIRST_NAME":"Alina","MSISDN":"+90 5XX XXX 69 03","EMAIL":"test.alina100023@example.com","PUSH_TOKEN":"tok_100023","CUSTOMER_TYPE":"postpaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"80.7","CHURN_RISK":"0.17","REGION":"Zaporizhzhia","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.1","TENURE_DAYS":"7","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****1056","FIRST_NAME":"Petro","MSISDN":"+90 5XX XXX 08 60","EMAIL":"test.petro100024@example.com","PUSH_TOKEN":"tok_100024","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"95.7","CHURN_RISK":"0.26","REGION":"Chernihiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"19.6","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****8975","FIRST_NAME":"Liliia","MSISDN":"+90 5XX XXX 40 57","EMAIL":"test.liliia100025@example.com","PUSH_TOKEN":"tok_100025","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-23","BALANCE_UAH":"100.0","CHURN_RISK":"0.37","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"12.1","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-09","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7004","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****7894","FIRST_NAME":"Artem","MSISDN":"+90 5XX XXX 88 23","EMAIL":"test.artem100026@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Kyiv 30GB","PACKAGE_EXPIRY_DATE":"2026-09-20","BILLING_DATE":"2026-09-19","BALANCE_UAH":"61.9","CHURN_RISK":"0.37","REGION":"Kyiv","LANGUAGE":"en","APP_INSTALLED":"N","DEVICE_5G":"Y","DATA_USAGE_GB":"19.5","TENURE_DAYS":"400","LAST_TOPUP_DATE":"2026-09-02","LAST_CAMPAIGN_DATE":"2026-08-21","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****6813","FIRST_NAME":"Tetiana","MSISDN":"+90 5XX XXX 66 33","EMAIL":"test.tetiana100027@example.com","PUSH_TOKEN":"tok_100027","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 15GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-17","BALANCE_UAH":"21.2","CHURN_RISK":"0.08","REGION":"Kyiv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"N","DATA_USAGE_GB":"5.3","TENURE_DAYS":"120","LAST_TOPUP_DATE":"2026-08-12","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"N"},{"CUSTOMER_ID":"CUS-****5732","FIRST_NAME":"Vasyl","MSISDN":"+90 5XX XXX 23 46","EMAIL":"test.vasyl100028@example.com","PUSH_TOKEN":"tok_100028","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-19","BALANCE_UAH":"81.8","CHURN_RISK":"0.24","REGION":"Lviv","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"18.9","TENURE_DAYS":"900","LAST_TOPUP_DATE":"2026-09-07","LAST_CAMPAIGN_DATE":"2026-08-01","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****4651","FIRST_NAME":"Kristina","MSISDN":"+90 5XX XXX 87 12","EMAIL":"test.kristina100029@example.com","PUSH_TOKEN":"tok_100029","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-11","BALANCE_UAH":"57.7","CHURN_RISK":"0.41","REGION":"Odesa","LANGUAGE":"uk","APP_INSTALLED":"N","DEVICE_5G":"N","DATA_USAGE_GB":"9.8","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-27","LAST_CAMPAIGN_DATE":"2026-09-08","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"},{"CUSTOMER_ID":"CUS-****3570","FIRST_NAME":"Denys","MSISDN":"+90 5XX XXX 13 50","EMAIL":"test.denys100030@example.com","PUSH_TOKEN":"","CUSTOMER_TYPE":"postpaid","PLAN":"Smart 5GB","PACKAGE_EXPIRY_DATE":"2026-09-05","BILLING_DATE":"2026-09-16","BALANCE_UAH":"28.7","CHURN_RISK":"0.34","REGION":"Dnipro","LANGUAGE":"uk","APP_INSTALLED":"Y","DEVICE_5G":"Y","DATA_USAGE_GB":"14.4","TENURE_DAYS":"45","LAST_TOPUP_DATE":"2026-07-02","LAST_CAMPAIGN_DATE":"2026-09-04","ACCOUNT_ID":"ACC-7005","IS_TEST_CUSTOMER":"Y"}];
 /* event (feedback) datamart: one row per delivery result, refreshed from the delivery_result table */
@@ -1907,64 +1955,89 @@ const custByCid=cid=>CUSTOMERS.find(c=>c.cid===String(cid));
 
 /* ---------- STATE ---------- */
 let quietInit=false;
-let curJ = 'JRN-20', selNode = null, day = 0, ptimeFollow = true;
+let curJ = 'JRN-07', selNode = null, day = 0, ptimeFollow = true;
 const sim = {}; const log = [];
 const rnd = Math.random;
+/* deterministic "coin" per customer + step, so a split sends the same contact the same way on every render */
+const hashOf=s=>{ let h=2166136261; for(const ch of String(s)){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); } return (h>>>0)/4294967296; };
+const custOf=cid=>CUSTOMERS.find(c=>c.id===cid);
+
+/* which contacts an entry admits — mocked on the 30-row demo datamart; the big Fizz numbers are display-scaled elsewhere */
+function entryPool(C){ const e=C.nodes[0].cfg; const all=CUSTOMERS.filter(c=>!excludedCids().has(c.cid)); const h=(c,salt)=>hashOf(c.id+'|'+C.jid+'|'+salt);
+  switch(e.kind){
+    case 'segment': return mlCustomers(e.segment).filter(c=>!excludedCids().has(c.cid));
+    case 'dateAttr': return all.filter(c=>h(c,e.attr)<0.35);
+    case 'joinsList': return all.filter(c=>h(c,e.list)<0.3);
+    case 'unengaged': return all.filter(c=>h(c,'uneng')<(e.days>=90?0.4:0.25));
+    case 'twin': return all.filter(c=>c.attrs.churnRisk>=(+e.threshold||0.7)*0.9);
+    case 'agent': return all.filter(c=>h(c,'agent')<0.2);
+    default: return []; } }
+const entryIsEvent=C=>C.nodes[0].cfg.kind==='event'||C.nodes[0].cfg.kind==='joinsList';
+/* one-line description of the entry, for the list and the monitor */
+function entryText(C){ const e=C.nodes[0].cfg, K=ENTRY_KINDS[e.kind]||{k:e.kind};
+  const sub={segment:()=>`${String(e.segment).split(' · ').slice(1).join(' · ')||e.segment} · ${e.freq} ${e.slot}`,dateAttr:()=>`${e.attr} · ${e.dir==='on'?'on the date':e.offset+' days '+e.dir}${e.yearly?' · yearly':''}`,event:()=>e.event,joinsList:()=>`${e.list} · ${e.source}`,unengaged:()=>`${e.channel} · ${e.days} days`,twin:()=>`${e.signal} ≥ ${e.threshold}`,agent:()=>'Marketing Agent'}[e.kind];
+  return {k:K.k,sub:sub?sub():''}; }
 
 function initSim(){
   day=0; log.length=0;
   allCtx().forEach(j=>{
     const parts={};
-    /* Active and Closing versions start with their segment loaded (a Closing one has customers still inside) */
+    /* Active and Closing versions start with their entry pool loaded (a Closing one has fewer, still inside) */
     const live=j.status==='Active'||j.status==='Closing';
-    const pool = (!live||j.nodes[0].cfg.mode==='Event only') ? [] : mlCustomers(j.nodes[0].cfg.segment).filter(c=>!excludedCids().has(c.cid));
-    pool.forEach((c,i)=>{ if(j.status==='Closing'&&i%3) return; parts[c.id]={pos:[j.nodes[0].id],status:'active',since:0,visited:new Set([j.nodes[0].id]),opened:null,offers:[],timers:{}}; });
+    const pool = !live ? [] : entryIsEvent(j) ? (j.status==='Closing'?CUSTOMERS.filter(c=>!excludedCids().has(c.cid)&&hashOf(c.id+j.id)<0.3):[]) : entryPool(j);
+    pool.forEach((c,i)=>{ if(j.status==='Closing'&&!entryIsEvent(j)&&i%3) return; parts[c.id]={pos:[j.nodes[0].id],status:'active',since:0,visited:new Set([j.nodes[0].id]),opened:null,eng:{},timers:{},attrs:{}}; });
     sim[j.id]={parts,history:[snapshot(parts)]};
   });
-  addLog('acc',`Simulator reset. ${allCtx().filter(j=>Object.keys(sim[j.id].parts).length).map(j=>`${j.id} pre-loaded from ${j.nodes[0].cfg.segment.split(' · ')[0]} (${Object.keys(sim[j.id].parts).length} customers, exclusion lists applied)`).join('; ')}; event-only journeys start empty — send an event to admit a customer.`,{kind:'system'});
+  addLog('acc',`Simulator reset. ${allCtx().filter(j=>Object.keys(sim[j.id].parts).length).map(j=>`${j.id} pre-loaded from its ${entryText(j).k} entry (${Object.keys(sim[j.id].parts).length} contacts, exclusion lists applied)`).join('; ')}; event entries start empty — send an event to admit a contact.`,{kind:'system'});
 }
-function snapshot(parts){ const o={}; for(const k in parts){ const p=parts[k]; o[k]={pos:[...p.pos],status:p.status,since:p.since,offers:[...p.offers]}; } return o; }
+function snapshot(parts){ const o={}; for(const k in parts){ const p=parts[k]; o[k]={pos:[...p.pos],status:p.status,since:p.since}; } return o; }
 function addLog(cls,msg,meta){ const m=meta||{}; if(m.j&&m.node) lit[m.j+'/'+m.node]=Date.now(); log.push(Object.assign({d:day,t:new Date().toTimeString().slice(0,8),cls,msg},m)); }
-const secondsOf=v=>{ const m=String(v).match(/(\d+)\s*second/); return m?parseInt(m[1]):null; };
-const lit={}; // "journey/node" -> timestamp of last execution (canvas glow)
-const spotlight={}; // journey -> customer whose path is highlighted on the canvas
-let minute=0; function clock(){ const h=9+Math.floor(minute/60)%24, m=minute%60; minute+=1+Math.floor(Math.random()*3); return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; }
-/* inject a business event for a customer: entry into event-driven journeys, or resolve a waiting step */
+const lit={}; // "version/node" -> timestamp of last execution (canvas glow)
+const spotlight={}; // version -> customer whose path is highlighted on the canvas
+/* admit a contact into a version at the entry, honouring the re-entry rule */
+function admit(j,S,cid,by){ const entry=j.nodes[0], e=entry.cfg, p=S.parts[cid];
+  if(p&&p.status==='active') return 'active';
+  if(p&&p.status!=='active'){ if(e.reentry==='never') return 'never'; if(e.reentry==='after N days'&&(day-p.since)<(+e.reentryDays||0)) return 'too-soon'; }
+  const first=nextIds(entry); S.parts[cid]={pos:first,status:'active',since:day,visited:new Set([entry.id,...first]),opened:null,eng:{},timers:{},attrs:{},enteredBy:by};
+  return 'ok'; }
+/* inject a business event for a contact: entry into event-driven versions, or resolve a Wait for event */
 function sendEvent(evName,cid){
-  const cust=CUSTOMERS.find(c=>c.id===cid); if(!cust) return; let hits=0, paused=[];
+  const cust=custOf(cid); if(!cust) return; let hits=0, paused=[];
   allCtx().forEach(j=>{
-    const S=simOf(j); const entry=j.nodes[0]; const evs=String(entry.cfg.events||'').split(/[,\s]+/).filter(Boolean);
+    const S=simOf(j); const entry=j.nodes[0]; const e=entry.cfg; const listens=e.kind==='event'&&e.event===evName;
     const p=S.parts[cid];
-    /* a Draft or Closed version ignores events; a Closing one still resolves the waits of contacts inside, but admits nobody */
-    if(j.status==='Draft'||j.status==='Closed'){ if(evs.includes(evName)&&j.status==='Draft'){ paused.push(j.id); addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — version is ${j.status} (activate it on the canvas)`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); } return; }
-    if(j.status==='Closing'&&!(p&&p.status==='active')){ if(evs.includes(evName)) addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — version is Closing, no new entries`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
-    if(evs.includes(evName)&&!p&&excludedCids().has((CUSTOMERS.find(c=>c.id===cid)||{}).cid)){ addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — customer is on an exclusion list (excluded from all deliveries)`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
-    // resolve a waiting step first
+    if(j.status==='Draft'||j.status==='Closed'){ if(listens&&j.status==='Draft'){ paused.push(j.id); addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — version is Draft (activate it on the canvas)`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); } return; }
+    if(j.status==='Closing'&&!(p&&p.status==='active')){ if(listens) addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — version is Closing, no new entries`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
+    if(listens&&!p&&excludedCids().has(cust.cid)){ addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — contact is on an exclusion list`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
+    // resolve a Wait for event first
     if(p&&p.status==='active'){
       let resolved=false;
-      p.pos=p.pos.flatMap(nid=>{ const n=node(j,nid); if(n&&n.type==='wait'&&String(n.cfg.event).split(' ')[0]===evName){ const labels=n.next.map(x=>typeof x==='string'?'':x.label); const ids=nextIds(n,labels[0]); ids.forEach(i=>p.visited.add(i)); delete p.timers[nid]; resolved=true; addLog('ok',`${cid}  ${j.id}/${n.id}  event ${evName} received → ${labels[0]||'next'}`,{j:j.id,cid,node:n.id,kind:'event'}); return ids; } return [nid]; });
-      if(resolved){ hits++; p.since=day; spotlight[j.id]=cid; runNow(j,S,cid); return; }
+      p.pos=p.pos.flatMap(nid=>{ const n=node(j,nid); if(n&&n.type==='waitEvent'&&n.cfg.event===evName){ const rejected=hashOf(cid+nid+day)<0.15; const lbl=rejected?'rejected':'accepted'; const ids=nextIds(n,lbl); ids.forEach(i=>p.visited.add(i)); delete p.timers[nid]; resolved=true; addLog(rejected?'warn':'ok',`${cid}  ${j.id}/${n.id}  event ${evName} received → ${lbl}`,{j:j.id,cid,node:n.id,kind:'event'}); return ids.length?ids:[]; } return [nid]; });
+      if(resolved){ hits++; p.since=day; spotlight[j.id]=cid; if(p.pos.length===0) p.status='completed'; runNow(j,S,cid); return; }
     }
     // entry by event
-    if(evs.includes(evName) && entry.cfg.mode!=='Segment only (scheduled)'){
-      if(p&&p.status==='active'){ addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — customer already active (max ${j.entry.maxConcurrent} concurrent)`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
-      if(p&&p.status!=='active'&&(day-p.since)<j.entry.reentryDays){ addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — re-entry allowed after ${j.entry.reentryDays} days`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
-      const first=nextIds(entry); S.parts[cid]={pos:first,status:'active',since:day,visited:new Set([entry.id,...first]),opened:null,offers:[],timers:{},enteredBy:evName};
-      spotlight[j.id]=cid; addLog('ok',`${cid}  ${j.id}/${entry.id}  event ${evName} received → entered journey (41 ms)`,{j:j.id,cid,node:entry.id,kind:'entry'}); hits++; runNow(j,S,cid);
+    if(listens){
+      const r=admit(j,S,cid,evName);
+      if(r==='active'){ addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — contact already inside`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
+      if(r==='never'||r==='too-soon'){ addLog('warn',`${cid}  ${j.id}  event ${evName} ignored — re-entry rule: ${e.reentry}${e.reentry==='after N days'?' ('+e.reentryDays+')':''}`,{j:j.id,cid,node:entry.id,kind:'entry-rejected'}); return; }
+      spotlight[j.id]=cid; addLog('ok',`${cid}  ${j.id}/${entry.id}  event ${evName} received → entered (41 ms)`,{j:j.id,cid,node:entry.id,kind:'entry'}); hits++; runNow(j,S,cid);
     }
   });
-  if(!hits) addLog('',`${cid}  event ${evName} received — no journey listening`,{cid,kind:'event'});
-  if(!quietInit) toast(hits?`Event ${evName} processed`:`Event ${evName} received`, hits?`${cid} — ${hits} journey step(s) reacted.`:paused.length?`${cid} — ${paused.join(', ')} listens for it but is not Active.`:`${cid} — no journey is listening for this event.`, hits?'':'warn');
+  if(!hits) addLog('',`${cid}  event ${evName} received — no version listening`,{cid,kind:'event'});
+  if(!quietInit) toast(hits?`Event ${evName} processed`:`Event ${evName} received`, hits?`${cid} — ${hits} step(s) reacted.`:paused.length?`${cid} — ${paused.join(', ')} listens for it but is not Active.`:`${cid} — no Active version is listening for this event.`, hits?'':'warn');
   allCtx().forEach(j=>{ const S=simOf(j); S.history[S.history.length-1]=snapshot(S.parts); });
   autoClose(); render();
 }
 function node(j,id){ return j.nodes.find(n=>n.id===id); }
-function nextIds(n,label){ return n.next.map(x=> typeof x==='string' ? {to:x,label:''} : x).filter(x=>!label || x.label===label).map(x=>x.to); }
+function nextIds(n,label){ return n.next.map(x=> typeof x==='string' ? {to:x,label:''} : x).filter(x=>label===undefined || x.label===label).map(x=>x.to); }
 
 function tick(){
   day++;
   allCtx().forEach(j=>{
     const S=simOf(j);
+    /* a scheduled entry (segment, date, unengaged, twin, agent) re-evaluates every day and admits new matches */
+    if(j.status==='Active'&&!entryIsEvent(j)){ const e=j.nodes[0].cfg; const due=e.kind!=='segment'||e.freq==='daily'||(e.freq==='weekly'&&day%7===0)||(e.freq==='monthly'&&day%30===0);
+      if(due){ let n=0; entryPool(j).forEach(c=>{ if(hashOf(c.id+j.id+day)<0.35&&admit(j,S,c.id,'schedule')==='ok'){ n++; runNow(j,S,c.id); } }); if(n) addLog('ok',`${j.id}/${j.nodes[0].id}  ${entryText(j).k} entry evaluated → ${n} new contact(s) admitted`,{j:j.id,node:j.nodes[0].id,kind:'entry'}); } }
     for(const cid in S.parts){ processCustomer(j,S,cid,true); }
     S.history.push(snapshot(S.parts));
   });
@@ -1973,103 +2046,125 @@ function tick(){
 /* a Closing version with nobody left inside becomes Closed on its own */
 function autoClose(){ allCtx().forEach(C=>{ if(C.status!=='Closing') return; const S=simOf(C); if(Object.values(S.parts).some(p=>p.status==='active')) return; C.V.status='Closed'; C.V.closedAt=stamp(); addLog('',`${C.id}  closed — last contact left the version`,{j:C.id,node:C.nodes[0].id,kind:'system'}); if(!quietInit) toast(`Closed · ${C.jid} v${C.v}`,'The Closing version emptied and closed itself.'); }); }
 const stamp=()=>{ const d=new Date(); return `${TODAY} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
-/* run the customer's current steps once; advance=true means a day passed (timers/waits progress),
-   advance=false means "now" (event just arrived): immediate steps run, timers/waits hold */
+/* a wait's length in simulated days (minutes and hours resolve on the next day) */
+const waitDays=(n,unit)=>unit==='days'?Math.max(1,+n||1):1;
+/* run the contact's current steps once; advance=true means a day passed (waits progress),
+   advance=false means "now" (event just arrived): immediate steps run, waits hold */
 function processCustomer(j,S,cid,advance){
-      const p=S.parts[cid]; if(!p||p.status!=='active') return;
-      const cust=CUSTOMERS.find(c=>c.id===cid);
-      const newPos=[];
-      p.pos.forEach(nid=>{
-        const n=node(j,nid); if(!n) return;
-        const go=(ids)=>{ ids.forEach(i=>{ newPos.push(i); p.visited.add(i); }); p.since=day; };
-        switch(n.type){
-          case 'entry': go(nextIds(n)); break;
-          case 'nbo': {
-            const scope=String(n.cfg.scope); const tag=scope.startsWith('Tag:')?scope.slice(4).trim().split(' › ').pop():null;
-            let cands=OFFERS.filter(o=>o.status==='Active'&&(!tag||o.tags.includes(tag)));
-            const score=o=>{ let sc=0.35; if(o.id==='OFR-1042'&&cust.attrs.balance<10) sc+=0.45; if(o.id==='OFR-1043'&&cust.attrs.dataUsageGb>8) sc+=0.35; if(o.id==='OFR-1051'&&cust.attrs.device5g) sc+=0.4; if(o.id==='OFR-1060'&&cust.attrs.churnRisk>=0.8) sc+=0.5; if(o.tags.includes('Retention')&&cust.attrs.churnRisk>=0.6) sc+=0.1; return Math.min(0.98,sc+rnd()*0.08); };
-            const ranked=cands.map(o=>({o,sc:score(o)})).sort((a,b)=>b.sc-a.sc); const minSc=parseFloat((String(n.cfg.min).match(/[\d.]+/)||['0'])[0]);
-            let pick=ranked.find(r=>r.sc>=minSc); const assured = pick ? !(pick.o.id==='OFR-1051'&&cust.attrs.region==='Occupied') : false;
-            if(!pick||!assured){ const fb=OFFERS.find(o=>o.id===n.cfg.fallback)||OFFERS[0]; addLog('warn',`${cid}  ${j.id}/${n.id}  NBO: no candidate ${pick?'passed Business Assurance':'above '+n.cfg.min} → fallback ${fb.id}`,{j:j.id,cid,node:n.id,kind:'nbo',channel:'Digital Twin'}); p.offers.push(fb.id); p.nbo=fb.id; }
-            else { addLog('acc',`${cid}  ${j.id}/${n.id}  NBO → ${pick.o.id} · ${pick.o.name} (score ${pick.sc.toFixed(2)}; 2nd: ${ranked[1]?ranked[1].o.id+' '+ranked[1].sc.toFixed(2):'—'}) · Business Assurance: eligible`,{j:j.id,cid,node:n.id,kind:'nbo',channel:String(n.cfg.source).split(' (')[0]}); p.offers.push(pick.o.id); p.nbo=pick.o.id; }
-            go(nextIds(n)); break; }
-          case 'offer': { const of=OFFERS.find(o=>o.id===n.cfg.offer)||OFFERS[0]; p.offers.push(of.id); addLog('',`${cid}  ${j.id}/${n.id}  offer ${of.id} presented (priority ${of.priority})`,{j:j.id,cid,node:n.id,kind:'offer'}); go(nextIds(n)); break; }
-          case 'delivery': {
-            const chans = String(n.cfg.channel).startsWith('Preferred') ? cust.pref.slice(0, parseInt(n.cfg.stopAfter)||cust.pref.length) : [n.cfg.channel];
-            let delivered=false, used=[];
-            for(const ch of chans){ used.push(ch); if(rnd()<0.72){ delivered=true; break; } }
-            if(delivered){ p.opened = rnd()<0.55; addLog('ok',`${cid}  ${j.id}/${n.id}  delivered via ${used[used.length-1]} · ${String(n.cfg.content||'').split(' ·')[0]}${p.nbo?' · offer '+p.nbo:''}${used.length>1?' (after '+used.slice(0,-1).join(', ')+' failed)':''}${p.opened?' · opened':''}`,{j:j.id,cid,node:n.id,kind:'delivered',channel:used[used.length-1],opened:p.opened}); }
-            else { p.opened=false; addLog('warn',`${cid}  ${j.id}/${n.id}  not delivered on ${used.join(', ')} — cascade exhausted, continuing`,{j:j.id,cid,node:n.id,kind:'not-delivered',channel:used.join('/')}); }
-            go(nextIds(n)); break; }
-          case 'timer': { if(!advance || (secondsOf(n.cfg.duration)!==null && !p.secDue)){ newPos.push(nid); break; } const d=/Immediately/.test(n.cfg.duration)?0:(secondsOf(n.cfg.duration)!==null?0:(parseInt(n.cfg.duration)||1)); p.timers[nid]=(p.timers[nid]||0)+1; if(p.timers[nid]>=d){ delete p.timers[nid]; addLog('',`${cid}  ${j.id}/${n.id}  timer elapsed (${n.cfg.duration})`,{j:j.id,cid,node:n.id,kind:'timer'}); go(nextIds(n)); } else newPos.push(nid); break; }
-          case 'wait': { if(!advance || (secondsOf(n.cfg.timeout)!==null && !p.secDue)){ newPos.push(nid); break; } const tmo=secondsOf(n.cfg.timeout)!==null?0:(parseInt(n.cfg.timeout)||3); p.timers[nid]=(p.timers[nid]||0)+1;
-            const labels=n.next.map(x=>typeof x==='string'?'':x.label);
-            if(!p.secDue && rnd()<0.22){ addLog('ok',`${cid}  ${j.id}/${n.id}  event ${String(n.cfg.event).split(' ')[0]} received`,{j:j.id,cid,node:n.id,kind:'event'}); go(nextIds(n,labels[0])); }
-            else if(p.timers[nid]>=tmo){ addLog('',`${cid}  ${j.id}/${n.id}  timeout after ${n.cfg.timeout}`,{j:j.id,cid,node:n.id,kind:'timeout'}); go(nextIds(n,labels[1]!==undefined?labels[1]:labels[0])); }
-            else newPos.push(nid); break; }
-          case 'cond': { let yes; const ex=String(n.cfg.expr);
-            if(ex.startsWith('delivery.opened')) yes=!!p.opened; else if(ex.startsWith('appInstalled')) yes=!!cust.attrs.appInstalled; else if(ex.startsWith('device5g')) yes=!!cust.attrs.device5g; else yes=rnd()<.5;
-            const labels=n.next.map(x=>typeof x==='string'?'':x.label); const pick = yes?labels[0]:(labels[1]!==undefined?labels[1]:labels[0]);
-            addLog('',`${cid}  ${j.id}/${n.id}  "${ex}" → ${pick||'next'}`,{j:j.id,cid,node:n.id,kind:'condition'}); go(nextIds(n,pick)); break; }
-          case 'par': {
-            if(n.label==='Join'){ const others=p.pos.filter(x=>x!==nid); if(others.length===0 && !newPos.includes(nid)) go(nextIds(n)); else if(!newPos.includes(nid)) newPos.push(nid); }
-            else go(nextIds(n)); break; }
-          case 'ext': { addLog('acc',`${cid}  ${j.id}/${n.id}  POST ${n.cfg.system} → 200 (stored as ${n.cfg.store})`,{j:j.id,cid,node:n.id,kind:'external'}); go(nextIds(n)); break; }
-          case 'call': { addLog('acc',`${cid}  ${j.id}/${n.id}  start ${n.cfg.journey} (mock)`,{j:j.id,cid,node:n.id,kind:'call'}); go(nextIds(n)); break; }
-          case 'exit': {
-            if(String(n.cfg.action).startsWith('Activate offer')){ const of=OFFERS.find(o=>o.id===p.offers[0]); addLog('ok',`${cid}  ${j.id}/${n.id}  goal reached → POST /tmf-api/productOrderingManagement/v4/productOrder {${of?of.catalog.split(' ·')[0]:'PO'}} → 201 (mock)`,{j:j.id,cid,node:n.id,kind:'goal'}); p.status='converted'; }
-            else { addLog('',`${cid}  ${j.id}/${n.id}  exited · ${n.cfg.action}`,{j:j.id,cid,node:n.id,kind:'exit'}); p.status='exited'; }
-            break; }
-        }
-      });
-      p.pos=[...new Set(newPos)];
-      if(p.pos.length===0 && p.status==='active') p.status='completed';
-}
-/* real-time loop: second-based timers/waits count down every second, then the customer's next immediate steps run */
-setInterval(()=>{
-  let changed=false;
-  allCtx().forEach(j=>{ const S=sim[j.id]; if(!S) return;
-    for(const cid in S.parts){ const p=S.parts[cid]; if(p.status!=='active') continue;
-      p.sec=p.sec||{};
-      const due=p.pos.filter(nid=>{ const n=node(j,nid); if(!n) return false; const secs=n.type==='timer'?secondsOf(n.cfg.duration):n.type==='wait'?secondsOf(n.cfg.timeout):null; if(secs===null) return false; p.sec[nid]=(p.sec[nid]||0)+1; changed=true; return p.sec[nid]>=secs; });
-      if(due.length){ due.forEach(nid=>delete p.sec[nid]); p.secDue=true; processCustomer(j,S,cid,true); p.secDue=false; runNow(j,S,cid); }
+  const p=S.parts[cid]; if(!p||p.status!=='active') return;
+  const cust=custOf(cid)||{attrs:{},pref:['email'],row:{}};
+  const newPos=[];
+  const labelsOf=n=>n.next.map(x=>typeof x==='string'?'':x.label);
+  p.pos.forEach(nid=>{
+    const n=node(j,nid); if(!n) return;
+    const go=(ids)=>{ ids.forEach(i=>{ newPos.push(i); p.visited.add(i); }); p.since=day; };
+    const hold=()=>newPos.push(nid);
+    const h=salt=>hashOf(cid+'|'+nid+'|'+salt);
+    switch(n.type){
+      case 'entry': go(nextIds(n)); break;
+      case 'delivery': {
+        const chans = String(n.cfg.channel).startsWith('Preferred') ? cust.pref.slice(0, parseInt(n.cfg.stopAfter)||cust.pref.length) : [n.cfg.channel];
+        const sent=h('sent')<0.96; const eng={sent, bounced:!sent, opened:sent&&h('open')<0.48, clicked:false, converted:false};
+        eng.clicked=eng.opened&&h('click')<0.42; eng.converted=eng.clicked&&h('conv')<0.3;
+        p.eng[nid]=eng; p.opened=eng.opened; p.lastDelivery=nid;
+        if(sent) addLog('ok',`${cid}  ${j.id}/${n.id}  sent via ${chans[0]} · ${String(n.cfg.content||'').split(' ·')[0]}${eng.opened?' · opened':''}${eng.clicked?' · clicked':''}${eng.converted?' · converted':''}`,{j:j.id,cid,node:n.id,kind:'delivered',channel:chans[0],opened:eng.opened});
+        else addLog('warn',`${cid}  ${j.id}/${n.id}  bounced on ${chans.join(', ')} — continuing`,{j:j.id,cid,node:n.id,kind:'not-delivered',channel:chans.join('/')});
+        go(nextIds(n)); break; }
+      case 'waitDur': { if(!advance){ hold(); break; } p.timers[nid]=(p.timers[nid]||0)+1; if(p.timers[nid]>=waitDays(n.cfg.n,n.cfg.unit)){ delete p.timers[nid]; addLog('',`${cid}  ${j.id}/${n.id}  waited ${n.cfg.n} ${n.cfg.unit}`,{j:j.id,cid,node:n.id,kind:'timer'}); go(nextIds(n)); } else hold(); break; }
+      case 'waitDate': { if(!advance){ hold(); break; } p.timers[nid]=(p.timers[nid]||0)+1; const need=n.cfg.mode==='weekday'?1+Math.floor(h('wd')*6):n.cfg.mode==='dom'?1+Math.floor(h('dom')*4):2; if(p.timers[nid]>=need){ delete p.timers[nid]; addLog('',`${cid}  ${j.id}/${n.id}  date reached (${n.cfg.mode==='weekday'?(n.cfg.weekdays||[]).join('/'):n.cfg.mode==='dom'?'day '+n.cfg.dom:n.cfg.date})`,{j:j.id,cid,node:n.id,kind:'timer'}); go(nextIds(n)); } else hold(); break; }
+      case 'waitEvent': { if(!advance){ hold(); break; } p.timers[nid]=(p.timers[nid]||0)+1; const tmo=waitDays(n.cfg.timeoutN,n.cfg.timeoutUnit);
+        if(h('ev'+p.timers[nid])<0.18){ const rejected=h('rej')<0.15; const lbl=rejected?'rejected':'accepted'; addLog(rejected?'warn':'ok',`${cid}  ${j.id}/${n.id}  event ${n.cfg.event} received → ${lbl}`,{j:j.id,cid,node:n.id,kind:'event'}); delete p.timers[nid]; go(nextIds(n,lbl)); }
+        else if(p.timers[nid]>=tmo){ delete p.timers[nid]; addLog('',`${cid}  ${j.id}/${n.id}  timeout after ${n.cfg.timeoutN} ${n.cfg.timeoutUnit}`,{j:j.id,cid,node:n.id,kind:'timeout'}); go(nextIds(n,'timeout')); }
+        else hold(); break; }
+      case 'waitSeg': { if(!advance){ hold(); break; } p.timers[nid]=(p.timers[nid]||0)+1; const inSeg=mlCustomers(n.cfg.segment).some(c=>c.id===cid)||h('seg'+p.timers[nid])<0.2;
+        if(inSeg){ delete p.timers[nid]; addLog('ok',`${cid}  ${j.id}/${n.id}  now matches ${String(n.cfg.segment).split(' · ')[0]} → matched`,{j:j.id,cid,node:n.id,kind:'event'}); go(nextIds(n,'matched')); }
+        else if(p.timers[nid]>=waitDays(n.cfg.timeoutN,n.cfg.timeoutUnit)){ delete p.timers[nid]; addLog('',`${cid}  ${j.id}/${n.id}  no match after ${n.cfg.timeoutN} ${n.cfg.timeoutUnit} → timeout`,{j:j.id,cid,node:n.id,kind:'timeout'}); go(nextIds(n,'timeout')); }
+        else hold(); break; }
+      case 'waitPrio': { const allowed=h('prio')<0.82; if(!allowed&&n.cfg.autoRetry&&advance&&(p.timers[nid]||0)<2){ p.timers[nid]=(p.timers[nid]||0)+1; hold(); break; } delete p.timers[nid]; addLog(allowed?'':'warn',`${cid}  ${j.id}/${n.id}  priority rollup ${n.cfg.rollup} → ${allowed?'allowed':'denied'}`,{j:j.id,cid,node:n.id,kind:'condition'}); go(nextIds(n,allowed?'allowed':'denied')); break; }
+      case 'splitEng': { const eng=p.eng[n.cfg.delivery]||p.eng[p.lastDelivery]||{}; const pick=(n.cfg.interactions||[]).find(k=>eng[k])||'Remaining'; addLog('',`${cid}  ${j.id}/${n.id}  engagement → ${pick}`,{j:j.id,cid,node:n.id,kind:'condition'}); go(nextIds(n,pick)); break; }
+      case 'splitSeg': { let pick='Remaining'; for(const sg of (n.cfg.segments||[])){ if(mlCustomers(sg).some(c=>c.id===cid)||h(sg)<0.3){ pick=String(sg).split(' · ')[0]; break; } } addLog('',`${cid}  ${j.id}/${n.id}  segment split → ${pick}`,{j:j.id,cid,node:n.id,kind:'condition'}); go(nextIds(n,pick)); break; }
+      case 'splitShuffle': { const ps=n.cfg.paths||[]; const W=ps.reduce((t,x)=>t+(+x.w||0),0)||1; let r=h('shuffle')*W, pick=ps[ps.length-1]?ps[ps.length-1].label:''; for(const x of ps){ r-=(+x.w||0); if(r<=0){ pick=x.label; break; } } addLog('',`${cid}  ${j.id}/${n.id}  shuffle → ${pick}`,{j:j.id,cid,node:n.id,kind:'condition'}); go(nextIds(n,pick)); break; }
+      case 'setAttr': { const v=n.cfg.mode==='timestamp'?`${TODAY}T10:0${Math.floor(h('ts')*9)}`:n.cfg.value; p.attrs[n.cfg.attr]=v; addLog('acc',`${cid}  ${j.id}/${n.id}  ${n.cfg.attr} = ${v}`,{j:j.id,cid,node:n.id,kind:'external'}); go(nextIds(n)); break; }
+      case 'callExt': { addLog('acc',`${cid}  ${j.id}/${n.id}  ${n.cfg.kind==='mcp'?'MCP tool':'webhook'} ${n.cfg.endpoint} → 200`,{j:j.id,cid,node:n.id,kind:'external'}); go(nextIds(n)); break; }
+      case 'ctrlGroup': { if(h('cg')<(+n.cfg.share||10)/100){ p.status='holdout'; addLog('',`${cid}  ${j.id}/${n.id}  held out (control group ${n.cfg.share}%)`,{j:j.id,cid,node:n.id,kind:'holdout'}); } else go(nextIds(n)); break; }
+      case 'audSync': { addLog('acc',`${cid}  ${j.id}/${n.id}  synced to ${n.cfg.platform} · ${n.cfg.audience}`,{j:j.id,cid,node:n.id,kind:'external'}); go(nextIds(n)); break; }
+      case 'exit': { if(n.cfg.goal){ addLog('ok',`${cid}  ${j.id}/${n.id}  goal reached — counted as conversion`,{j:j.id,cid,node:n.id,kind:'goal'}); p.status='converted'; } else { addLog('',`${cid}  ${j.id}/${n.id}  exited`,{j:j.id,cid,node:n.id,kind:'exit'}); p.status='exited'; } break; }
+      default: go(nextIds(n));
     }
   });
-  const glowing=Object.values(lit).some(t=>Date.now()-t<2200);
-  if(changed||glowing){ if(document.getElementById('view-journeys').classList.contains('active')) renderCanvas(); if(repModal&&!repModal.hidden) renderReport(); if(document.getElementById('view-monitor').classList.contains('active')) renderMonitor(); }
-},1000);
-/* run immediate steps until only timers/waits remain (event arrived "now") */
+  if(p.status==='active'){ p.pos=[...new Set(newPos)]; if(p.pos.length===0) p.status='completed'; } else p.pos=[];
+}
+const WAIT_TYPES=new Set(['waitDur','waitDate','waitEvent','waitSeg','waitPrio']);
+/* run immediate steps until only waits remain (event arrived "now") */
 function runNow(j,S,cid){
-  for(let i=0;i<8;i++){ const p=S.parts[cid]; if(!p||p.status!=='active') return; const before=p.pos.join(',');
-    const pending=p.pos.some(id=>{ const n=node(j,id); return n && !['timer','wait'].includes(n.type); }); if(!pending) return;
+  for(let i=0;i<12;i++){ const p=S.parts[cid]; if(!p||p.status!=='active') return; const before=p.pos.join(',');
+    const pending=p.pos.some(id=>{ const n=node(j,id); return n && !(WAIT_TYPES.has(n.type)&&n.type!=='waitPrio'); }); if(!pending) return;
     processCustomer(j,S,cid,false); if(p.pos.join(',')===before) return; }
 }
+/* canvas glow fades a couple of seconds after a step ran */
+setInterval(()=>{ if(Object.values(lit).some(t=>Date.now()-t<2200)&&document.getElementById('view-journeys').classList.contains('active')) renderCanvas(); },1000);
 
-/* ---------- CANVAS ---------- */
+/* ---------- STEP TYPES ---------- */
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-const NW=190, NH=96;
-const BIZ_EVENTS=EVENTS['Business events (BSS / app / partner)'];
+const NW=200, NH=78;
+const NODE_GROUPS=[['entry','Entry','one per version — pick the type'],['message','Message',''],['wait','Wait',''],['split','Split',''],['action','Action','']];
+/* paths(n) lists the labelled outgoing paths of a step; a step without paths has one unlabelled output */
+const NODE_META={
+  entry:{k:'Entry',ic:'⇥',g:'entry',t:'entry'},
+  delivery:{k:'Delivery',ic:'✉',g:'message',t:'delivery'},
+  waitDur:{k:'Wait duration',ic:'◷',g:'wait',t:'timer'},
+  waitDate:{k:'Wait until date',ic:'▦',g:'wait',t:'timer'},
+  waitEvent:{k:'Wait for event',ic:'⚡',g:'wait',t:'wait',paths:()=>['accepted','rejected','timeout']},
+  waitSeg:{k:'Wait for segment match',ic:'◔',g:'wait',t:'wait',paths:()=>['matched','timeout']},
+  waitPrio:{k:'Priority',ic:'⇅',g:'wait',t:'wait',paths:()=>['allowed','denied']},
+  splitEng:{k:'Engagement split',ic:'⑂',g:'split',t:'cond',paths:n=>[...(n.cfg.interactions||[]),'Remaining']},
+  splitSeg:{k:'Segment split',ic:'⑃',g:'split',t:'cond',paths:n=>[...(n.cfg.segments||[]).map(s=>String(s).split(' · ')[0]),'Remaining']},
+  splitShuffle:{k:'Shuffle',ic:'⤨',g:'split',t:'cond',paths:n=>(n.cfg.paths||[]).map(p=>p.label)},
+  setAttr:{k:'Set attribute',ic:'✎',g:'action',t:'ext'},
+  callExt:{k:'Call external',ic:'⇄',g:'action',t:'ext'},
+  ctrlGroup:{k:'Control group',ic:'◐',g:'action',t:'par'},
+  audSync:{k:'Audience sync',ic:'⇪',g:'action',t:'call'},
+  exit:{k:'Exit',ic:'◎',g:'action',t:'exit'},
+};
+const pathsOf=n=>{ const m=NODE_META[n.type]; return m&&m.paths?m.paths(n):null; };
+const INTERACTIONS=[['opened','Opened'],['clicked','Clicked'],['converted','Converted'],['bounced','Bounced']];
+const ENDPOINTS=[['CRM ticket','webhook'],['Billing credit','mcp'],['Loyalty points','mcp'],['Partner offer','webhook'],['Slack #cvm-alerts','webhook']];
+const ROLLUPS=['Marketing outbound · max 2 / week','Service messages · no cap','Winback offers · 1 / 30 days'];
+const AD_PLATFORMS=['Meta Ads','Google Ads'];
+const ATTRS=['LOYALTY_TIER','WINBACK_FLAG','LAST_NUDGE_AT','TRIAL_FOLLOWUP_DONE','PREFERRED_LANGUAGE'];
 /* journey-owned delivery plan: same object as a campaign plan, without a schedule */
-function jPlanDefaults(){ return {contentB:'',abSplit:20,dyn:'LANGUAGE',rules:{cg:{use:false,log:true},cooldown:{use:true,log:true},type:{use:true,log:true},presend:{use:true,log:true}},override:false,tests:[DEMO_USERS.me.split(' ')[0]+' (test MSISDN)']}; }
-function jPlanEnsure(n){ const d=jPlanDefaults(); for(const k in d) if(n.cfg[k]===undefined) n.cfg[k]=d[k]; if(n.cfg.text===undefined) n.cfg.text=contentTextOf(String(n.cfg.content||'').split(' ·')[0]); if(n.cfg.content&&!TEMPLATES.some(t=>String(n.cfg.content).startsWith(t.id))){ const chk={SMS:'sms',Email:'email',Push:'push',WSC:'wsc',Chatbot:'chatbot',Telemarketing:'tm'}[String(n.cfg.channel).split(' ')[0]]||'sms'; const t=tplOf(tplDefault(chk)); if(t) n.cfg.content=`${t.id} · ${t.name}`; } if(n.cfg.controlGroup&&n.cfg.controlGroup!=='off') n.cfg.rules.cg.use=true; }
-/* in-node editable fields per step type: label, cfg key, options */
-function nodeFields(n){
-  const offFmt=id=>{ const o=OFFERS.find(x=>x.id===id); return o?`${o.id} · ${o.name}`:id; };
+function jPlanDefaults(){ return {contentB:'',abSplit:20,dyn:'LANGUAGE',policies:[],sendUnsub:false,controlGroup:'off'}; }
+function jPlanEnsure(n){ const d=jPlanDefaults(); for(const k in d) if(n.cfg[k]===undefined) n.cfg[k]=d[k]; if(n.cfg.text===undefined) n.cfg.text=contentTextOf(String(n.cfg.content||'').split(' ·')[0]); if(n.cfg.content&&!TEMPLATES.some(t=>String(n.cfg.content).startsWith(t.id))&&!String(n.cfg.channel).startsWith('Preferred')){ const t=tplOf(tplDefault(n.cfg.channel)); if(t) n.cfg.content=`${t.id} · ${t.name}`; } }
+function nodeDefaults(t){ const prevDelivery=()=>{ const j=curCtx(); return (j.nodes.filter(n=>n.type==='delivery').pop()||{}).id||''; };
+  const d={delivery:Object.assign({channel:'email',content:CONTENTS.email[0],variant:'Single content',stopAfter:'1 channel'},jPlanDefaults()),
+    waitDur:{n:1,unit:'days'}, waitDate:{mode:'weekday',weekdays:['Mon'],dom:1,date:TODAY},
+    waitEvent:{event:'payment_received',timeoutN:3,timeoutUnit:'days'}, waitSeg:{segment:MLISTS_get()[1]||'',retry:'daily',timeoutN:7,timeoutUnit:'days'}, waitPrio:{rollup:ROLLUPS[0],autoRetry:true},
+    splitEng:{delivery:prevDelivery(),interactions:['opened','clicked']}, splitSeg:{segments:[MLISTS_get()[1]||'']}, splitShuffle:{paths:[{label:'A',w:50},{label:'B',w:50}]},
+    setAttr:{attr:ATTRS[0],mode:'static',value:'4'}, callExt:{endpoint:ENDPOINTS[0][0],kind:'webhook',fields:'contactId, journeyId, step'}, ctrlGroup:{share:10}, audSync:{platform:'Meta Ads',account:'Fizz · CA',audience:'Winback 90d'}, exit:{goal:false}};
+  return JSON.parse(JSON.stringify(d[t]||{})); }
+/* one line under the step name: what it is set to */
+function nodeSummary(n){ const c=n.cfg||{};
   switch(n.type){
-    case 'entry': return [{label:'Entry mode',key:'mode',opts:MODES},{label:'Target audience',key:'segment',opts:MLISTS_get()},{label:'Trigger event',key:'events',opts:BIZ_EVENTS}];
-    case 'delivery': return [{label:'Channel',key:'channel',opts:CHANNELS},{label:'Content',key:'content',opts:contentsFor(n.cfg.channel)}];
-    case 'offer': return [{label:'Offer',key:'offer',opts:OFFERS.map(o=>o.id),fmt:offFmt},{label:'Priority rule',key:'priorityBoost',opts:PRIO}];
-    case 'timer': return [{label:'Trigger delivery',key:'duration',opts:TIMERS}];
-    case 'wait': return [{label:'Event type',key:'event',opts:EVENTS},{label:'Timeout',key:'timeout',opts:TIMEOUTS}];
-    case 'cond': return [{label:'Expression',key:'expr',opts:EXPRS}];
-    case 'exit': return [{label:'On exit',key:'action',opts:EXITS}];
-    case 'call': return [{label:'Journey',key:'journey',opts:CALLS},{label:'Mode',key:'mode',opts:CALLMODES}];
-    case 'ext': return [{label:'System',key:'system',opts:SYSTEMS},{label:'Store response as',key:'store',opts:['response','ticketId','balance','nboScore']}];
-    case 'par': return [{label:'Join rule',key:'join',opts:JOINS}];
-    case 'nbo': return [{label:'Decision source',key:'source',opts:NBO_SOURCES},{label:'Candidate offers',key:'scope',opts:NBO_SCOPES},{label:'Fallback offer',key:'fallback',opts:OFFERS.map(o=>o.id),fmt:offFmt}];
-  } return [];
-}
-function nh(n){ return 30+8+26+nodeFields(n).length*40+8; }
+    case 'entry': { const t=entryText({nodes:[n]}); return `${t.k}${t.sub?' · '+t.sub:''}`; }
+    case 'delivery': return `${chName(c.channel)} · ${c.text?c.text.replace(/\s+/g,' '):String(c.content||'—')}${c.variant&&!c.variant.startsWith('Single')?' · '+c.variant.split(' ')[0]:''}`;
+    case 'waitDur': return `${c.n} ${c.unit}`;
+    case 'waitDate': return c.mode==='weekday'?`next ${(c.weekdays||[]).join(', ')||'weekday'}`:c.mode==='dom'?`day ${c.dom} of the month`:`${c.date}`;
+    case 'waitEvent': return `${c.event} · timeout ${c.timeoutN} ${c.timeoutUnit}`;
+    case 'waitSeg': return `${String(c.segment).split(' · ')[0]} · ${c.retry} · timeout ${c.timeoutN} ${c.timeoutUnit}`;
+    case 'waitPrio': return `${c.rollup}${c.autoRetry?' · auto-retry':''}`;
+    case 'splitEng': return `${c.delivery?'on '+c.delivery:'⚠ no delivery'} · ${(c.interactions||[]).join(', ')||'—'}`;
+    case 'splitSeg': return (c.segments||[]).length?`${c.segments.length} segment(s), top-down`:'⚠ no segment';
+    case 'splitShuffle': return (c.paths||[]).map(p=>`${p.label} ${p.w}%`).join(' · ');
+    case 'setAttr': return `${c.attr} = ${c.mode==='timestamp'?'timestamp when reached':c.value}`;
+    case 'callExt': return `${c.kind==='mcp'?'MCP tool':'webhook'} · ${c.endpoint}`;
+    case 'ctrlGroup': return `hold out ${c.share}% · exportable`;
+    case 'audSync': return `${c.platform} · ${c.audience}`;
+    case 'exit': return c.goal?'goal reached — counts as conversion':'leaves the journey';
+  } return ''; }
+/* per-step stats from the simulation: entered · waiting · exited (+ delivery funnel) */
+function nodeStats(C,n){ const S=simOf(C); const ps=Object.values(S.parts); const entered=ps.filter(p=>p.visited.has(n.id)).length, waiting=ps.filter(p=>p.status==='active'&&p.pos.includes(n.id)).length;
+  const st={entered,waiting,exited:entered-waiting}; if(n.type==='delivery'){ const es=ps.map(p=>p.eng[n.id]).filter(Boolean); st.sent=es.filter(e=>e.sent).length; st.opened=es.filter(e=>e.opened).length; st.clicked=es.filter(e=>e.clicked).length; st.converted=es.filter(e=>e.converted).length; } return st; }
+const nh=n=>NH;
 function optionsHtml(opts,val,fmt){
   const f=fmt||(x=>x); const one=(o)=>`<option value="${esc(o)}" ${o===val?'selected':''}>${esc(f(o))}</option>`;
   if(Array.isArray(opts)){ const extra = (val!==undefined && val!=='' && !opts.includes(val)) ? one(val) : ''; return extra+opts.map(one).join(''); }
@@ -2080,49 +2175,51 @@ const view={x:24,y:24,k:1};
 let repModal=null;
 let drag=null; // {kind:'pan'|'node'|'link', ...}
 function renderCanvas(){
-  const j=curCtx(), S=simOf(j); const locked=vLocked(j.V), closed=j.status==='Closed';
+  const j=curCtx(), S=simOf(j); const locked=vLocked(j.V), closed=j.status==='Closed', live=j.status==='Active'||j.status==='Closing';
   document.getElementById('jb').classList.toggle('locked',locked);
   const counts={}; for(const cid in S.parts){ const p=S.parts[cid]; if(p.status==='active') p.pos.forEach(n=>counts[n]=(counts[n]||0)+1); }
   const svg=document.getElementById('canvas');
   const spot=S.parts[spotlight[j.id]]||null; const visited=spot?spot.visited:new Set(); const curPos=spot&&spot.status==='active'?spot.pos:[];
+  const H=NH+(live?20:0);
   let edges='';
   j.nodes.forEach(n=>{
     n.next.forEach(nx=>{ const t=typeof nx==='string'?{to:nx,label:''}:nx; const m=node(j,t.to); if(!m) return;
       const taken=visited.has(n.id)&&visited.has(m.id);
-      const x1=n.x+NW, y1=n.y+nh(n)/2, x2=m.x, y2=m.y+nh(m)/2; const dx=Math.max(40,(x2-x1)/2);
+      const x1=n.x+NW, y1=n.y+H/2, x2=m.x, y2=m.y+H/2; const dx=Math.max(40,(x2-x1)/2);
       const d=`M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`;
       const lx=(x1+x2)/2, ly=(y1+y2)/2; const w=Math.max(34, t.label.length*6.5+12);
-      edges+=`<g class="edge${taken?' taken':''}" data-from="${n.id}" data-to="${m.id}"><path d="${d}"/><g class="ecut"><title>Remove connection</title>${t.label?`<rect x="${lx-w/2}" y="${ly-9}" width="${w}" height="18" rx="9"/><text x="${lx}" y="${ly+3.5}" text-anchor="middle">${esc(t.label)}</text>`:`<circle cx="${lx}" cy="${ly}" r="7" fill="#fff" stroke="#DFE1DF"/><text x="${lx}" y="${ly+3}" text-anchor="middle" style="font-size:8px;fill:#6B6B80">⛓</text>`}</g></g>`;
+      edges+=`<g class="edge${taken?' taken':''}" data-from="${n.id}" data-to="${m.id}"><path d="${d}"/><g class="ecut"><title>${locked?'Connection (locked)':'Remove connection'}</title>${t.label?`<rect x="${lx-w/2}" y="${ly-9}" width="${w}" height="18" rx="9"/><text x="${lx}" y="${ly+3.5}" text-anchor="middle">${esc(t.label)}</text>`:locked?'':`<circle cx="${lx}" cy="${ly}" r="7" fill="#fff" stroke="#DFE1DF"/><text x="${lx}" y="${ly+3}" text-anchor="middle" style="font-size:8px;fill:#6B6B80">⛓</text>`}</g></g>`;
     });
   });
   let nodes='';
   j.nodes.forEach(n=>{
-    const meta=NODE_META[n.type]; const flds=nodeFields(n); const c=counts[n.id]||0; const H=nh(n);
-    const tint=`var(--t-${n.type})`, ink=`var(--t-${n.type}-i)`;
+    const meta=NODE_META[n.type]||{k:n.type,ic:'?',t:'ext'}; const c=counts[n.id]||0;
+    const tint=`var(--t-${meta.t})`, ink=`var(--t-${meta.t}-i)`;
     const off=n.label.startsWith('[off]'); const glow=(Date.now()-(lit[j.id+'/'+n.id]||0))<2200;
     const isCur=curPos.includes(n.id), isDone=!isCur&&visited.has(n.id);
-    let remain=null; for(const cid in S.parts){ const p=S.parts[cid]; if(p.status==='active'&&p.pos.includes(n.id)&&p.sec&&p.sec[n.id]!==undefined){ const secs=n.type==='timer'?secondsOf(n.cfg.duration):secondsOf(n.cfg.timeout); if(secs!==null) remain=Math.max(0,secs-p.sec[n.id]); } }
+    const st=live?nodeStats(j,n):null; const sum=nodeSummary(n);
+    const kind=n.type==='entry'?(ENTRY_KINDS[n.cfg.kind]||{}).k||'Entry':meta.k;
+    const strip=st?(n.type==='delivery'?`<text class="stat" x="10" y="${NH+13}">sent <tspan>${st.sent}</tspan> · opened <tspan>${st.opened}</tspan> · clicked <tspan>${st.clicked}</tspan> · conv <tspan>${st.converted}</tspan></text>`:`<text class="stat" x="10" y="${NH+13}">entered <tspan>${st.entered}</tspan> · waiting <tspan>${st.waiting}</tspan> · exited <tspan>${st.exited}</tspan></text>`):'';
     nodes+=`<g class="node${selNode===n.id?' sel':''}${glow?' lit':''}${isCur?' cur':''}${isDone?' done':''}" data-id="${n.id}" transform="translate(${n.x},${n.y})" tabindex="0" role="button" aria-label="${esc(n.label)}" ${off?'opacity="0.45"':''}>
       <rect class="body" width="${NW}" height="${H}"/>
-      <rect class="head" width="${NW}" height="30" fill="${tint}"/><rect width="${NW}" height="14" y="16" fill="${tint}"/>
-      <text class="k" x="10" y="19" fill="${ink}">${meta.ic} ${esc(meta.k)}</text>
-      <text class="id" x="${NW-(n.type==='entry'?8:26)}" y="19" text-anchor="end">${n.id}</text>
-      ${n.type!=='entry'&&!locked?`<g class="ndel" data-del="${n.id}" transform="translate(${NW-12},13)"><title>Delete step</title><circle r="8" fill="#fff" stroke="#DFE1DF"/><path d="M-3,-3 L3,3 M3,-3 L-3,3" stroke="#6B6B80" stroke-width="1.6" stroke-linecap="round"/></g>`:''}
-      ${isDone?`<g transform="translate(${NW-30},9)"><circle r="7" fill="#2A7230"/><path d="M-3,0 L-1,2.5 L3.5,-2.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></g>`:''}
-      ${isCur?`<g transform="translate(${NW-30},9)"><circle r="7" fill="#F58220"><animate attributeName="r" values="6;8;6" dur="1.2s" repeatCount="indefinite"/></circle><path d="M-2.5,-3.5 L3.5,0 L-2.5,3.5 Z" fill="#fff"/></g>`:''}
-      <foreignObject x="8" y="36" width="${NW-16}" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="nname"><input data-node="${n.id}" data-k="__label" value="${esc(n.label)}" aria-label="Step name" ${closed?'disabled':''}/></div></foreignObject>
-      ${flds.map((f,i)=>`<text class="lab" x="10" y="${72+i*40}">${esc(f.label)}</text><foreignObject x="10" y="${76+i*40}" width="${NW-20}" height="28"><div xmlns="http://www.w3.org/1999/xhtml" class="nsel"><select data-node="${n.id}" data-k="${f.key}" aria-label="${esc(f.label)}" ${closed?'disabled':''}>${optionsHtml(f.opts,n.cfg[f.key],f.fmt)}</select></div></foreignObject>`).join('')}
+      <rect class="head" width="${NW}" height="26" fill="${tint}"/><rect width="${NW}" height="12" y="14" fill="${tint}"/>
+      <text class="k" x="10" y="17" fill="${ink}">${meta.ic} ${esc(kind)}</text>
+      <text class="id" x="${NW-(n.type==='entry'||locked?8:26)}" y="17" text-anchor="end">${n.id}</text>
+      ${n.type!=='entry'&&!locked?`<g class="ndel" data-del="${n.id}" transform="translate(${NW-12},12)"><title>Delete step</title><circle r="8" fill="#fff" stroke="#DFE1DF"/><path d="M-3,-3 L3,3 M3,-3 L-3,3" stroke="#6B6B80" stroke-width="1.6" stroke-linecap="round"/></g>`:''}
+      ${isDone?`<g transform="translate(${NW-30},8)"><circle r="7" fill="#2A7230"/><path d="M-3,0 L-1,2.5 L3.5,-2.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></g>`:''}
+      ${isCur?`<g transform="translate(${NW-30},8)"><circle r="7" fill="#F58220"><animate attributeName="r" values="6;8;6" dur="1.2s" repeatCount="indefinite"/></circle><path d="M-2.5,-3.5 L3.5,0 L-2.5,3.5 Z" fill="#fff"/></g>`:''}
+      <foreignObject x="8" y="31" width="${NW-16}" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="nname"><input data-node="${n.id}" data-k="__label" value="${esc(n.label)}" aria-label="Step name" ${closed?'disabled':''}/></div></foreignObject>
+      <text class="sum" x="10" y="${NH-10}"><title>${esc(sum)}</title>${esc(sum.length>34?sum.slice(0,33)+'…':sum)}</text>
+      ${strip?`<line x1="0" y1="${NH}" x2="${NW}" y2="${NH}" stroke="var(--line-2)"/>${strip}`:''}
       ${n.type!=='entry'&&!locked?`<circle class="port" cx="0" cy="${H/2}" r="4"/>`:''}
-      ${n.type!=='exit'&&!locked?`<circle class="port out" cx="${NW}" cy="${H/2}" r="4"/>`:''}
+      ${n.type!=='exit'&&!locked?`<circle class="port out" cx="${NW}" cy="${H/2}" r="4"><title>Drag to connect${pathsOf(n)?' — next free path: '+(pathsOf(n).find(l=>!n.next.some(x=>typeof x!=='string'&&x.label===l))||'all paths connected'):''}</title></circle>`:''}
       ${c?`<g class="badge" transform="translate(${NW-4},-2)"><circle r="10"/><text text-anchor="middle" y="3.5">${c}</text></g>`:''}
-      ${remain!==null?`<g class="cd" transform="translate(${NW-34},${H-12})"><rect x="-6" y="-9" width="34" height="16" rx="8" fill="#FDF0E2" stroke="#F58220"/><text x="11" y="3" text-anchor="middle" style="font-size:10px;font-weight:700;fill:#9E560D;font-family:var(--mono)">${remain}s</text></g>`:''}
     </g>`;
   });
   let tmp='';
-  if(drag&&drag.kind==='link'){ const s=node(j,drag.from); tmp=`<path class="tmpline" d="M${s.x+NW},${s.y+nh(s)/2} L${drag.cx},${drag.cy}"/>`; }
+  if(drag&&drag.kind==='link'){ const s=node(j,drag.from); tmp=`<path class="tmpline" d="M${s.x+NW},${s.y+H/2} L${drag.cx},${drag.cy}"/>`; }
   svg.innerHTML=`<g id="vp" transform="translate(${view.x},${view.y}) scale(${view.k})">${edges}${nodes}${tmp}</g>`;
-  svg.querySelectorAll('.node').forEach(g=>{ g.addEventListener('keydown',e=>{ if(e.target.tagName==='SELECT') return; if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selNode=g.dataset.id; renderCanvas(); renderNodePanel(); } }); });
-  svg.querySelectorAll('.nsel select').forEach(s=>{ s.addEventListener('change',()=>{ const n=node(j,s.dataset.node); n.cfg[s.dataset.k]=s.value; if(s.dataset.k==='channel') n.cfg.content=contentsFor(s.value)[0]; selNode=n.id; renderCanvas(); renderNodePanel(); }); });
+  svg.querySelectorAll('.node').forEach(g=>{ g.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selNode=g.dataset.id; renderCanvas(); renderNodePanel(); } }); });
   svg.querySelectorAll('.nname input').forEach(i=>{ i.addEventListener('change',()=>{ const n=node(j,i.dataset.node); n.label=i.value; selNode=n.id; renderCanvas(); renderNodePanel(); }); i.addEventListener('keydown',e=>{ if(e.key==='Enter') i.blur(); e.stopPropagation(); }); });
   const active=Object.values(S.parts).filter(p=>p.status==='active').length, conv=Object.values(S.parts).filter(p=>p.status==='converted').length;
   renderVersionBar(j,active,conv);
@@ -2137,7 +2234,7 @@ function renderCanvas(){
     if(e.button!==0) return;
     const j=curCtx();
     const del=e.target.closest('.ndel'); if(del){ e.preventDefault(); deleteNode(del.dataset.del); return; }
-    const cut=e.target.closest('.ecut'); if(cut){ const eg=cut.closest('.edge'); e.preventDefault(); removeEdge(eg.dataset.from,eg.dataset.to); toast('Connection removed',`${eg.dataset.from} → ${eg.dataset.to}`); return; }
+    const cut=e.target.closest('.ecut'); if(cut){ const eg=cut.closest('.edge'); e.preventDefault(); if(!vLocked(j.V)){ removeEdge(eg.dataset.from,eg.dataset.to); toast('Connection removed',`${eg.dataset.from} → ${eg.dataset.to}`); } return; }
     if(e.target.closest('select,input,button,option,textarea')){ const gg=e.target.closest('.node'); if(gg&&selNode!==gg.dataset.id){ selNode=gg.dataset.id; renderNodePanel(); svg.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.dataset.id===selNode)); } return; } // native control inside a step
     const port=e.target.closest('.port.out'); const g=e.target.closest('.node');
     if(port&&g){ const c=toCanvas(e); drag={kind:'link',from:g.dataset.id,cx:c.x,cy:c.y}; }
@@ -2156,8 +2253,7 @@ function renderCanvas(){
     if(d.kind==='node'&&!d.moved){ selNode=d.id; renderNodePanel(); }
     if(d.kind==='link'&&vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: connections cannot change.`,'warn'); }
     else if(d.kind==='link'){ const el=document.elementFromPoint(e.clientX,e.clientY); const g=el&&el.closest?el.closest('.node'):null;
-      if(g&&g.dataset.id!==d.from){ const s=node(j,d.from); const already=s.next.some(x=>(typeof x==='string'?x:x.to)===g.dataset.id);
-        if(!already){ const label=(s.type==='cond'||s.type==='wait'||s.type==='par')?(prompt('Branch label (e.g. yes / no, accepted / timeout):','')||''):''; s.next.push(label?{to:g.dataset.id,label}:g.dataset.id); } } }
+      if(g&&g.dataset.id!==d.from) connect(j,d.from,g.dataset.id); }
     renderCanvas();
   };
   svg.addEventListener('pointerup',end); svg.addEventListener('pointercancel',end);
@@ -2168,109 +2264,155 @@ function renderCanvas(){
   svg.addEventListener('wheel',e=>{ if(!(e.ctrlKey||e.metaKey)) return; e.preventDefault(); const r=svg.getBoundingClientRect(); zoom(e.deltaY<0?1.1:1/1.1,e.clientX-r.left,e.clientY-r.top); },{passive:false});
   /* palette drag-and-drop */
   let pd=null, ghost=null;
-  window.addEventListener('pointermove',e=>{ if(!pd) return; if(!ghost&&Math.abs(e.clientX-pd.sx)+Math.abs(e.clientY-pd.sy)>6){ ghost=document.createElement('div'); ghost.className='ghost'; ghost.textContent=NODE_META[pd.type].k; document.body.appendChild(ghost); pd.btn.classList.add('dragging'); } if(ghost){ ghost.style.left=(e.clientX+12)+'px'; ghost.style.top=(e.clientY+12)+'px'; } });
+  window.addEventListener('pointermove',e=>{ if(!pd) return; if(!ghost&&Math.abs(e.clientX-pd.sx)+Math.abs(e.clientY-pd.sy)>6){ ghost=document.createElement('div'); ghost.className='ghost'; ghost.textContent=pd.label; document.body.appendChild(ghost); pd.btn.classList.add('dragging'); } if(ghost){ ghost.style.left=(e.clientX+12)+'px'; ghost.style.top=(e.clientY+12)+'px'; } });
   window.addEventListener('pointerup',e=>{ if(!pd) return; const p=pd; pd=null; p.btn.classList.remove('dragging'); const dropped=!!ghost; if(ghost){ ghost.remove(); ghost=null; }
     const r=svg.getBoundingClientRect(); const inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
+    if(p.entryKind){ setEntryKind(p.entryKind); return; }
     if(dropped&&inside){ const c=toCanvas(e); addNode(p.type,{x:Math.round((c.x-NW/2)/8)*8,y:Math.round((c.y-NH/2)/8)*8,connect:false}); }
     else if(!dropped) addNode(p.type,{connect:true}); });
-  window.paletteDown=(btn,type,e)=>{ pd={btn,type,sx:e.clientX,sy:e.clientY}; };
+  window.paletteDown=(btn,type,e,entryKind,label)=>{ pd={btn,type,sx:e.clientX,sy:e.clientY,entryKind,label}; };
 })();
 function toast(title,msg,cls){ const t=document.getElementById('toast'); const d=document.createElement('div'); if(cls) d.className=cls; d.innerHTML=`<b>${esc(title)}</b>${esc(msg||'')}`; t.appendChild(d); setTimeout(()=>{ d.style.opacity='0'; d.style.transition='opacity .3s'; setTimeout(()=>d.remove(),320); },4200); }
+/* connect two steps; a multi-path step takes its next free path label, a single-output step an unlabelled edge */
+function connect(j,from,to){ const s=node(j,from); if(!s||from===to) return false; const already=s.next.some(x=>(typeof x==='string'?x:x.to)===to); if(already) return false;
+  const paths=pathsOf(s);
+  if(paths){ const free=paths.find(l=>!s.next.some(x=>typeof x!=='string'&&x.label===l)); if(!free){ toast('All paths connected',`${s.label}: ${paths.join(', ')} already have a target. Remove a connection first.`,'warn'); return false; } s.next.push({to,label:free}); }
+  else s.next.push(to);
+  return true; }
 function deleteNode(id){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: steps cannot be added or removed. Copy to a new version to change the structure.`,'warn'); return; } const n=node(j,id); if(!n||n.type==='entry') return;
   j.nodes=j.nodes.filter(x=>x.id!==id); j.nodes.forEach(x=>x.next=x.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==id));
-  const S=sim[j.id]; for(const cid in S.parts){ const p=S.parts[cid]; p.pos=p.pos.filter(x=>x!==id); if(p.pos.length===0&&p.status==='active') p.status='completed'; }
+  const S=simOf(j); for(const cid in S.parts){ const p=S.parts[cid]; p.pos=p.pos.filter(x=>x!==id); if(p.pos.length===0&&p.status==='active') p.status='completed'; }
   if(selNode===id) selNode=null; renderCanvas(); renderNodePanel(); }
-function removeEdge(from,to){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: connections cannot change. Copy to a new version first.`,'warn'); return; } const n=node(j,from); if(!n) return; n.next=n.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==to); renderCanvas(); }
-function fitView(){ const j=curCtx(); const svg=document.getElementById('canvas'); const r=svg.getBoundingClientRect(); const minX=Math.min(...j.nodes.map(n=>n.x)), minY=Math.min(...j.nodes.map(n=>n.y)), maxX=Math.max(...j.nodes.map(n=>n.x))+NW, maxY=Math.max(...j.nodes.map(n=>n.y+nh(n))); const k=Math.min(1,Math.max(.45,Math.min((r.width-48)/(maxX-minX),(r.height-48)/(maxY-minY)))); view.k=k; view.x=24-minX*k; view.y=24-minY*k; renderCanvas(); }
+function removeEdge(from,to){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: connections cannot change. Copy to a new version first.`,'warn'); return; } const n=node(j,from); if(!n) return; n.next=n.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==to); renderCanvas(); renderNodePanel(); }
+function fitView(){ const j=curCtx(); const svg=document.getElementById('canvas'); const r=svg.getBoundingClientRect(); const H=NH+20; const minX=Math.min(...j.nodes.map(n=>n.x)), minY=Math.min(...j.nodes.map(n=>n.y)), maxX=Math.max(...j.nodes.map(n=>n.x))+NW, maxY=Math.max(...j.nodes.map(n=>n.y+H)); const k=Math.min(1,Math.max(.6,Math.min((r.width-48)/(maxX-minX),(r.height-48)/(maxY-minY)))); view.k=k; view.x=24-minX*k; view.y=24-minY*k; renderCanvas(); }
+/* the Entry group of the palette changes the type of the one entry step instead of adding a step */
+function setEntryKind(kind){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: the entry type is part of the structure. Copy to a new version to change it.`,'warn'); return; }
+  const e=j.nodes[0]; if(e.cfg.kind===kind){ selNode=e.id; renderCanvas(); renderNodePanel(); return; } const keep={includeProject:e.cfg.includeProject,reentry:e.cfg.reentry,reentryDays:e.cfg.reentryDays}; e.cfg=Object.assign(entryDefaults(kind),keep); e.label=ENTRY_KINDS[kind].k; selNode=e.id; renderCanvas(); renderNodePanel(); toast('Entry type changed',`${ENTRY_KINDS[kind].k} — ${ENTRY_KINDS[kind].d}`); }
 function addNode(t,opt){
   const j=curCtx(); const m=NODE_META[t];
   if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: steps cannot be added. Copy to a new version to change the structure.`,'warn'); return; }
-  const cfgs={delivery:Object.assign({channel:'sms',content:CONTENTS.sms[0],variant:'Single content',stopAfter:'1 channel',controlGroup:'off'},jPlanDefaults()),timer:{duration:'1 day',at:'10:00 local'},cond:{expr:EXPRS[0]},wait:{event:'offer_accepted',timeout:'3 days'},offer:{offer:OFFERS[1].id,priorityBoost:'none'},par:{branches:'2',join:'wait for all'},nbo:{source:NBO_SOURCES[0],scope:NBO_SCOPES[0],fallback:'OFR-1043',min:NBO_MIN[1]},exit:{action:EXITS[1]},call:{journey:CALLS[0],mode:CALLMODES[0]},ext:{system:SYSTEMS[0],payload:'{ "customerId": "{{customer.id}}" }',store:'response'}};
-  const id='n'+(Date.now()%100000); const s=selNode?node(j,selNode):null;
+  const s=selNode?node(j,selNode):null;
   let x=opt.x, y=opt.y; if(x===undefined){ if(!s){ toast('Add step','Select a step first, or drag the component onto the canvas.','warn'); return; } x=s.x+NW+40; y=s.y+(s.next.length?130:0); }
-  const n={id,type:t,x,y,label:m.k,cfg:cfgs[t],next:[]}; j.nodes.push(n);
-  if(opt.connect&&s) s.next.push(id);
+  const id='n'+(Date.now()%100000);
+  const n={id,type:t,x,y,label:m.k,cfg:nodeDefaults(t),next:[]}; if(t==='splitEng'&&s&&s.type==='delivery') n.cfg.delivery=s.id; j.nodes.push(n);
+  /* two deliveries back to back: a Wait is slipped in between so the second one is not sent in the same second */
+  if(opt.connect&&s&&s.type==='delivery'&&t==='delivery'){ const w={id:'n'+((Date.now()+1)%100000),type:'waitDur',x,y,label:'Wait duration',cfg:{n:1,unit:'days'},next:[id]}; n.x=x+NW+40; j.nodes.push(w); connect(j,s.id,w.id); toast('Wait added','Two deliveries in a row: a 1-day Wait was placed between them. Change its length or remove it.'); }
+  else if(opt.connect&&s) connect(j,s.id,id);
   selNode=id; renderCanvas(); renderNodePanel();
 }
 
 function renderNodePanel(){
   const j=curCtx(); const body=document.getElementById('jp-body'); renderJSettings(); const jset=document.getElementById('jset'); const locked=vLocked(j.V), closed=j.status==='Closed';
-  if(!selNode){ jset.open=true; body.innerHTML=`<div class="empty">Select a step on the canvas.${locked?`<br><span style="font-size:11.5px">v${j.v} is ${j.status}: ${closed?'read-only':'structure locked, step content editable'}.</span>`:''}</div>`; document.getElementById('jp-type').textContent=''; document.getElementById('jp-title').textContent='Step details'; return; }
+  if(!selNode){ jset.open=true; body.innerHTML=`<div class="empty">Select a step on the canvas.${locked?`<br><span style="font-size:11.5px">v${j.v} is ${j.status}: ${closed?'read-only':'structure locked, step content editable'}.</span>`:''}</div>`; document.getElementById('jp-title').textContent='Step details'; return; }
   jset.open=false;
-  const n=node(j,selNode); if(!n){ selNode=null; renderNodePanel(); return; } const meta=NODE_META[n.type];
-  document.getElementById('jp-title').textContent=`Step ${n.id} · ${meta.k}`;
-  const f=(k,label,val,type='text')=>`<div class="fld"><label for="f-${k}">${label}</label>${type==='ta'?`<textarea id="f-${k}" data-k="${k}">${esc(val)}</textarea>`:`<input id="f-${k}" data-k="${k}" value="${esc(val)}">`}</div>`;
+  const n=node(j,selNode); if(!n){ selNode=null; renderNodePanel(); return; } const meta=NODE_META[n.type]||{k:n.type};
+  document.getElementById('jp-title').textContent=`Step ${n.id} · ${n.type==='entry'?'Entry · '+(ENTRY_KINDS[n.cfg.kind]||{}).k:meta.k}`;
+  const f=(k,label,val,type='text',extra='')=>`<div class="fld"><label for="f-${k}">${label}</label>${type==='ta'?`<textarea id="f-${k}" data-k="${k}">${esc(val)}</textarea>`:`<input id="f-${k}" data-k="${k}" type="${type}" value="${esc(val)}" ${extra}>`}</div>`;
   const sel=(k,label,opts,fmt)=>`<div class="fld"><label for="f-${k}">${label}</label><select id="f-${k}" data-k="${k}">${optionsHtml(opts,n.cfg[k],fmt)}</select></div>`;
+  const selP=(k,label,pairs)=>`<div class="fld"><label for="f-${k}">${label}</label><select id="f-${k}" data-k="${k}">${pairs.map(([v,l])=>`<option value="${esc(v)}" ${String(n.cfg[k])===String(v)?'selected':''}>${esc(l)}</option>`).join('')}</select></div>`;
+  const ck=(k,label)=>`<label class="ck"><input type="checkbox" data-ck="${k}" ${n.cfg[k]?'checked':''}> ${label}</label>`;
+  const two=(a,b)=>`<div class="js-2">${a}${b}</div>`;
+  const segOpts=MLS.filter(m=>!m.excl).map(mlLabel);
+  const pathsHtml=()=>{ const ps=pathsOf(n); if(!ps) return ''; return `<div class="sec">Paths</div><div class="paths">${ps.map(l=>{ const e=n.next.find(x=>typeof x!=='string'&&x.label===l); const t=e&&node(j,e.to); return `<div class="path"><b>${esc(l)}</b><span>${t?'→ '+esc(t.label)+' <span class="mono">'+t.id+'</span>':'<em>not connected</em>'}</span>${t&&!locked?`<a data-unlink="${e.to}" title="Remove connection">×</a>`:''}</div>`; }).join('')}</div>`; };
   let html=`<div class="fld"><label for="f-label">Step name</label><input id="f-label" data-k="__label" value="${esc(n.label)}"></div>`;
   switch(n.type){
-    case 'entry': html+=sel('mode','Entry mode',MODES)+sel('segment','Target audience (segment)',MLISTS_get())+f('events','Trigger events (BSS / app / partner)',n.cfg.events)
-      +`<div class="sec">Journey rules</div><dl class="kv"><dt>Re-entry</dt><dd>after ${j.entry.reentryDays} days</dd><dt>Concurrent</dt><dd>max ${j.entry.maxConcurrent} journeys</dd><dt>Goal</dt><dd>${esc(j.exit.goal)}</dd><dt>Expires</dt><dd>${j.exit.expireDays} days after entry</dd></dl><div class="note">Re-entry and concurrency are journey rules; the segment and the events are this version's entry.</div>`; break;
-    case 'delivery': { jPlanEnsure(n); const pc=n.cfg; const isAB=pc.variant.startsWith('A/B'), isDyn=pc.variant.startsWith('Dynamic');
-      html+=`<div class="sec">Delivery — owned by <b>${j.id}</b></div><div style="font-size:11.5px;color:var(--ink-2)">Same as a campaign delivery, minus the schedule: <b>when</b> comes from the journey (the Timer / Wait before this step), <b>who</b> from the customer reaching it. Content (the text below) belongs to this journey; the template only gives the design. Reporting key: JOURNEY_ID ${j.id} · step ${n.id}.</div>`
-      +sel('channel','Channel',CHANNELS)+sel('content',isAB?'Template A':'Template',contentsFor(n.cfg.channel))
-      +`<div class="fld"><label for="f-text">Content text <span style="color:var(--ink-3)">— this journey's own text, rendered in the template</span></label><textarea id="f-text" data-k="text" style="font-family:var(--sans);font-size:12.5px;min-height:64px">${esc(pc.text||'')}</textarea><div class="chips" style="margin-top:4px">${PARAMS.map(x=>`<span class="param" data-jins="${x}" title="Insert">{{${x}}}</span>`).join('')}</div></div>`
+    case 'entry': { const e=n.cfg, K=ENTRY_KINDS[e.kind]||{};
+      html+=`<div class="etype">${Object.entries(ENTRY_KINDS).map(([k,m])=>`<button type="button" class="${k===e.kind?'on':''}" data-ek="${k}" title="${esc(m.d)}" ${locked?'disabled':''}><i>${m.ic}</i>${esc(m.k)}${m.cm?'<small>CM</small>':''}</button>`).join('')}</div><div class="note" style="margin-top:4px">${esc(K.d||'')}</div>`;
+      switch(e.kind){
+        case 'segment': html+=sel('segment','Segment',segOpts)+two(selP('freq','Evaluation',EVAL_FREQ.map(x=>[x,x])),selP('slot','Time slot',EVAL_SLOTS.map(x=>[x,x]))); break;
+        case 'dateAttr': html+=sel('attr','Date attribute',DATE_ATTRS)+two(f('offset','Offset (days)',e.offset,'number','min="0" max="365"'),selP('dir','Relative to the date',[['before','before'],['on','on the date'],['after','after']]))+ck('yearly','Repeats every year (birthday, anniversary)'); break;
+        case 'event': html+=sel('event','Event name',EVENT_NAMES)+f('payload','Payload fields used in the journey (optional)',e.payload)+ck('createContact','Create the contact if it does not exist yet')+`<button class="btn sm outline" id="btn-apicode">API code — sample payload</button><pre class="code apicode" id="apicode" hidden>${esc(JSON.stringify({event:e.event,contactId:'{{contactId}}',occurredAt:new Date().toISOString(),payload:EVENT_PAYLOADS[e.event]||{}},null,2))}\n\nPOST https://api.example.com/journeys/v1/events\nAuthorization: Bearer <token></pre>`; break;
+        case 'joinsList': html+=sel('list','List / datamart',LISTS)+selP('source','Source of the join',[['any','any'],['api','API'],['import','import'],['optin','opt-in form']]); break;
+        case 'unengaged': html+=selP('channel','Channel',UNENG_CHANNELS)+f('days','Inactivity (days)',e.days,'number','min="7" max="730"'); break;
+        case 'twin': html+=sel('signal','Signal',TWIN_SIGNALS)+f('threshold','Threshold',e.threshold,'number','min="0" max="1" step="0.05"')+`<div class="note">Digital Twin pushes the signal per contact; the entry fires when the score crosses the threshold. CM-only.</div>`; break;
+        case 'agent': html+=`<div class="agentcard"><div class="ac-h">✧ Suggested by Marketing Agent</div><p>${esc(e.rationale)}</p><div class="ac-f">confidence 0.78 · based on 30-day engagement and usage trends</div></div><div class="note">Read-only: the Agent proposes the audience, the marketer owns the steps. CM-only.</div>`; break; }
+      html+=`<div class="sec">Common</div>`+ck('includeProject','Include the project (folder) segment')+two(selP('reentry','Re-entry',REENTRY.map(x=>[x,x])),e.reentry==='after N days'?f('reentryDays','Days',e.reentryDays,'number','min="1" max="730"'):'<div></div>'); break; }
+    case 'delivery': { jPlanEnsure(n); const pc=n.cfg; const isAB=String(pc.variant).startsWith('A/B'), isDyn=String(pc.variant).startsWith('Dynamic');
+      html+=`<div style="font-size:11.5px;color:var(--ink-2)">A full delivery owned by this journey: <b>when</b> comes from the step before, <b>who</b> from the contact reaching it. The template gives the design; the text below is this journey's own.</div>`
+      +sel('channel','Channel',CHANNELS,chName)+sel('content',isAB?'Template A':'Template',contentsFor(n.cfg.channel))
+      +`<div class="fld"><label for="f-text">Content text <span style="color:var(--ink-3)">— rendered in the template</span></label><textarea id="f-text" data-k="text" style="font-family:var(--sans);font-size:12.5px;min-height:64px">${esc(pc.text||'')}</textarea><div class="chips" style="margin-top:4px">${PARAMS.map(x=>`<span class="param" data-jins="${x}" title="Insert">{{${x}}}</span>`).join('')}</div></div>`
       +sel('variant','Content mode',['Single content','A/B test (2 variants, winner by open rate)','Dynamic content (rule on categorical attribute)'])
       +(isAB?sel('contentB','Template B',contentsFor(n.cfg.channel))+`<div class="fld"><label>Test share <span style="color:var(--ink-3)">— rest gets the winner</span></label><div class="range"><input type="range" min="10" max="50" step="5" data-k="abSplit" value="${pc.abSplit}"><output id="ab-out">${pc.abSplit}%</output></div></div>`:'')
-      +(isDyn?sel('dyn','Variant by column',['LANGUAGE','CUSTOMER_TYPE','REGION','DEVICE_5G','APP_INSTALLED']):'')
-      +sel('stopAfter','Stop cascade after',STOPS)+sel('controlGroup','Control group',CGS)
-      +`<div class="sec">Communication rules</div><label class="ck" style="margin-bottom:6px"><input type="checkbox" data-rk="override" ${pc.override?'checked':''}> Override elimination rules</label>
-        <table class="tbl" style="font-size:12px;${pc.override?'opacity:.45':''}"><thead><tr><th>Rule</th><th style="width:56px">Use</th><th style="width:56px">Log</th></tr></thead><tbody>${PLAN_RULES.map(([k,l,d])=>`<tr><td title="${d}">${l}</td><td><input type="checkbox" data-rule="${k}" data-f="use" ${pc.rules[k].use?'checked':''} ${pc.override||(k==='cg'&&pc.controlGroup==='off')?'disabled':''}></td><td><input type="checkbox" data-rule="${k}" data-f="log" ${pc.rules[k].log?'checked':''} ${pc.override?'disabled':''}></td></tr>`).join('')}</tbody></table>
-        <div style="font-size:11px;color:var(--ink-3)">Consent and global exclusion lists always apply. Overlap counts this journey's type; pre-sent uses the journey's pre-sent period.</div>`
-      +`<div class="sec">Test users</div><div class="chips">${pc.tests.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}<button class="btn sm outline" id="btn-addtest">+ Add</button><button class="btn sm outline" id="btn-testsend">Send test</button></div>`; break; }
-    case 'timer': html+=sel('duration','Trigger delivery after',TIMERS)+f('at','Send at',n.cfg.at||'immediately')+`<div class="note">Relative-to-step, fixed-date and recurring options are proposed; today the Timer takes a fixed wait.</div>`; break;
-    case 'wait': html+=sel('event','Event type',EVENTS)+sel('timeout','Timeout',TIMEOUTS)+`<div class="note">Today the Event step listens to delivery feedback (opened, clicked…). Proposed: business events from BSS / app / partner APIs, and a second <b>timeout</b> branch.</div>`; break;
-    case 'cond': html+=sel('expr','Expression',EXPRS)+`<div class="sec">Operators</div><div class="chips"><span class="chip">equals</span><span class="chip">not equals</span><span class="chip">contains</span><span class="chip">starts with</span><span class="chip">ends with</span><span class="chip">empty</span><span class="chip">between</span><span class="chip">greater</span><span class="chip">lower</span><span class="chip">in last N days</span><span class="chip">case-insensitive</span></div><div class="sec">Sources</div><div class="chips"><span class="chip">datamart attribute</span><span class="chip">journey variable</span><span class="chip">stored external response</span><span class="chip">computed parameter</span></div>`; break;
-    case 'offer': { const o=OFFERS.find(x=>x.id===n.cfg.offer)||{};
-      html+=sel('offer','Offer',OFFERS.map(x=>x.id),id=>{ const x=OFFERS.find(y=>y.id===id); return x?`${x.id} · ${x.name}`:id; })
-      +`<dl class="kv"><dt>Catalog</dt><dd class="mono">${esc(o.catalog||'')}</dd><dt>Priority</dt><dd>${o.priority}</dd><dt>Tags</dt><dd>${(o.tags||[]).join(' › ')}</dd><dt>Activation</dt><dd>${esc(o.activation||'')}</dd></dl>`
-      +sel('priorityBoost','Priority rule (customer level)',PRIO); break; }
-    case 'nbo': html+=sel('source','Decision source',NBO_SOURCES)+sel('scope','Candidate offers',NBO_SCOPES)+sel('min','Minimum score',NBO_MIN)+sel('fallback','Fallback offer',OFFERS.map(x=>x.id),id=>{ const x=OFFERS.find(y=>y.id===id); return x?`${x.id} · ${x.name}`:id; })
-      +`<div class="sec">How it decides</div><dl class="kv"><dt>Input</dt><dd>customer profile + candidate offers in scope</dd><dt>Decision</dt><dd>Digital Twin NBO score per offer; Business Assurance checks eligibility and conflicts against live BSS state</dd><dt>Output</dt><dd>journey variable <span class="mono">nbo.offer</span>, used by the next delivery and the Decision API</dd></dl><div class="note">Today: NBO and Business Assurance live in Digital Twin; ECM offers "AI recommended target list". Proposed: this step calls the Digital Twin decision API per customer inside the journey.</div>`; break;
-    case 'par': html+=f('branches','Branches',n.cfg.branches)+sel('join','Join rule',JOINS)+`<div class="note">All parallel branches are live for the customer at the same time; the join waits for all (or first) before continuing.</div>`; break;
-    case 'exit': html+=sel('action','On exit',EXITS)+`<div class="note">Exit removes the customer from this journey immediately; downstream steps no longer target them. Today this is done with exclusion lists; the step automates it.</div>`; break;
-    case 'call': html+=sel('journey','Journey to start',CALLS)+sel('mode','Mode',CALLMODES); break;
-    case 'ext': html+=sel('system','System / endpoint',SYSTEMS)+f('payload','Request',n.cfg.payload,'ta')+f('store','Store response as',n.cfg.store)+`<div class="note">Stored response fields become available in later conditions and content.</div>`; break;
+      +(isDyn?sel('dyn','Variant by attribute',['LANGUAGE','CUSTOMER_TYPE','REGION','DEVICE_5G','APP_INSTALLED']):'')
+      +(String(pc.channel).startsWith('Preferred')?sel('stopAfter','Stop cascade after',STOPS):'')+sel('controlGroup','Control group',CGS)
+      +`<div class="sec">Communication rules</div><div class="fld"><label>Policies applied at send time <span style="color:var(--ink-3)">— consent and exclusion lists always apply</span></label><div class="pols">${POLICIES.filter(p=>p.kind==='Communication').map(p=>`<label class="ck"><input type="checkbox" data-pol="${p.id}" ${(pc.policies||[]).includes(p.id)?'checked':''}> <b>${esc(p.name)}</b> <small>${esc(p.rule)}</small></label>`).join('')}</div></div>`
+      +(j.j.ignoreUnsub?`<label class="ck warn"><input type="checkbox" data-ck="sendUnsub" ${pc.sendUnsub?'checked':''}> Send even if unsubscribed <span class="tip" data-tip="The journey has 'ignore unsubscribe' on. Confirm it for this step: service messages only.">i</span></label>`:'')
+      +`<div class="sec">Engagement</div><div style="font-size:11.5px;color:var(--ink-2)">Opened · clicked · converted · bounced feed an <b>Engagement split</b> placed later in the journey.</div>`
+      +`<div class="sec">Test</div><div class="chips">${j.j.testUsers.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}<button class="btn sm outline" id="btn-testsend">Send test</button></div>`; break; }
+    case 'waitDur': html+=two(f('n','Wait',n.cfg.n,'number','min="1" max="365"'),selP('unit','Unit',[['minutes','minutes'],['hours','hours'],['days','days']]))+`<div class="note">In the prototype minutes and hours resolve on the next "Advance 1 day"; days count days.</div>`; break;
+    case 'waitDate': html+=selP('mode','Wait until',[['weekday','the next weekday(s)'],['dom','a day of the month'],['date','a specific date']])
+      +(n.cfg.mode==='weekday'?`<div class="fld"><label>Weekdays</label><div class="chips">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<button type="button" class="fchip ${(n.cfg.weekdays||[]).includes(d)?'on':''}" data-wd="${d}">${d}</button>`).join('')}</div></div>`:n.cfg.mode==='dom'?f('dom','Day of month',n.cfg.dom,'number','min="1" max="31"'):f('date','Date',n.cfg.date,'date')); break;
+    case 'waitEvent': html+=sel('event','Event to wait for',EVENT_NAMES)+two(f('timeoutN','Timeout',n.cfg.timeoutN,'number','min="1" max="365"'),selP('timeoutUnit','Unit',[['hours','hours'],['days','days']]))
+      +`<div class="note"><b>How the release works:</b> when a contact reaches this step a webhook is sent to your system with a one-time <span class="mono">release URL</span>. Call it with <span class="mono">accepted</span> or <span class="mono">rejected</span> to move the contact on; after the timeout the contact takes the <b>timeout</b> path.</div>`+pathsHtml(); break;
+    case 'waitSeg': html+=sel('segment','Segment to match',segOpts)+selP('retry','Re-check',[['hourly','hourly'],['daily','daily'],['weekly','weekly']])+two(f('timeoutN','Timeout',n.cfg.timeoutN,'number','min="1" max="365"'),selP('timeoutUnit','Unit',[['hours','hours'],['days','days']]))+pathsHtml(); break;
+    case 'waitPrio': html+=sel('rollup','Priority rollup',ROLLUPS)+ck('autoRetry','Retry automatically when denied (up to 2 days)')+`<div class="note">The rollup caps how many marketing messages a contact gets across journeys; journey priority (${j.j.priority}) decides who wins.</div>`+pathsHtml(); break;
+    case 'splitEng': { const dels=j.nodes.filter(x=>x.type==='delivery'&&x.id!==n.id); html+=`<div class="fld"><label for="f-delivery">Delivery to evaluate</label><select id="f-delivery" data-k="delivery"><option value="">— choose a Delivery step</option>${dels.map(d=>`<option value="${d.id}" ${n.cfg.delivery===d.id?'selected':''}>${esc(d.label)} · ${d.id}</option>`).join('')}</select></div>`
+      +`<div class="fld"><label>Interactions — one path each, in this order</label><div class="chips">${INTERACTIONS.map(([k,l])=>`<button type="button" class="fchip ${(n.cfg.interactions||[]).includes(k)?'on':''}" data-int="${k}">${l}</button>`).join('')}</div></div><div class="note">Everyone else takes <b>Remaining</b>.</div>`+pathsHtml(); break; }
+    case 'splitSeg': html+=`<div class="fld"><label>Segments, evaluated top-down</label><div class="seglist">${(n.cfg.segments||[]).map((s,i)=>`<div class="path"><b>${String.fromCharCode(65+i)}</b><span>${esc(s)}</span><a data-seg-up="${i}" title="Move up">↑</a><a data-seg-del="${i}" title="Remove">×</a></div>`).join('')}</div><select id="f-addseg"><option value="">+ Add a segment…</option>${segOpts.filter(s=>!(n.cfg.segments||[]).includes(s)).map(s=>`<option>${esc(s)}</option>`).join('')}</select></div><div class="note">The first matching segment wins; everyone else takes <b>Remaining</b>.</div>`+pathsHtml(); break;
+    case 'splitShuffle': html+=`<div class="fld"><label>Paths and weights</label><div class="seglist">${(n.cfg.paths||[]).map((p,i)=>`<div class="path"><input data-sh-l="${i}" value="${esc(p.label)}" style="width:60px"><input data-sh-w="${i}" type="number" min="0" max="100" value="${p.w}" style="width:64px"><span>%</span>${(n.cfg.paths||[]).length>2?`<a data-sh-del="${i}" title="Remove">×</a>`:''}</div>`).join('')}</div><div class="row" style="display:flex;gap:6px"><button class="btn sm outline" id="btn-sh-add">+ Path</button><button class="btn sm outline" id="btn-sh-eq">Set equal</button><span id="sh-total" class="pill ${((n.cfg.paths||[]).reduce((t,p)=>t+(+p.w||0),0)===100)?'ok':'warn'}" style="margin-left:auto">${(n.cfg.paths||[]).reduce((t,p)=>t+(+p.w||0),0)}%</span></div></div>`+pathsHtml(); break;
+    case 'setAttr': html+=sel('attr','Attribute',ATTRS)+selP('mode','Value',[['static','a static value'],['timestamp','the timestamp when the contact reaches this step']])+(n.cfg.mode==='static'?f('value','Static value',n.cfg.value):''); break;
+    case 'callExt': html+=`<div class="fld"><label for="f-endpoint">Endpoint</label><select id="f-endpoint" data-k="endpoint">${ENDPOINTS.map(([nm,k])=>`<option value="${esc(nm)}" ${n.cfg.endpoint===nm?'selected':''}>${esc(nm)} · ${k==='mcp'?'MCP tool':'webhook'}</option>`).join('')}</select></div>`+f('fields','Custom fields sent with the call',n.cfg.fields)+`<div class="note">Labelled <b>${n.cfg.kind==='mcp'?'MCP tool':'webhook'}</b>: ${n.cfg.kind==='mcp'?'the Marketing Agent can call the same endpoint as a tool.':'a signed POST with the contact and the step.'}</div>`; break;
+    case 'ctrlGroup': html+=f('share','Hold-out share (%)',n.cfg.share,'number','min="1" max="50"')+`<div class="note">Held-out contacts leave the journey silently and are kept for the uplift report. The list is exportable and a segment can be built from it.</div><div class="row" style="display:flex;gap:6px"><button class="btn sm outline" id="btn-cg-export">Export hold-out</button><button class="btn sm outline" id="btn-cg-seg">Build a segment from it</button></div>`; break;
+    case 'audSync': html+=sel('platform','Ad platform',AD_PLATFORMS)+f('account','Ad account',n.cfg.account)+f('audience','Audience name',n.cfg.audience)+`<div class="note">Contacts reaching this step are pushed to the audience (hashed identifiers).</div>`; break;
+    case 'exit': html+=ck('goal','Goal reached — count this exit as a conversion'); break;
   }
   html+=locked?'':`<div class="fld"><div class="row"><button class="btn sm outline" id="btn-disable">${n.label.startsWith('[off]')?'Enable step':'Disable step'}</button>${n.type!=='entry'?`<button class="btn sm outline" id="btn-delete-step" style="color:var(--bad)">Delete step</button>`:''}</div></div>`;
   body.innerHTML=html; if(closed) body.querySelectorAll('input,select,textarea,button').forEach(el=>el.disabled=true);
-  body.querySelectorAll('[data-k]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.k; if(k==='__label') n.label=el.value; else n.cfg[k]=el.value; if(k==='channel') n.cfg.content=contentsFor(el.value)[0]; if(k==='content'){ const id=String(el.value).split(' ·')[0]; n.cfg.text=contentTextOf(id); } renderCanvas(); if(el.tagName==='SELECT'&&(k==='offer'||k==='channel'||k==='variant'||k==='controlGroup'||k==='content'||k==='survey')) renderNodePanel(); }));
-  body.querySelectorAll('[data-rule]').forEach(el=>el.onchange=()=>{ n.cfg.rules[el.dataset.rule][el.dataset.f]=el.checked; });
-  body.querySelectorAll('[data-rk]').forEach(el=>el.onchange=()=>{ n.cfg[el.dataset.rk]=el.checked; renderNodePanel(); });
+  const rerender=()=>{ renderCanvas(); renderNodePanel(); };
+  const structural=k=>['kind','interactions','segments','paths','delivery'].includes(k);
+  body.querySelectorAll('[data-k]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.k; if(k==='__label') n.label=el.value; else n.cfg[k]=el.type==='number'?+el.value:el.value;
+    if(k==='channel') n.cfg.content=contentsFor(el.value)[0]; if(k==='content'){ const id=String(el.value).split(' ·')[0]; n.cfg.text=contentTextOf(id); } if(k==='endpoint') n.cfg.kind=(ENDPOINTS.find(x=>x[0]===el.value)||[])[1]||'webhook';
+    renderCanvas(); if(el.tagName==='SELECT'&&['channel','variant','content','mode','reentry','event','endpoint','kind','delivery'].includes(k)) renderNodePanel(); }));
+  body.querySelectorAll('[data-ck]').forEach(el=>el.onchange=()=>{ const k=el.dataset.ck; if(k==='sendUnsub'&&el.checked&&!confirm('Send even if unsubscribed — service messages only. Confirm for this step?')){ el.checked=false; return; } n.cfg[k]=el.checked; rerender(); });
+  body.querySelectorAll('[data-ek]').forEach(b=>b.onclick=()=>setEntryKind(b.dataset.ek));
+  body.querySelectorAll('[data-pol]').forEach(el=>el.onchange=()=>{ const set=new Set(n.cfg.policies||[]); el.checked?set.add(el.dataset.pol):set.delete(el.dataset.pol); n.cfg.policies=[...set]; });
+  body.querySelectorAll('[data-wd]').forEach(b=>b.onclick=()=>{ const set=new Set(n.cfg.weekdays||[]); set.has(b.dataset.wd)?set.delete(b.dataset.wd):set.add(b.dataset.wd); n.cfg.weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].filter(d=>set.has(d)); rerender(); });
+  body.querySelectorAll('[data-int]').forEach(b=>b.onclick=()=>{ if(locked) return; const set=new Set(n.cfg.interactions||[]); set.has(b.dataset.int)?set.delete(b.dataset.int):set.add(b.dataset.int); n.cfg.interactions=INTERACTIONS.map(x=>x[0]).filter(k=>set.has(k)); prunePaths(n); rerender(); });
+  const as=body.querySelector('#f-addseg'); if(as) as.onchange=()=>{ if(locked||!as.value) return; (n.cfg.segments=n.cfg.segments||[]).push(as.value); rerender(); };
+  body.querySelectorAll('[data-seg-del]').forEach(a=>a.onclick=()=>{ if(locked) return; n.cfg.segments.splice(+a.dataset.segDel,1); prunePaths(n); rerender(); });
+  body.querySelectorAll('[data-seg-up]').forEach(a=>a.onclick=()=>{ const i=+a.dataset.segUp; if(locked||!i) return; const s=n.cfg.segments; [s[i-1],s[i]]=[s[i],s[i-1]]; rerender(); });
+  body.querySelectorAll('[data-sh-l]').forEach(i=>i.onchange=()=>{ const k=+i.dataset.shL, old=n.cfg.paths[k].label; n.cfg.paths[k].label=i.value||old; n.next.forEach(x=>{ if(typeof x!=='string'&&x.label===old) x.label=n.cfg.paths[k].label; }); rerender(); });
+  body.querySelectorAll('[data-sh-w]').forEach(i=>{ i.oninput=()=>{ n.cfg.paths[+i.dataset.shW].w=+i.value; renderCanvas(); const tot=n.cfg.paths.reduce((t,p)=>t+(+p.w||0),0), pill=body.querySelector('#sh-total'); if(pill){ pill.textContent=tot+'%'; pill.className='pill '+(tot===100?'ok':'warn'); } }; });
+  body.querySelectorAll('[data-sh-del]').forEach(a=>a.onclick=()=>{ if(locked) return; n.cfg.paths.splice(+a.dataset.shDel,1); prunePaths(n); rerender(); });
+  const sha=body.querySelector('#btn-sh-add'); if(sha) sha.onclick=()=>{ if(locked) return; n.cfg.paths.push({label:String.fromCharCode(65+n.cfg.paths.length),w:0}); rerender(); };
+  const she=body.querySelector('#btn-sh-eq'); if(she) she.onclick=()=>{ const k=n.cfg.paths.length, base=Math.floor(100/k); n.cfg.paths.forEach((p,i)=>p.w=base+(i<100-base*k?1:0)); rerender(); };
+  body.querySelectorAll('[data-unlink]').forEach(a=>a.onclick=()=>removeEdge(n.id,a.dataset.unlink));
   body.querySelectorAll('[data-jins]').forEach(sp=>sp.onclick=()=>{ const ta=body.querySelector('#f-text'); if(!ta) return; const v=`{{${sp.dataset.jins}}}`; const st=ta.selectionStart||ta.value.length; ta.value=ta.value.slice(0,st)+v+ta.value.slice(st); ta.dispatchEvent(new Event('input')); ta.focus(); });
   const abr=body.querySelector('input[data-k="abSplit"]'); if(abr){ abr.oninput=()=>{ n.cfg.abSplit=+abr.value; body.querySelector('#ab-out').textContent=abr.value+'%'; }; }
-  const bt=body.querySelector('#btn-addtest'); if(bt) bt.onclick=()=>{ n.cfg.tests.push('Test user '+(n.cfg.tests.length+1)); renderNodePanel(); };
-  const bs=body.querySelector('#btn-testsend'); if(bs) bs.onclick=()=>toast('Test send',`${n.id} · ${String(n.cfg.content).split(' ·')[0]} rendered for ${n.cfg.tests.join(', ')} — test delivery is not enabled in this environment.`,'warn');
+  const bs=body.querySelector('#btn-testsend'); if(bs) bs.onclick=()=>toast('Test send',`${n.id} · ${String(n.cfg.content).split(' ·')[0]} rendered for ${j.j.testUsers.join(', ')} — test delivery is not enabled in this environment.`,'warn');
+  const api=body.querySelector('#btn-apicode'); if(api) api.onclick=()=>{ const pre=body.querySelector('#apicode'); pre.hidden=!pre.hidden; };
+  const cge=body.querySelector('#btn-cg-export'); if(cge) cge.onclick=()=>toast('Export','Hold-out list (CSV) would download here — export is not enabled in this environment.','warn');
+  const cgs=body.querySelector('#btn-cg-seg'); if(cgs) cgs.onclick=()=>toast('Segment','A static segment "Control group · '+j.jid+' v'+j.v+' · '+n.id+'" would be created from the hold-out — not enabled in this environment.','warn');
   const bd=body.querySelector('#btn-delete-step'); if(bd) bd.onclick=()=>deleteNode(n.id);
-  const bdis=body.querySelector('#btn-disable'); if(bdis) bdis.onclick=()=>{ n.label=n.label.startsWith('[off] ')?n.label.slice(6):'[off] '+n.label; renderCanvas(); renderNodePanel(); };
+  const bdis=body.querySelector('#btn-disable'); if(bdis) bdis.onclick=()=>{ n.label=n.label.startsWith('[off] ')?n.label.slice(6):'[off] '+n.label; rerender(); };
 }
+/* when a split loses a path, the edge on that path goes with it */
+function prunePaths(n){ const ps=pathsOf(n); if(!ps) return; n.next=n.next.filter(x=>typeof x==='string'||ps.includes(x.label)); }
 
 function buildPalette(){
   const p=document.getElementById('palette');
-  Object.entries(NODE_META).filter(([t])=>t!=='entry').forEach(([t,m])=>{
-    const b=document.createElement('button'); b.style.setProperty('--c',`var(--t-${t}-i)`); b.style.setProperty('--bg2',`var(--t-${t})`);
-    b.innerHTML=`<i>${m.ic}</i><span>${m.k}</span>`; b.title=m.k; b.dataset.tour='pal-'+t;
-    b.addEventListener('pointerdown',e=>{ if(e.button===0) window.paletteDown(b,t,e); });
-    b.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); addNode(t,{connect:true}); } });
-    p.appendChild(b);
+  NODE_GROUPS.forEach(([g,label,hint])=>{
+    const h=document.createElement('div'); h.className='pg'; h.innerHTML=`<span>${label}</span>${hint?`<small>${hint}</small>`:''}`; p.appendChild(h);
+    if(g==='entry'){ Object.entries(ENTRY_KINDS).forEach(([k,m])=>{ const b=document.createElement('button'); b.style.setProperty('--c','var(--t-entry-i)'); b.style.setProperty('--bg2','var(--t-entry)'); b.innerHTML=`<i>${m.ic}</i><span>${m.k}${m.cm?' <em>CM</em>':''}</span>`; b.title=m.k+' — '+m.d; b.dataset.tour='pal-entry-'+k; b.addEventListener('pointerdown',e=>{ if(e.button===0) window.paletteDown(b,'entry',e,k,m.k); }); b.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setEntryKind(k); } }); p.appendChild(b); }); return; }
+    Object.entries(NODE_META).filter(([t,m])=>m.g===g).forEach(([t,m])=>{
+      const b=document.createElement('button'); b.style.setProperty('--c',`var(--t-${m.t}-i)`); b.style.setProperty('--bg2',`var(--t-${m.t})`);
+      b.innerHTML=`<i>${m.ic}</i><span>${m.k}</span>`; b.title=m.k; b.dataset.tour='pal-'+t;
+      b.addEventListener('pointerdown',e=>{ if(e.button===0) window.paletteDown(b,t,e,null,m.k); });
+      b.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); addNode(t,{connect:true}); } });
+      p.appendChild(b);
+    });
   });
 }
 
 /* ---------- POLICIES ---------- */
 function renderPolicies(){
+  const used=id=>JOURNEYS.filter(j=>j.versions.some(V=>V.nodes.some(n=>n.type==='delivery'&&(n.cfg.policies||[]).includes(id)))).map(j=>j.id);
+  const row=p=>`<tr><td><b>${esc(p.name)}</b> <span class="mono" style="color:var(--ink-3)">${p.id}</span></td><td>${esc(p.rule)}</td><td>${esc(p.level)}</td><td>${esc(p.window)}</td><td>${esc(p.applies)}</td><td>${used(p.id).map(x=>`<span class="chip">${x}</span>`).join(' ')||'<span style="color:var(--ink-3)">—</span>'}</td></tr>`;
   document.getElementById('pol-left').innerHTML=`
-  <div class="h4">Invitation policies — customer stays out of the offer group for a period, even if eligible</div>
-  <div class="padx"><table class="tbl"><thead><tr><th>Applies to</th><th>Quiet period</th><th>Counted from</th><th>Varies by attribute</th></tr></thead><tbody>
-    <tr><td>Tag: Retention</td><td>45 days</td><td>Exit step of any journey in group</td><td>churnRisk ≥ 0.8 → 20 days</td></tr>
-    <tr><td>JRN-12 Onboarding master</td><td>365 days</td><td>Entry</td><td>—</td></tr>
-    <tr><td>OFR-1051 5G upgrade</td><td>90 days</td><td>Last presentation</td><td>—</td></tr>
-  </tbody></table></div>
-  <div class="h4">Communication policies — outbound is skipped, journey state is kept</div>
-  <div class="padx"><table class="tbl"><thead><tr><th>Applies to</th><th>Rule</th><th>Level</th><th>Window</th></tr></thead><tbody>
-    <tr><td>Tag: Mobile › Prepaid</td><td>max 1 outbound / 7 days</td><td>Subscriber</td><td>Rolling</td></tr>
-    <tr><td>B2B accounts</td><td>max 2 outbound / 30 days</td><td>Contact person</td><td>Rolling</td></tr>
-    <tr><td>OFR-1042 Top-up bonus</td><td>max 1 until 31 Oct 2026</td><td>Subscriber</td><td>Fixed date</td></tr>
-    <tr><td>All offers</td><td>upper limit 3 sends / offer / 30 days</td><td>Subscriber</td><td>Rolling</td></tr>
-  </tbody></table></div>
+  <div class="h4">Communication policies — the outbound is skipped, the journey state is kept</div>
+  <div class="padx"><table class="tbl"><thead><tr><th>Policy</th><th>Rule</th><th>Level</th><th>Window</th><th>Applies to</th><th>Picked by</th></tr></thead><tbody>${POLICIES.filter(p=>p.kind==='Communication').map(row).join('')}</tbody></table></div>
+  <div class="h4">Invitation policies — the contact stays out of the journey group for a period, even if eligible</div>
+  <div class="padx"><table class="tbl"><thead><tr><th>Policy</th><th>Rule</th><th>Level</th><th>Window</th><th>Applies to</th><th>Picked by</th></tr></thead><tbody>${POLICIES.filter(p=>p.kind==='Invitation').map(row).join('')}</tbody></table></div>
   <div class="grid2">
     <div>
       <div class="h4" style="padding-left:0">Control groups — per channel</div>
@@ -2299,7 +2441,7 @@ function renderMonitor(){
   const parts=Object.values(S.parts); const n=parts.length, act=parts.filter(p=>p.status==='active').length, conv=parts.filter(p=>p.status==='converted').length, ex=parts.filter(p=>p.status==='exited'||p.status==='completed').length;
   document.getElementById('daypill').textContent=`Day ${day}`;
   document.getElementById('mstats-title').textContent=`${j.jid} · ${j.name} — v${j.v} · ${j.status}${j.V.activatedAt?' · activated '+j.V.activatedAt:''}`;
-  document.querySelector('#jtable tbody').innerHTML=JOURNEYS.map(x=>{ const C=mainCtx(x), ps=Object.values(simOf(C).parts); const e=C.nodes[0].cfg; return `<tr class="row ${x.id===jid?'sel':''}" data-j="${x.id}"><td><b>${x.id}</b> · ${esc(x.name)}</td><td><span class="pill ${J_STATUS_CLS[jStatus(x)]}">${jStatus(x)}</span></td><td class="num">v${C.v} <span class="pill ${V_STATUS_CLS[C.status]}">${C.status}</span></td><td class="num">${fmtWhen(C.V.activatedAt)||'—'}</td><td>${esc(e.mode)}${e.mode!=='Event only'?' · '+esc(String(e.segment).split(' · ')[0]):''}${e.mode!=='Segment only (scheduled)'?' · '+esc(e.events):''}</td><td class="num">${ps.length}</td><td class="num">${ps.filter(p=>p.status==='active').length}</td><td class="num">${ps.filter(p=>p.status==='converted').length}</td><td><button class="btn sm outline" data-open="${x.id}">Open</button></td></tr>`; }).join('');
+  document.querySelector('#jtable tbody').innerHTML=JOURNEYS.map(x=>{ const C=mainCtx(x), ps=Object.values(simOf(C).parts); const e=C.nodes[0].cfg; return `<tr class="row ${x.id===jid?'sel':''}" data-j="${x.id}"><td><b>${x.id}</b> · ${esc(x.name)}</td><td><span class="pill ${J_STATUS_CLS[jStatus(x)]}">${jStatus(x)}</span></td><td class="num">v${C.v} <span class="pill ${V_STATUS_CLS[C.status]}">${C.status}</span></td><td class="num">${fmtWhen(C.V.activatedAt)||'—'}</td><td>${esc(entryText(C).k)} · ${esc(entryText(C).sub)}</td><td class="num">${ps.length}</td><td class="num">${ps.filter(p=>p.status==='active').length}</td><td class="num">${ps.filter(p=>p.status==='converted').length}</td><td><button class="btn sm outline" data-open="${x.id}">Open</button></td></tr>`; }).join('');
   document.querySelectorAll('#jtable tr.row').forEach(tr=>tr.onclick=e=>{ if(e.target.tagName==='BUTTON') return; document.getElementById('msel').value=tr.dataset.j; renderMonitor(); });
   document.querySelectorAll('#jtable button[data-open]').forEach(b=>b.onclick=()=>jOpen(b.dataset.open));
   document.getElementById('mstats').innerHTML=`<div class="stat"><div class="l">Participants</div><div class="v">${n}</div><div class="s">entered since day 0</div></div><div class="stat"><div class="l">Active now</div><div class="v">${act}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Goal reached</div><div class="v">${conv}</div><div class="s">${n?Math.round(conv/n*100):0}% conversion</div></div><div class="stat"><div class="l">Exited</div><div class="v">${ex}</div><div class="s">timeout / no conversion</div></div>`;
@@ -2307,7 +2449,7 @@ function renderMonitor(){
   const r=document.getElementById('ptime'); r.max=S.history.length-1; if(ptimeFollow||+r.value>+r.max) r.value=r.max;
   const at=+r.value; document.getElementById('ptime-lbl').textContent=`Day ${at}${at===S.history.length-1?' (now)':''}`;
   const snap=S.history[at];
-  document.querySelector('#ptable tbody').innerHTML=Object.entries(snap).map(([cid,p])=>{ const c=CUSTOMERS.find(x=>x.id===cid)||{seg:'',pref:[],name:''}; const st=p.status; const cls=st==='converted'?'ok':st==='active'?'acc':''; return `<tr><td class="mono">${cid}<br><span style="color:var(--ink-3)">${esc(c.name)}</span></td><td>${esc(c.seg)}</td><td>${p.pos.map(x=>{const nd=node(j,x); return nd?`<span class="chip">${esc(nd.label)}</span>`:''}).join(' ')||'—'}</td><td><span class="pill ${cls}">${st}</span></td><td>${p.offers.map(o=>`<span class="chip">${o}</span>`).join(' ')||'—'}</td><td>${c.pref.join(' → ')}</td><td class="num">day ${p.since}</td></tr>`; }).join('');
+  document.querySelector('#ptable tbody').innerHTML=Object.entries(snap).map(([cid,p])=>{ const c=CUSTOMERS.find(x=>x.id===cid)||{seg:'',pref:[],name:''}; const st=p.status; const cls=st==='converted'?'ok':st==='active'?'acc':''; return `<tr><td class="mono">${cid}<br><span style="color:var(--ink-3)">${esc(c.name)}</span></td><td>${esc(c.seg)}</td><td>${p.pos.map(x=>{const nd=node(j,x); return nd?`<span class="chip">${esc(nd.label)}</span>`:''}).join(' ')||'—'}</td><td><span class="pill ${cls}">${st}</span></td><td>${p.enteredBy||'preload'}</td><td>${c.pref.join(' → ')}</td><td class="num">day ${p.since}</td></tr>`; }).join('');
   document.getElementById('log').innerHTML=log.slice(-80).reverse().map(l=>`<div class="${l.cls}"><span class="t">d${String(l.d).padStart(2,'0')} ${l.t||''}</span>  ${esc(l.msg)}</div>`).join('');
 }
 
@@ -2343,21 +2485,21 @@ document.getElementById('btn-nav').onclick=()=>{ const app=document.querySelecto
 const msel=document.getElementById('msel');
 JOURNEYS.forEach(j=>msel.add(new Option(`${j.id} · ${j.name}`,j.id)));
 const evName=document.getElementById('ev-name'), evCust=document.getElementById('ev-cust');
-BIZ_EVENTS.forEach(e=>evName.add(new Option(e,e))); CUSTOMERS.forEach(c=>evCust.add(new Option(`${c.id} · ${c.name} · ${c.seg} · churn ${c.attrs.churnRisk}`,c.id)));
-evName.value='balance_low'; evCust.value=CUSTOMERS[0].id;
+EVENT_NAMES.forEach(e=>evName.add(new Option(e,e))); CUSTOMERS.forEach(c=>evCust.add(new Option(`${c.id} · ${c.name} · ${c.seg} · churn ${c.attrs.churnRisk}`,c.id)));
+evName.value='order_abandoned'; evCust.value=CUSTOMERS[0].id;
 document.getElementById('btn-send-event').onclick=()=>sendEvent(evName.value,evCust.value);
 document.getElementById('btn-tick-j').onclick=tick;
 function renderReport(){
   const j=curCtx(), S=simOf(j); const parts=Object.entries(S.parts);
   const rows=log.filter(l=>l.j===j.id).slice().reverse();
-  const byEvent=parts.filter(([,p])=>p.enteredBy).length, conv=parts.filter(([,p])=>p.status==='converted').length, act=parts.filter(([,p])=>p.status==='active').length;
+  const byEvent=parts.filter(([,p])=>p.enteredBy&&p.enteredBy!=='schedule'&&p.enteredBy!=='activation').length, conv=parts.filter(([,p])=>p.status==='converted').length, act=parts.filter(([,p])=>p.status==='active').length;
   const deliv=rows.filter(r=>r.kind==='delivered').length, nd=rows.filter(r=>r.kind==='not-delivered').length, rej=rows.filter(r=>r.kind==='entry-rejected').length;
   document.getElementById('rep-sub').textContent=`${j.jid} · ${j.name} · v${j.v} · ${j.status}`;
-  document.getElementById('rep-stats').innerHTML=`<div class="stat"><div class="l">Participants</div><div class="v">${parts.length}</div><div class="s">${byEvent} admitted by event · ${parts.length-byEvent} by segment</div></div><div class="stat"><div class="l">Active now</div><div class="v">${act}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Deliveries</div><div class="v">${deliv}</div><div class="s">${nd} not delivered</div></div><div class="stat"><div class="l">Goal reached</div><div class="v">${conv}</div><div class="s">${parts.length?Math.round(conv/parts.length*100):0}% conversion</div></div><div class="stat"><div class="l">Events rejected</div><div class="v">${rej}</div><div class="s">re-entry / concurrency rules</div></div>`;
+  document.getElementById('rep-stats').innerHTML=`<div class="stat"><div class="l">Participants</div><div class="v">${parts.length}</div><div class="s">${byEvent} admitted by event · ${parts.length-byEvent} by schedule</div></div><div class="stat"><div class="l">Active now</div><div class="v">${act}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Deliveries</div><div class="v">${deliv}</div><div class="s">${nd} not delivered</div></div><div class="stat"><div class="l">Goal reached</div><div class="v">${conv}</div><div class="s">${parts.length?Math.round(conv/parts.length*100):0}% conversion</div></div><div class="stat"><div class="l">Events rejected</div><div class="v">${rej}</div><div class="s">re-entry / concurrency rules</div></div>`;
   const resCls=k=>k==='delivered'||k==='goal'||k==='entry'?'ok':k==='not-delivered'||k==='entry-rejected'?'bad':k==='timeout'||k==='exit'?'':'acc';
-  const resTxt=k=>({delivered:'Delivered','not-delivered':'Not delivered',goal:'Goal · BSS order',exit:'Exited',timeout:'Timeout',timer:'Timer elapsed',nbo:'Offer decided',event:'Event matched',entry:'Entered',"entry-rejected":'Rejected',offer:'Offer presented',condition:'Evaluated',external:'200 OK',call:'Started'})[k]||k;
+  const resTxt=k=>({delivered:'Sent','not-delivered':'Bounced',goal:'Goal reached',exit:'Exited',timeout:'Timeout',timer:'Wait over',event:'Event matched',entry:'Entered',"entry-rejected":'Rejected',condition:'Routed',external:'Done',holdout:'Held out',system:'System'})[k]||k;
   document.getElementById('rep-steps').innerHTML=j.nodes.map(n=>{ const execs=rows.filter(r=>r.node===n.id).length; const now=parts.filter(([,p])=>p.status==='active'&&p.pos.includes(n.id)).length; return `<span class="chip" style="display:inline-flex;gap:6px;align-items:center;padding:4px 8px;border-left:3px solid var(--t-${n.type}-i)"><b>${esc(n.label)}</b><span class="mono" style="color:var(--ink-3)">${n.id}</span><span>${execs} run${execs===1?'':'s'}</span>${now?`<span class="pill acc">${now} here</span>`:''}</span>`; }).join('');
-  document.querySelector('#rep-table tbody').innerHTML=rows.map(r=>{ const n=node(j,r.node)||{label:'—',type:''}; const p=S.parts[r.cid]||{}; return `<tr><td class="num">d${String(r.d).padStart(2,'0')} · ${r.t||''}</td><td class="mono">${esc(r.cid||'')}</td><td>${p.enteredBy?`<span class="chip">${esc(p.enteredBy)}</span>`:'segment'}</td><td>${esc(n.label)} <span class="mono" style="color:var(--ink-3)">${r.node||''}</span></td><td>${esc((NODE_META[n.type]||{}).k||'')}</td><td>${esc(r.channel||'—')}</td><td><span class="pill ${resCls(r.kind)}">${esc(resTxt(r.kind))}</span>${r.opened?' <span class="chip">opened</span>':''}</td></tr>`; }).join('') || '<tr><td colspan="7" class="empty">No executions yet — send an event to admit a customer; timers and waits progress with "Advance 1 day".</td></tr>';
+  document.querySelector('#rep-table tbody').innerHTML=rows.map(r=>{ const n=node(j,r.node)||{label:'—',type:''}; const p=S.parts[r.cid]||{}; return `<tr><td class="num">d${String(r.d).padStart(2,'0')} · ${r.t||''}</td><td class="mono">${esc(r.cid||'')}</td><td>${p.enteredBy?`<span class="chip">${esc(p.enteredBy)}</span>`:'preload'}</td><td>${esc(n.label)} <span class="mono" style="color:var(--ink-3)">${r.node||''}</span></td><td>${esc((NODE_META[n.type]||{}).k||'')}</td><td>${esc(r.channel||'—')}</td><td><span class="pill ${resCls(r.kind)}">${esc(resTxt(r.kind))}</span>${r.opened?' <span class="chip">opened</span>':''}</td></tr>`; }).join('') || '<tr><td colspan="7" class="empty">No executions yet — send an event to admit a customer; timers and waits progress with "Advance 1 day".</td></tr>';
 }
 repModal=document.getElementById('rep-modal');
 document.getElementById('rep-close').onclick=document.getElementById('rep-close2').onclick=()=>{ repModal.hidden=true; };
@@ -2384,8 +2526,8 @@ function activateVersion(j,V){
   const r=jValidate(C); const miss=r.items.filter(i=>!i.ok); if(miss.length){ toast('Cannot activate',`Fix the validation first: ${miss.map(i=>i.l+(i.why?' ('+i.why+')':'')).join('; ')}.`,'bad'); return; }
   const prev=jActive(j); if(prev){ prev.status='Closing'; prev.closingAt=stamp(); addLog('warn',`${j.id}@${prev.v}  closing — v${V.v} activated; contacts inside finish their steps, no new entries`,{j:j.id+'@'+prev.v,node:prev.nodes[0].id,kind:'system'}); }
   V.status='Active'; V.activatedAt=stamp(); V.activatedBy=DEMO_USERS.me; j.updated=TODAY; j.cur=V.v;
-  addLog('acc',`${C.id}  activated · by ${DEMO_USERS.me} · entry: ${C.nodes[0].cfg.mode}${C.nodes[0].cfg.mode!=='Event only'?' · '+String(C.nodes[0].cfg.segment).split(' · ')[0]:''}`,{j:C.id,node:C.nodes[0].id,kind:'system'});
-  if(C.nodes[0].cfg.mode!=='Event only'){ const S=simOf(C); let added=0; mlCustomers(C.nodes[0].cfg.segment).filter(c=>!excludedCids().has(c.cid)).forEach(c=>{ if(!S.parts[c.id]){ S.parts[c.id]={pos:nextIds(C.nodes[0]),status:'active',since:day,visited:new Set([C.nodes[0].id,...nextIds(C.nodes[0])]),opened:null,offers:[],timers:{}}; added++; runNow(C,S,c.id); } }); if(added) addLog('ok',`${C.id}  ${added} customer(s) admitted from ${String(C.nodes[0].cfg.segment).split(' · ')[0]} on activation — immediate steps executed`,{j:C.id,node:C.nodes[0].id,kind:'entry'}); S.history[S.history.length-1]=snapshot(S.parts); }
+  addLog('acc',`${C.id}  activated · by ${DEMO_USERS.me} · entry: ${entryText(C).k} ${entryText(C).sub}`,{j:C.id,node:C.nodes[0].id,kind:'system'});
+  if(!entryIsEvent(C)){ const S=simOf(C); let added=0; entryPool(C).forEach(c=>{ if(admit(C,S,c.id,'activation')==='ok'){ added++; runNow(C,S,c.id); } }); if(added) addLog('ok',`${C.id}  ${added} contact(s) admitted by the ${entryText(C).k} entry on activation — immediate steps executed`,{j:C.id,node:C.nodes[0].id,kind:'entry'}); S.history[S.history.length-1]=snapshot(S.parts); }
   autoClose(); render();
   toast(`Activated · ${j.id} v${V.v}`, prev?`v${prev.v} is now Closing: no new entries, the contacts inside finish their steps, and it closes itself when empty.`:'First activation — the version admits contacts from its entry rule. Structure is locked from now on; step content stays editable.');
 }
@@ -2429,8 +2571,8 @@ function renderVersionBar(C,active,conv){
   bar.querySelectorAll('[data-test]').forEach(b=>b.onclick=()=>{ b.closest('.pop').hidden=true; jTest(C,b.dataset.test); });
 }
 /* Test actions (mock): entry match count, first 10 contacts, test send */
-function jTest(C,what){ const e=C.nodes[0].cfg; const pool=e.mode==='Event only'?[]:mlCustomers(e.segment).filter(c=>!excludedCids().has(c.cid));
-  if(what==='count') toast('Entry match count',e.mode==='Event only'?`Event entry (${e.events}) — contacts enter when the event arrives; nothing to count up front.`:`${pool.length} contact(s) match ${String(e.segment).split(' · ')[0]} right now, after exclusion lists.`);
+function jTest(C,what){ const t=entryText(C); const pool=entryIsEvent(C)?[]:entryPool(C);
+  if(what==='count') toast('Entry match count',entryIsEvent(C)?`${t.k} entry (${t.sub}) — contacts enter when it fires; nothing to count up front.`:`${pool.length} contact(s) match the ${t.k} entry right now, after exclusion lists.`);
   else if(what==='first') toast('First matching contacts',pool.length?pool.slice(0,10).map(c=>c.id+' · '+c.name).join(', '):'No contact matches the entry right now.');
   else { const ds=C.nodes.filter(n=>n.type==='delivery'); toast('Test send',`${ds.length} Delivery step(s) rendered for ${C.j.testUsers.join(', ')} — test delivery is not enabled in this environment.`,'warn'); } }
 document.addEventListener('click',e=>{ if(!e.target.closest('.dm-menu')) document.querySelectorAll('#vbar .dm-menu .pop').forEach(p=>p.hidden=true); });
@@ -2452,22 +2594,9 @@ function renderJSettings(){ const j=jById(curJ), box=document.getElementById('js
 }
 /* ---------- create / list journeys ---------- */
 function nextJourneyId(){ return 'JRN-'+(Math.max(...JOURNEYS.map(j=>parseInt(j.id.slice(4))||0))+1); }
-function initVersionSim(j,V){ const C=ctxOf(j,V); const S={parts:{},history:[]}; S.history.push(snapshot(S.parts)); sim[C.id]=S; }
+function initVersionSim(j,V){ const C=ctxOf(j,V); sim[C.id]={parts:{},history:[{}]}; }
 function registerJourney(j){ JOURNEYS.push(j); j.versions.forEach(V=>initVersionSim(j,V)); msel.add(new Option(`${j.id} · ${j.name}`,j.id)); }
-function journeyTemplate(tpl,mode,seg,ev){
-  const E=(x,y,next)=>({id:'e1',type:'entry',x,y,label:'Entry',cfg:{segment:seg,events:ev,mode},next});
-  if(tpl==='renewal') return [E(53,245,['s2']),
-    {id:'s2',type:'delivery',x:304,y:245,label:'Renewal SMS',cfg:{campaign:'433 · Package renewal — SMS offer',channel:'sms',content:'SMS-301 · Renewal offer (uk/en dynamic)',variant:'Dynamic content (rule on categorical attribute)',stopAfter:'1 channel',controlGroup:'off'},next:['s3']},
-    {id:'s3',type:'wait',x:555,y:245,label:'Renewed?',cfg:{event:'package_renewed',timeout:'2 days'},next:[{to:'s4',label:'renewed'},{to:'s5',label:'timeout'}]},
-    {id:'s4',type:'exit',x:806,y:70,label:'Goal reached',cfg:{action:'End journey (no action)'},next:[]},
-    {id:'s5',type:'delivery',x:806,y:420,label:'Last day push',cfg:{campaign:'435 · Renewal — last day reminder',channel:'push',content:'PSH-401 · Your offer is ready',variant:'Single content',stopAfter:'1 channel',controlGroup:'off'},next:['s6']},
-    {id:'s6',type:'exit',x:1057,y:420,label:'Exit',cfg:{action:'Apply invitation policy 20 days'},next:[]}];
-  if(tpl==='event') return [E(53,245,['s2']),
-    {id:'s2',type:'nbo',x:304,y:245,label:'Pick best offer',cfg:{source:NBO_SOURCES[0],scope:NBO_SCOPES[0],fallback:'OFR-1042',min:NBO_MIN[1]},next:['s3']},
-    {id:'s3',type:'delivery',x:555,y:245,label:'SMS',cfg:{campaign:'3310 · Top-up bonus 10%',channel:'sms',content:'SMS-302 · Top-up bonus +10%',variant:'Single content',stopAfter:'1 channel',controlGroup:'off'},next:['s4']},
-    {id:'s4',type:'exit',x:806,y:245,label:'Exit',cfg:{action:EXITS[0]},next:[]}];
-  return [E(53,245,['s2']),{id:'s2',type:'exit',x:555,y:245,label:'Exit',cfg:{action:'End journey (no action)'},next:[]}];
-}
+function journeyTemplate(kind,cfg){ const e=Object.assign(entryDefaults(kind),cfg||{}); return [{id:'e1',type:'entry',x:40,y:120,label:ENTRY_KINDS[kind].k,cfg:e,next:['s2']},{id:'s2',type:'exit',x:560,y:120,label:'Exit',cfg:{goal:false},next:[]}]; }
 /* ---------- journey list + "Create your journey" ----------
    Journey Builder opens on a list, like Campaign (decision J1): campaign and journey are equal
    top-level entities and a journey estate has to be searchable. The canvas opens when a journey is
@@ -2475,36 +2604,42 @@ function journeyTemplate(tpl,mode,seg,ev){
 let jMode='list', jQ='', jStatusF='All', jPage=1, jFitFor=null, jSel=new Set();
 const jFilter={folder:'',phase:'',trigger:''};
 const J_STATUSES=['Draft','Live','Past'];
-function jTrigger(j){ const e=jMainV(j).nodes[0].cfg, seg=String(e.segment||'').split(' · ').slice(1).join(' · ')||String(e.segment||''), ev=Array.isArray(e.events)?e.events.join(', '):String(e.events||'');
-  if(e.mode==='Event only') return {k:'Event',sub:ev||'no event set'};
-  if(e.mode==='Segment only (scheduled)') return {k:'Schedule',sub:`${seg}${e.schedule?' · '+e.schedule:''}`};
-  return {k:'Segment entry',sub:seg+(ev?' · '+ev:'')}; }
+function jTrigger(j){ return entryText(mainCtx(j)); }
 /* entered (30 d) = contacts admitted into any version; the Monitor shows the per-version split */
 function jStats(j){ let inside=0, entered=0, conv=0; j.versions.forEach(V=>{ const ps=Object.values((sim[j.id+'@'+V.v]||{parts:{}}).parts); entered+=ps.length; inside+=ps.filter(p=>p.status==='active').length; conv+=ps.filter(p=>p.status==='converted').length; }); return {inside,entered,conv}; }
 const jLastActivated=j=>j.versions.filter(v=>v.activatedAt).map(v=>v.activatedAt).sort().pop()||'';
-function jValidate(j){ if(j.versions) j=mainCtx(j); const ids=new Set(j.nodes.map(n=>n.id)), e=j.nodes[0].cfg, seen=new Set(), stack=[j.nodes[0].id];
-  while(stack.length){ const id=stack.pop(); if(seen.has(id)) continue; seen.add(id); const n=node(j,id); if(n) nextIds(n).forEach(x=>ids.has(x)&&stack.push(x)); }
-  const dangling=j.nodes.filter(n=>n.type!=='exit'&&n.next.length===0), noContent=j.nodes.filter(n=>n.type==='delivery'&&!String(n.cfg.content||'').trim());
-  const badOffers=j.nodes.filter(n=>n.type==='offer'&&n.cfg.offer&&!(OFFERS.find(o=>o.id===String(n.cfg.offer).split(' ')[0])||{status:'Active'}).status.startsWith('Active'));
+function jValidate(j){ if(j.versions) j=mainCtx(j); const ids=new Set(j.nodes.map(n=>n.id)), seen=new Set(), stack=[j.nodes[0]&&j.nodes[0].id];
+  while(stack.length){ const id=stack.pop(); if(!id||seen.has(id)) continue; seen.add(id); const n=node(j,id); if(n) nextIds(n).forEach(x=>ids.has(x)&&stack.push(x)); }
+  const names=ns=>ns.map(n=>n.label).join(', ');
+  const entry=j.nodes.find(n=>n.type==='entry');
+  const noWait=j.nodes.filter(n=>(n.type==='waitDur'&&!(+n.cfg.n>0))||(n.type==='waitDate'&&(n.cfg.mode==='weekday'?!(n.cfg.weekdays||[]).length:n.cfg.mode==='dom'?!(+n.cfg.dom>0):!n.cfg.date))||((n.type==='waitEvent'||n.type==='waitSeg')&&!(+n.cfg.timeoutN>0)));
+  const noSeg=j.nodes.filter(n=>(n.type==='splitSeg'&&!(n.cfg.segments||[]).length)||(n.type==='waitSeg'&&!n.cfg.segment));
+  const unbound=j.nodes.filter(n=>n.type==='splitEng'&&(!n.cfg.delivery||!j.nodes.some(d=>d.id===n.cfg.delivery&&d.type==='delivery')));
+  const dangling=j.nodes.filter(n=>n.type!=='exit'&&!n.label.startsWith('[off]')&&(pathsOf(n)?pathsOf(n).some(l=>!n.next.some(x=>typeof x!=='string'&&x.label===l)):n.next.length===0));
+  const noContent=j.nodes.filter(n=>n.type==='delivery'&&!String(n.cfg.content||'').trim());
+  const badShuffle=j.nodes.filter(n=>n.type==='splitShuffle'&&(n.cfg.paths||[]).reduce((t,p)=>t+(+p.w||0),0)!==100);
   const items=[
-    {l:'Entry has an audience or an event',ok:e.mode==='Event only'?!!String(Array.isArray(e.events)?e.events.join(''):e.events||'').trim():!!e.segment&&e.segment!=='— (event only)'},
-    {l:'Every path ends in an exit',ok:!dangling.length,why:dangling.map(n=>n.label).join(', ')},
-    {l:'Every step is reachable from the entry',ok:seen.size===j.nodes.length,why:j.nodes.filter(n=>!seen.has(n.id)).map(n=>n.label).join(', ')},
-    {l:'Every delivery step has content',ok:!noContent.length,why:noContent.map(n=>n.label).join(', ')},
-    {l:'Linked offers are active',ok:!badOffers.length,why:badOffers.map(n=>n.label).join(', ')}];
+    {l:'An entry step exists and is set up',ok:!!entry&&!(entry.cfg.kind==='segment'&&!entry.cfg.segment)&&!(entry.cfg.kind==='event'&&!entry.cfg.event)},
+    {l:'Every wait has a duration or a date',ok:!noWait.length,why:names(noWait)},
+    {l:'Every segment split / wait names a segment',ok:!noSeg.length,why:names(noSeg)},
+    {l:'Every engagement split is bound to a Delivery',ok:!unbound.length,why:names(unbound)},
+    {l:'Every path ends in an Exit',ok:!dangling.length,why:names(dangling)},
+    {l:'Every step is reachable from the entry',ok:seen.size===j.nodes.length,why:names(j.nodes.filter(n=>!seen.has(n.id)))},
+    {l:'Every Delivery has content',ok:!noContent.length,why:names(noContent)},
+    {l:'Shuffle weights add up to 100%',ok:!badShuffle.length,why:names(badShuffle)}];
   return {items,done:items.filter(i=>i.ok).length,total:items.length}; }
 function jValidHtml(j){ const r=jValidate(j), pct=Math.round(100*r.done/r.total), miss=r.items.filter(i=>!i.ok);
   return `<span class="mini" title="${esc(miss.length?miss.map(i=>'✕ '+i.l+(i.why?': '+i.why:'')).join(' · '):'Validation passed — every check is green')}"><i><b style="width:${pct}%"></b></i>${miss.length?'⚠ ':'✓ '}${r.done}/${r.total}</span>`; }
 function jFiltered(){ const q=jQ.toLowerCase(), f=jFilter;
   return JOURNEYS.filter(j=>(jStatusF==='All'||jStatus(j)===jStatusF)&&(!q||(j.id+' '+j.name+' '+(j.desc||'')).toLowerCase().includes(q))
-    &&(!f.folder||j.folder===f.folder)&&(!f.phase||j.phase===f.phase)&&(!f.trigger||jTrigger(j).k===f.trigger)); }
+    &&(!f.folder||j.folder===f.folder)&&(!f.phase||j.phase===f.phase)&&(!f.trigger||mainCtx(j).nodes[0].cfg.kind===f.trigger)); }
 
 /* open a journey on the canvas; the first time a journey is shown it is fitted, later visits keep the pan and zoom */
 function jOpen(id,nodeId,v){ const j=jById(id); if(!j) return; curJ=id; if(v) j.cur=v; else if(!jVer(j,j.cur)) j.cur=jMainV(j).v; selNode=nodeId||null; jMode='canvas';
   if(curView!=='journeys') showView('journeys'); else render();
   if(jFitFor!==id+'@'+j.cur){ jFitFor=id+'@'+j.cur; fitView(); setTimeout(fitView,200); } }
 function jToList(){ jMode='list'; if(curView!=='journeys') showView('journeys'); else render(); }
-function jCreate(){ jMode='create'; jcc={name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],trig:'event',ev:'balance_low',seg:(MLS.find(m=>!m.excl)?mlLabel(MLS.find(m=>!m.excl)):''),sched:'Daily · 10:00'}; if(curView!=='journeys') showView('journeys'); else render(); }
+function jCreate(){ jMode='create'; jcc={name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],kind:'event',ev:EVENT_NAMES[0],seg:(MLS.find(m=>!m.excl)?mlLabel(MLS.find(m=>!m.excl)):''),attr:DATE_ATTRS[0]}; if(curView!=='journeys') showView('journeys'); else render(); }
 /* Duplicate = a new journey whose v1 Draft is a copy of the source's main version */
 function jCopy(id,folder){ const src=jById(id); const V=jMainV(src); const j=jBlank({id:nextJourneyId(),name:src.name+' (copy)',desc:src.desc,folder:folder||src.folder,phase:src.phase,priority:src.priority,endDate:src.endDate,expiryAction:src.expiryAction,ignoreUnsub:src.ignoreUnsub,testUsers:[...src.testUsers],entry:Object.assign({},src.entry),exit:Object.assign({},src.exit),versions:[{v:1,status:'Draft',createdAt:stamp(),nodes:JSON.parse(JSON.stringify(V.nodes))}],cur:1}); registerJourney(j); return j; }
 
@@ -2526,7 +2661,7 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
     <div class="toolrow" style="gap:8px">
       <div class="search-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="jl-q" placeholder="Search by name, description or journey ID" value="${esc(jQ)}" aria-label="Search journeys"></div>
       <div class="chipbar"><span style="color:var(--ink-3);font-size:11px">STATUS</span>${chip('All')}${J_STATUSES.map(chip).join('')}</div>
-      ${sel('folder','Folder',FOLDERS)}${sel('phase','Phase',PHASES)}${sel('trigger','Entry type',['Event','Segment entry','Schedule'])}
+      ${sel('folder','Folder',FOLDERS)}${sel('phase','Phase',PHASES)}<select data-jf="trigger" aria-label="Entry type"><option value="">Entry type: any</option>${Object.entries(ENTRY_KINDS).map(([k,m])=>`<option value="${k}" ${f.trigger===k?'selected':''}>${esc(m.k)}</option>`).join('')}</select>
       <span class="kpi"><b>${rows.length}</b> journeys</span>
     </div>
     ${selN?`<div class="bulk"><b>${selN} selected</b><button class="btn sm outline" id="jl-bdup">Duplicate</button><label>Move to folder <select id="jl-bmove"><option value="">choose…</option>${FOLDERS.map(x=>`<option>${esc(x)}</option>`).join('')}</select></label><button class="btn sm outline" id="jl-bclear">Clear selection</button></div>`:''}
@@ -2572,24 +2707,18 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
 document.addEventListener('click',e=>{ if(curView==='journeys'&&jMode==='list'&&!e.target.closest('.dm-menu')) document.querySelectorAll('#jl-card .dm-menu .pop').forEach(p=>p.hidden=true); });
 
 let jcc=null;
-const JC_TRIG=[
-  ['event','When something happens','An event arrives — balance low, package expiring, offer accepted.','<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>'],
-  ['segment','When someone enters a segment','A customer starts matching a segment and is taken in.','<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M16 11h5M18.5 8.5v5"/>'],
-  ['schedule','On a schedule','The journey runs for a segment at set times.','<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>']];
-const JC_SCHED=['Daily · 10:00','Weekly · Mon · 10:00','Monthly · 1st · 10:00'];
-function renderJCreate(card){ const c=jcc; const ic=d=>`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+function renderJCreate(card){ const c=jcc;
   const segs=MLS.filter(m=>!m.excl).map(mlLabel), recent=[...JOURNEYS].sort((a,b)=>(b.updated||b.created||'').localeCompare(a.updated||a.created||'')).slice(0,3);
-  const segSel=`<div class="fld"><label for="jc-seg" class="req">Segment</label><select id="jc-seg">${segs.map(s=>`<option ${c.seg===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>`;
-  const follow=c.trig==='event'?`<div class="fld"><label for="jc-ev" class="req">Event</label><select id="jc-ev">${BIZ_EVENTS.map(e=>`<option ${c.ev===e?'selected':''}>${e}</option>`).join('')}</select></div>`
-    :c.trig==='segment'?segSel
-    :`<div class="jc-2">${segSel}<div class="fld"><label for="jc-sched" class="req">Runs</label><select id="jc-sched">${JC_SCHED.map(s=>`<option ${c.sched===s?'selected':''}>${s}</option>`).join('')}</select></div></div>`;
+  const follow=c.kind==='event'?`<div class="fld"><label for="jc-ev" class="req">Event</label><select id="jc-ev">${EVENT_NAMES.map(e=>`<option ${c.ev===e?'selected':''}>${e}</option>`).join('')}</select></div>`
+    :c.kind==='segment'?`<div class="fld"><label for="jc-seg" class="req">Segment</label><select id="jc-seg">${segs.map(s=>`<option ${c.seg===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>`
+    :c.kind==='dateAttr'?`<div class="fld"><label for="jc-attr" class="req">Date attribute</label><select id="jc-attr">${DATE_ATTRS.map(a=>`<option ${c.attr===a?'selected':''}>${a}</option>`).join('')}</select></div>`:'';
   card.innerHTML=`<div class="cc-top"><button class="btn sm outline" id="jc-back">‹ Journey list</button></div>
   <div class="cc">
-    <div class="cc-hd"><h2>Create your journey</h2><p>Name it and choose what starts it — you build the steps on the canvas next.</p></div>
-    <div class="fld cc-name"><label for="jc-name" class="req">Journey name</label><input id="jc-name" maxlength="100" value="${esc(c.name)}" placeholder="e.g. Package expiring — renewal nudge" autocomplete="off"></div>
+    <div class="cc-hd"><h2>Create your journey</h2><p>Name it, file it, and choose what starts it — you build the steps on the canvas next.</p></div>
+    <div class="fld cc-name"><label for="jc-name" class="req">Journey name</label><input id="jc-name" maxlength="100" value="${esc(c.name)}" placeholder="e.g. Payment failed – dunning" autocomplete="off"></div>
     <div class="fld"><label for="jc-desc">Description</label><input id="jc-desc" value="${esc(c.desc)}" placeholder="What this journey does, for your team"></div>
     <div class="jc-2"><div class="fld"><label for="jc-folder">Folder (project)</label><select id="jc-folder">${FOLDERS.map(x=>`<option ${c.folder===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div><div class="fld"><label for="jc-phase">Lifecycle phase</label><select id="jc-phase">${PHASES.map(x=>`<option ${c.phase===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div></div>
-    <div class="cc-sec"><div class="cc-l">What starts it?</div><div class="cc-trig">${JC_TRIG.map(([k,t,d,svg])=>`<button type="button" class="cc-card ${c.trig===k?'on':''}" data-trig="${k}" aria-pressed="${c.trig===k}">${ic(svg)}<b>${t}</b><span>${d}</span></button>`).join('')}</div>
+    <div class="cc-sec"><div class="cc-l">What starts it? <small>— the entry type; it can be changed on the canvas</small></div><div class="cc-trig ek">${Object.entries(ENTRY_KINDS).map(([k,m])=>`<button type="button" class="cc-card ${c.kind===k?'on':''}" data-trig="${k}" aria-pressed="${c.kind===k}"><i>${m.ic}</i><b>${esc(m.k)}${m.cm?' <small>CM</small>':''}</b><span>${esc(m.d)}</span></button>`).join('')}</div>
       <div class="jc-follow">${follow}</div></div>
     <div class="cc-go"><button class="btn primary" id="jc-start">Start building</button></div>
     <div class="cc-tpl"><div class="cc-l">Start from a template <small>— a copy of an existing journey</small></div>
@@ -2598,27 +2727,22 @@ function renderJCreate(card){ const c=jcc; const ic=d=>`<svg viewBox="0 0 24 24"
   const q=s=>card.querySelector(s), nm=q('#jc-name');
   nm.oninput=()=>{ c.name=nm.value; }; nm.onkeydown=e=>{ if(e.key==='Enter') q('#jc-start').click(); };
   q('#jc-desc').oninput=e=>{ c.desc=e.target.value; };
-  if(!card.contains(document.activeElement)) setTimeout(()=>{ if(jMode==='create'&&document.body.contains(nm)&&!document.querySelector('.tour-card')) nm.focus(); },0);
-  card.querySelectorAll('[data-trig]').forEach(b=>b.onclick=()=>{ c.trig=b.dataset.trig; renderJCreate(card); q('#jc-name')&&card.querySelector('#jc-name').blur(); });
-  ['ev','seg','sched','folder','phase'].forEach(k=>{ const el=q('#jc-'+k); if(el) el.onchange=()=>{ c[k]=el.value; }; });
+  if(!card.contains(document.activeElement)) setTimeout(()=>{ if(jMode==='create'&&document.body.contains(nm)) nm.focus(); },0);
+  card.querySelectorAll('[data-trig]').forEach(b=>b.onclick=()=>{ c.kind=b.dataset.trig; renderJCreate(card); });
+  ['ev','seg','attr','folder','phase'].forEach(k=>{ const el=q('#jc-'+k); if(el) el.onchange=()=>{ c[k]=el.value; }; });
   q('#jc-back').onclick=jToList;
   card.querySelectorAll('[data-jctpl]').forEach(b=>b.onclick=()=>{ const j=jCopy(b.dataset.jctpl); toast(`Copied · ${j.id}`,`${j.name} created as Draft v1.`); jOpen(j.id); });
   q('#jc-start').onclick=()=>{ if(!c.name.trim()){ toast('Name is required','Give the journey a name your team will recognise.','bad'); nm.focus(); return; }
-    const mode=c.trig==='event'?'Event only':c.trig==='segment'?'Segment entry':'Segment only (scheduled)';
-    const seg=c.trig==='event'?'— (event only)':c.seg, ev=c.trig==='event'?c.ev:'';
-    const nodes=journeyTemplate('',mode,seg,ev); if(c.trig==='schedule') nodes[0].cfg.schedule=c.sched;
-    const j=jBlank({id:nextJourneyId(),name:c.name.trim(),desc:c.desc.trim(),folder:c.folder,phase:c.phase,versions:[{v:1,status:'Draft',createdAt:stamp(),nodes}],cur:1});
-    registerJourney(j); addLog('',`${j.id}@1  journey created · ${j.name} · Draft v1 · entry: ${mode}${seg!=='— (event only)'?' · '+seg.split(' · ')[0]:''}${ev?' · '+ev:''}`,{j:j.id+'@1',node:'e1',kind:'system'});
-    jOpen(j.id,'e1'); toast(`Created · ${j.id}`,`${j.name} is a Draft with its entry step in place. Add steps from the palette, then Activate.`); };
+    const cfg=c.kind==='event'?{event:c.ev}:c.kind==='segment'?{segment:c.seg}:c.kind==='dateAttr'?{attr:c.attr}:{};
+    const j=jBlank({id:nextJourneyId(),name:c.name.trim(),desc:c.desc.trim(),folder:c.folder,phase:c.phase,versions:[{v:1,status:'Draft',createdAt:stamp(),nodes:journeyTemplate(c.kind,cfg)}],cur:1});
+    registerJourney(j); addLog('',`${j.id}@1  journey created · ${j.name} · Draft v1 · entry: ${ENTRY_KINDS[c.kind].k}`,{j:j.id+'@1',node:'e1',kind:'system'});
+    jOpen(j.id,'e1'); toast(`Created · ${j.id}`,`${j.name} is a Draft with its ${ENTRY_KINDS[c.kind].k} entry in place. Add steps from the palette, then Activate.`); };
 }
-
-
 /* ---------- delivery = channel + content + rules + schedule, kept per channel behind the scenes; the user just fills campaign steps ---------- */
 const PLAN_CHANNELS=[['sms','SMS'],['isms','Interactive SMS'],['mms','MMS'],['email','Email'],['push','Mobile Push'],['webpush','Web Push'],['tm','Telemarketing'],['inapp','In-App'],['wsc','WSC'],['chatbot','Chatbot']];
 /* push = we send to the customer; pull = the customer sees it when they come. One campaign uses one kind (meeting 3). */
 const CH_KIND={sms:'push',isms:'push',mms:'push',email:'push',push:'push',webpush:'push',tm:'push',inapp:'pull',wsc:'pull',chatbot:'pull'};
 const chName=k=>(PLAN_CHANNELS.find(x=>x[0]===k)||[k,k])[1];
-const PLAN_RULES=[['cg','Control group','from the campaign: size and method'],['cooldown','Channel cooldown','days between two sends on the same channel, any campaign'],['type','Campaign Type (overlap)','max. Information / Offer sends per day'],['presend','Campaign pre-sent','days between two sends of this same campaign to one customer (default from Parameters)']];
 function contentTextOf(id){ const it=CONTENT_ITEMS.find(x=>x.id===id); if(!it) return ''; return it.ch==='email'?[it.hero,it.lead,it.body].filter(Boolean).join('\n'):Object.values(it.variants)[0]||''; }
 function exclForChannel(ch){ const k=ch==='isms'?'sms':ch; return MLS.filter(m=>m.excl&&(!(m.exclCh&&m.exclCh.length)||m.exclCh.includes(k))); }
 function exclHint(ch){ const ex=exclForChannel(ch); const chn=CONTENT_CHANNELS.find(x=>x.k===ch); if(!ex.length) return `<div class="hintline"><span class="pill">no exclusion list on ${chn.n}</span><span>Exclusions are applied at delivery time, so this content stays reusable in any campaign.</span></div>`; return `<div class="hintline"><span class="pill warn">${ex.length} exclusion list${ex.length>1?'s':''} on ${chn.n}</span><span>${ex.map(m=>`<b>${m.id}</b> ${esc(m.name)} (${evalML(m).count})`).join(' · ')} — removed at delivery time; content stays reusable.</span></div>`; }
@@ -2823,11 +2947,9 @@ function renderSegmentation(){ renderSegList(); if(curView==='segmentation') set
   segShow('list'); renderSegList(); segDraft=segBlank();
 })();
 
-JOURNEYS.forEach(j=>j.versions.forEach(V=>V.nodes.forEach(n=>{ n.y=Math.round(n.y*1.75); n.x=Math.round(n.x*1.32); })));
 
 buildPalette(); initSim(); selNode=null;
-for(let i=0;i<3;i++) tick();
-quietInit=true; sendEvent('subscription_activated',CUSTOMERS[20].id); quietInit=false;
+quietInit=true; for(let i=0;i<3;i++) tick(); sendEvent('order_abandoned',CUSTOMERS[20].id); sendEvent('level_up',CUSTOMERS[4].id); quietInit=false;
 /* ---- user manual ----------------------------------------------------------
    The manual is embedded as markdown (#man-src) and rendered here, so a
    downloaded index.html carries it with no server and no network. The renderer

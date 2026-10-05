@@ -2,6 +2,20 @@
 
 Version numbers follow the published artifact versions.
 
+## v60 — 5 Oct 2026
+**Journey Studio, phase (c): the step inventory.**
+- Palette grouped **Entry · Message · Wait · Split · Action**. Exactly one Entry step per version; the Entry group swaps its type: Segment (segment, evaluation frequency, time slot), Date attribute (attribute, offset before/after/on, yearly), Event (API/BSS) (event picker, payload fields, create-contact flag, **API code** sample), Joins list, Unengaged (channel, days), Digital Twin signal (CM), Agent suggestion (CM, read-only card). Common: include project segment, re-entry rule (never / after N days / always).
+- Message: Delivery keeps channel, template, content text, A/B and dynamic variants, control group; Communication rules become a **policy picker**; "send even if unsubscribed" appears only when the journey flag is on and asks for confirmation.
+- Wait: duration (minutes/hours/days), until date (weekdays / day of month / date), for event (accepted · rejected · timeout, with the webhook / release-URL explainer), for segment match (matched · timeout), Priority (allowed · denied).
+- Split: Engagement (bound to a previous Delivery; opened/clicked/converted/bounced + Remaining), Segment (ordered list, top-down, + Remaining), Shuffle (weights, Set equal).
+- Action: Set attribute (static value or timestamp), Call external (labelled webhook / MCP tool), Control group (hold-out, export, build a segment), Audience sync (Meta / Google), Exit (optionally a goal).
+- Canvas: cards show type, name, a one-line summary and — on Active/Closing versions — a **stats strip** (entered · waiting · exited; Delivery: sent / opened / clicked / conv). Path labels are type-driven: dragging from a port takes the next free path; the panel lists each path and its target; paths may merge. A Delivery added after a Delivery gets a 1-day Wait slipped in between.
+- Validation (Validate button and Activate): entry set up, every wait has a duration/date, every segment split names a segment, every engagement split is bound to a Delivery, every path ends in an Exit, every step reachable, every Delivery has content, shuffle weights add to 100.
+- Engine: scheduled entries admit new matches on Advance 1 day; event entries on Send event; deliveries produce engagement for the Engagement split; a contact's route through a split is deterministic.
+- Policies page is data-driven (`POLICIES`) and shows which journeys pick each policy.
+- Sample data: seven Fizz-flavoured journeys (Device order flow abandonment v13 Active / v12 Closing, Free trial – communication après la fin, Birthday reward, Winback – unengaged 90d, Loyalty level up, Payment failed – dunning as Draft, Summer referral push as Past). Numbers and the datamart get their Fizz pass in phase (e).
+- Tests: `nodes.spec.js` (palette order, entry swap + API code, wait paths and next-free-path connect, auto Wait between deliveries, engagement split binding, validation blocking Activate, shuffle weights).
+
 ## v59 — 5 Oct 2026
 **Journey Studio, phase (b): journey model with versions.**
 - A journey is a container (name, description, folder, lifecycle phase, priority, end date + expiry action, ignore-unsubscribe flag, test users); its steps live in a **version**. Version statuses Draft → Active → Closing → Closed; one Active version per journey, activating a Draft puts the current Active into Closing; a Closing version admits nobody, lets the contacts inside finish and closes itself when empty; Closed is final. Journey status is derived: Draft / Live / Past.
