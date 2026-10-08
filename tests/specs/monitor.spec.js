@@ -17,33 +17,33 @@ test.describe('journey monitor', () => {
     await openMonitor(app);
     const tiles = await app.$$eval('#mon-body .stats .stat .l', (els) => els.map((e) => e.textContent.trim()));
     expect(tiles).toEqual(['Entered', 'In journey', 'Exited']);
-    await expect(app.locator('#mon-body .tbl').first()).toContainText('Email');
+    await expect(app.locator('#mon-body .tbl').first()).toContainText('SMS');
     // anomaly alerts are Phase 2: nothing of the Marketing Agent shows while PHASE2 is off
     expect(await app.locator('#mon-body .alert').count()).toBe(0);
     await expect(app.locator('#mon-body')).not.toContainText('Marketing Agent');
     // one row per version, newest first
     const vs = await app.$$eval('#mvtable tbody tr td:first-child', (els) => els.map((e) => e.textContent.trim()));
-    expect(vs).toEqual(['v4', 'v3']);
+    expect(vs).toEqual(['v1']);
     expect(await app.locator('[data-mexport]').count(), 'step export is Phase 2').toBe(0);
   });
 
   test('View version draws the read-only canvas with the stats strip and lists the steps', async ({ app }) => {
-    await openMonitor(app);
+    await openMonitor(app, 'JRN-03');
     await app.locator('#mon-tabs [data-mt="version"]').click();
     await expect(app.locator('#mon-vwrap')).toBeVisible();
-    await expect(app.locator('#mvsel')).toHaveValue('4');
-    expect(await app.locator('#mcanvas .node').count()).toBe(7);
-    expect(await app.locator('#mcanvas text.stat').count()).toBe(7);
+    await expect(app.locator('#mvsel')).toHaveValue('2');
+    expect(await app.locator('#mcanvas .node').count()).toBe(9);
+    expect(await app.locator('#mcanvas text.stat').count()).toBe(9);
     expect(await app.locator('#mcanvas .port').count(), 'read-only: no ports').toBe(0);
     expect(await app.locator('#mcanvas input').count(), 'read-only: no editable names').toBe(0);
-    // the Closed v3 carries no statistics
-    await app.selectOption('#mvsel', '3');
+    // the Closed v1 carries no statistics
+    await app.selectOption('#mvsel', '1');
     expect(await app.locator('#mcanvas text.stat').count()).toBe(0);
     await expect(app.locator('#mon-body')).toContainText('no statistics');
     // Open in builder lands on that version
     await app.locator('#mon-open').click();
     await expect(app.locator('#jsplit')).toBeVisible();
-    await expect(app.locator('#vsel')).toHaveValue('3');
+    await expect(app.locator('#vsel')).toHaveValue('1');
   });
 
   test('a step on the version canvas selects it in the steps table (export is Phase 2)', async ({ app }) => {
@@ -55,7 +55,7 @@ test.describe('journey monitor', () => {
   });
 
   test('the Contacts tab lists every contact with its current step and status; a row opens its step history', async ({ app }) => {
-    await openMonitor(app);
+    await openMonitor(app, 'JRN-01');
     await app.locator('#mon-tabs [data-mt="contacts"]').click();
     const heads = await app.$$eval('#ctable thead th', (t) => t.map((x) => x.textContent.trim()));
     expect(heads).toEqual(['Contact', 'Event', 'Received at', 'Version', 'Current step', 'Status', 'Last delivery result']);
@@ -94,13 +94,13 @@ test.describe('journey monitor', () => {
   test('the validation panel opens above the canvas and names the step to fix', async ({ app }) => {
     await setRole(app, 'approver');
     await app.locator('#jtabs [data-jst="Draft"]').click();
-    await app.locator('#jl-table [data-jopen="JRN-06"]').click();
+    await app.locator('#jl-table [data-jopen="JRN-05"]').click();
     await expect(app.locator('#jvalid')).toBeHidden();
     await app.locator('#btn-activate').click();
     await expect(app.locator('#jvalid')).toBeVisible();
-    await expect(app.locator('#jvalid .jv-h b')).toContainText('1 check(s) block Activate');
-    await app.locator('#jvalid [data-jvsel]').click();
-    await expect(app.locator('#jp-title')).toContainText('Wait for event');
+    await expect(app.locator('#jvalid .jv-h b')).toContainText('2 check(s) block Activate');
+    await app.locator('#jvalid [data-jvsel]').first().click();
+    await expect(app.locator('#jp-title')).toContainText('Delivery');
     await app.locator('#jv-close').click();
     await expect(app.locator('#jvalid')).toBeHidden();
   });

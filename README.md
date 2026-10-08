@@ -10,34 +10,40 @@ Append **`?notour`** to the URL for a clean start in demos and automated runs.
 **Deploy:** it is a static file. On Vercel, import the repository with no framework preset and no build command; the
 root `index.html` is served as is. GitHub Pages works the same way.
 
-## What is in the prototype (v62)
+## What is in the prototype (v67 — Phase 1)
 
-- **Journeys** — the list (name · folder · lifecycle phase · status · active version · entered 30d · last activated;
-  filters by status / folder / phase / entry type; bulk duplicate and move to folder) under a **Lifecycle coverage**
-  strip (live journeys per phase, gaps highlighted). *Create your journey*: name, folder, phase, entry type.
-- **Journey model** — a journey is a container; its steps live in a **version**: Draft → Active → Closing → Closed.
-  One Active version per journey; activating a Draft puts the current Active into Closing (no new entries, contacts
-  inside finish, auto-Closed when empty). Journey status Draft / Live / Past is derived. Settings: folder, phase,
-  priority 1–100, end date + expiry action, ignore unsubscribe (per-step confirmation), test users.
-- **Canvas** — grouped palette **Entry · Message · Wait · Split · Action**; one Entry step per version with seven entry
-  types (Segment, Date attribute, Event with an API code sample, Joins list, Unengaged, Digital Twin signal, Agent
-  suggestion); Delivery with template, FR/EN text, A/B and dynamic variants, control group, policy picker; waits
-  (duration, until date, for event with accepted · rejected · timeout, for segment match, Priority); splits
-  (Engagement bound to a Delivery, Segment top-down, Shuffle with weights); actions (Set attribute, Call external as
-  webhook / MCP tool, Control group, Audience sync, Exit). Cards show type, name, a one-line summary and — on live
-  versions — a **stats strip**. Paths are type-driven and may merge. A **version bar** (version dropdown, Activate,
-  Stop ▾ Closing / Closed, Copy to new version, Test ▾, Execution report) and a **validation panel** that blocks
-  Activate.
-- **Journey Monitor** — per journey: *General* (entered / active / exited / conversions, channel totals, **Marketing
-  Agent anomaly alerts** with confidence, versions table, participants at a point in time) and *View version* (read-only
-  canvas with the stats strip); **step export** with four strategies (mock download); a time range filter.
+Phase 1 covers **event-triggered journeys** end to end. Everything from the earlier Journey Studio round that is
+not in Phase 1 stays in the file behind one `PHASE2` flag (off by default) and does not show in the palette, the
+menus or the sample data.
+
+- **Journeys** — the list on three tabs **Drafts · Live · Past** (name · project · event · channels · active version
+  with its note · entered 30d · last modified · modified by; filters by project / event / channel; duplicate and move
+  to project). *Create your journey*: name, description, project, entry type.
+- **Journey model** — a journey is a container (project, contact list Customers / Prospects, override unsubscribe
+  with confirmation and badge, test users); its steps live in a **version** with a free-text note: Draft → Active →
+  Closing → Closed. **Activation is the approval**: a marketer submits (validation must be green), an approver or
+  admin activates; an edit withdraws the submission. One Active version per journey; activating puts the current
+  Active into Closing (no new entries, contacts inside finish, auto-Closed when empty). Status Draft / Live / Past is
+  derived.
+- **Canvas** — grouped palette **Entry · Message · Wait · Split · Action**; one Entry per version: **Event – single
+  contact** or **Event – multiple contacts** on five named events, with payload placeholders, create-if-missing and
+  an API code sample; **Delivery** with Email · SMS · Push, FR / EN variants and a default language, offer and payload
+  placeholders, control-group share, policy picker, per-step send-even-if-unsubscribed, and a **skip rule** (no
+  address / token / consent → skipped, counted); Wait duration; Segment split, Shuffle, Engagement split (opened /
+  clicked + Remaining); named Control group; Exit. Cards show type, name, summary and — on live versions — a
+  **stats strip** (Delivery: sent · skipped · opened · clicked). A **version bar** (dropdown with notes, Submit /
+  Activate, Stop ▾, Copy to new version, Test ▾ incl. *Send a test event* with an editable payload, Execution report)
+  and a **validation panel** that blocks Submit and Activate.
+- **Journey Monitor** — per journey: *General* (entered / in journey / exited, channel totals with skipped, versions
+  table), *View version* (read-only canvas with the stats strip, time range) and **Contacts** (contact, event,
+  received at, version, current step, status, last delivery result → step history and test payload).
 - **Segments** (workbench, read-mostly) and **Policies** (read-only list picked by Delivery steps) — kept from CM.
-- **Roles**: Marketer · Approver · Admin — the same pages; the approver/admin activates and stops versions.
-- **Simulation strip** (demo only): send an event, advance the clock; it drives every counter. One simulated contact
-  stands for ≈6,500 real ones.
+- **Roles**: Marketer · Approver · Admin — the same pages; the marketer submits, the approver/admin activates and stops.
+- **Simulation strip** (demo only): send an event, advance the clock, reset; it drives every counter. One simulated
+  contact stands for ≈6,500 real ones.
 - **User manual** behind a button in the top bar — embedded in the file, so it works offline.
 
-Demo data only (Fizz-flavoured, fictional names, 7 journeys, 30 simulated contacts). Nothing is sent.
+Demo data only (Fizz-flavoured, fictional names, 6 journeys in 4 projects, 30 simulated contacts). Nothing is sent.
 
 ## Repository layout
 
@@ -59,8 +65,8 @@ CHANGELOG.md
 ## Working on it
 
 The prototype is one HTML file with inline CSS and vanilla JS. Data lives in constants near the top of the script
-(`JOURNEYS`, `POLICIES`, `MLS` segments, `TEMPLATES`, `CONTENT_ITEMS`, `DATAMART_ROWS`). `CLAUDE.md` is the
-architecture page.
+(`JOURNEYS`, `POLICIES`, `MLS` segments, `TEMPLATES`, `CONTENT_ITEMS`, `DATAMART_ROWS`); the Phase 2 switch is
+`PHASE2`. `CLAUDE.md` is the architecture page.
 
 After a change, run the regression suite (see `tests/README.md` for what it covers):
 

@@ -9,7 +9,7 @@ const { test, expect, setRole } = require('./fixtures');
 async function openDraft(app) {
   await app.locator('.nav button[data-view="journeys"]').click();
   await app.locator('#jtabs [data-jst="Draft"]').click();
-  await app.locator('#jl-table [data-jopen="JRN-06"]').click();
+  await app.locator('#jl-table [data-jopen="JRN-05"]').click();
   await expect(app.locator('#jsplit')).toBeVisible();
   await expect(app.locator('#vbar [data-tour="v-status"]')).toHaveText('Draft');
 }
@@ -43,18 +43,19 @@ test.describe('step inventory', () => {
     await expect(app.locator('#apicode')).toContainText('"contacts"');
   });
 
-  test('a Wait for event has accepted · rejected · timeout paths and the port takes the next free one', async ({ app }) => {
+  test('a Segment split always ends with Remaining and the port takes the next free path', async ({ app }) => {
     await openDraft(app);
-    await app.locator('#canvas .node[data-id="s3"]').click();
-    const paths = await app.$$eval('#jp-body .path b', (els) => els.map((e) => e.textContent.trim()));
-    expect(paths).toEqual(['accepted', 'rejected', 'timeout']);
-    await expect(app.locator('#jp-body .path').nth(1)).toContainText('not connected');
-    // connecting from the wait takes the free "rejected" path
-    const ok = await app.evaluate(() => connect(curCtx(), 's3', 's5'));
-    expect(ok).toBe(true);
-    expect((await nodesOf(app)).find((n) => n[0] === 's3')[2]).toEqual(['accepted→s6', 'timeout→s4', 'rejected→s5']);
-    // a fourth connection is refused: every path has a target
-    expect(await app.evaluate(() => connect(curCtx(), 's3', 's2'))).toBe(false);
+    await app.locator('#canvas .node[data-id="s2"]').click();
+    await app.locator('#palette button[data-tour="pal-splitSeg"]').click();
+    const paths = await app.$$eval('#jp-body .paths .path b', (els) => els.map((e) => e.textContent.trim()));
+    expect(paths.length).toBe(2);
+    expect(paths[paths.length - 1]).toBe('Remaining');
+    const sid = await app.evaluate(() => selNode);
+    expect(await app.evaluate((id) => connect(curCtx(), id, 's3'), sid)).toBe(true);
+    expect(await app.evaluate((id) => connect(curCtx(), id, 'e1'), sid)).toBe(true);
+    expect(await app.evaluate((id) => connect(curCtx(), id, 's2'), sid), 'every path has a target').toBe(false);
+    const edges = (await nodesOf(app)).find((n) => n[0] === sid)[2];
+    expect(edges.some((e) => e.startsWith('Remaining→'))).toBe(true);
   });
 
   test('a Delivery dropped after a Delivery gets a Wait slipped in between', async ({ app }) => {
@@ -84,16 +85,16 @@ test.describe('step inventory', () => {
   test('validation names the gaps and blocks Activate until they are fixed', async ({ app }) => {
     await setRole(app, 'approver');
     await openDraft(app);
-    // the sample draft has an unconnected "rejected" path
+    // the sample draft's e-mail is not connected to its Exit yet
     await app.locator('#btn-validate').click();
-    await expect(app.locator('#jvalid')).toContainText('Every path ends in an Exit: Paid?');
+    await expect(app.locator('#jvalid')).toContainText('Every path ends in an Exit: E-mail · changement de forfait');
     await app.locator('#btn-activate').click();
     await expect(app.locator('#toast')).toContainText('Cannot activate');
-    expect(await app.evaluate(() => JOURNEYS.find((j) => j.id === 'JRN-06').versions[0].status)).toBe('Draft');
+    expect(await app.evaluate(() => JOURNEYS.find((j) => j.id === 'JRN-05').versions[0].status)).toBe('Draft');
     // connect the path and it goes through
-    await app.evaluate(() => { connect(curCtx(), 's3', 's5'); renderCanvas(); });
+    await app.evaluate(() => { connect(curCtx(), 's2', 's3'); renderCanvas(); });
     await app.locator('#btn-activate').click();
-    expect(await app.evaluate(() => JOURNEYS.find((j) => j.id === 'JRN-06').versions[0].status)).toBe('Active');
+    expect(await app.evaluate(() => JOURNEYS.find((j) => j.id === 'JRN-05').versions[0].status)).toBe('Active');
     // live versions show the stats strip on every card
     expect(await app.locator('#canvas text.stat').count()).toBeGreaterThan(0);
   });
@@ -116,9 +117,11 @@ test.describe('step inventory', () => {
 test.describe('delivery parity (Phase 1)', () => {
   test('Email · SMS · Push only, FR / EN variants with a default language, offer placeholders and the SMS counter', async ({ app }) => {
     await openDraft(app);
-    await app.evaluate(() => { selNode = 's4'; renderCanvas(); renderNodePanel(); }); // the SMS reminder
+    await app.evaluate(() => { selNode = 's2'; renderCanvas(); renderNodePanel(); });
     const chans = await app.$$eval('#f-channel option', (os) => os.map((o) => o.value));
     expect(chans).toEqual(['email', 'sms', 'push']);
+    await app.selectOption('#f-channel', 'sms');
+    await app.fill('#f-l-text', 'Fizz: votre forfait passe à {{payload.to}} le {{payload.effectiveOn}}.');
     await expect(app.locator('.langtabs .tabs button.on')).toContainText('FR');
     await expect(app.locator('.langtabs .tabs button.on small')).toHaveText('default');
     await expect(app.locator('#jp-body .smscount')).toContainText('segment');
@@ -126,29 +129,28 @@ test.describe('delivery parity (Phase 1)', () => {
     await app.locator('.langtabs [data-lang="en"]').click();
     await app.fill('#f-l-text', 'Fizz: payment pending. Update your card: fizz.ca/pay');
     await app.locator('#jp-body input[data-deflang="en"]').check();
-    const cfg = await app.evaluate(() => { const n = curCtx().nodes.find((x) => x.id === 's4'); return { def: n.cfg.lang.default, en: n.cfg.lang.en.text, fr: n.cfg.lang.fr.text }; });
+    const cfg = await app.evaluate(() => { const n = curCtx().nodes.find((x) => x.id === 's2'); return { def: n.cfg.lang.default, en: n.cfg.lang.en.text, fr: n.cfg.lang.fr.text }; });
     expect(cfg.def).toBe('en');
     expect(cfg.en).toContain('payment pending');
     expect(cfg.fr).not.toBe(cfg.en);
     // an offer adds its placeholders
     await app.selectOption('#f-offer', 'OFR-10');
     await expect(app.locator('#jp-body [data-jins="offer.name"]')).toBeVisible();
-    await expect(app.locator('#jp-body [data-jins="payload.invoiceId"]')).toBeVisible();
+    await expect(app.locator('#jp-body [data-jins="payload.effectiveOn"]')).toBeVisible();
     // a test send exists per language
     expect(await app.locator('#jp-body [data-testsend]').count()).toBe(2);
   });
 
   test('a contact without a phone number skips the SMS step and continues on the path', async ({ app }) => {
-    await setRole(app, 'approver');
-    await openDraft(app);
-    await app.evaluate(() => { connect(curCtx(), 's3', 's5'); renderCanvas(); });
-    await app.locator('#btn-activate').click();
-    // admit a contact that has no MSISDN into the dunning journey and run it through
+    // the live payment-failed journey sends an SMS first: a contact without a number skips it
+    await app.locator('.nav button[data-view="journeys"]').click();
+    await app.locator('#jl-table [data-jopen="JRN-04"]').click();
+    await expect(app.locator('#jsplit')).toBeVisible();
     const r = await app.evaluate(() => {
       const C = curCtx(); const c = CUSTOMERS[0]; const S = simOf(C); const saved = c.row.MSISDN; c.row.MSISDN = '';
       sendEvent('payment_failed', c.id); for (let i = 0; i < 5; i++) tick(); c.row.MSISDN = saved;
-      const p = S.parts[c.id]; const e = p && p.eng['s4'];
-      return { skipped: !!(e && e.skipped), reason: e && e.reason, status: p && p.status, skips: p && p.skips, stat: nodeStats(C, C.nodes.find((n) => n.id === 's4')).skipped };
+      const p = S.parts[c.id]; const e = p && p.eng['s2'];
+      return { skipped: !!(e && e.skipped), reason: e && e.reason, status: p && p.status, skips: p && p.skips, stat: nodeStats(C, C.nodes.find((n) => n.id === 's2')).skipped };
     });
     expect(r.skipped).toBe(true);
     expect(r.reason).toBe('no phone number');

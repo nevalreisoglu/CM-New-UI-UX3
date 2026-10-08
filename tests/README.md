@@ -30,9 +30,9 @@ version that matches.
 | `roles.spec.js` | Role views: Marketer, Approver and Admin all see the same four pages; the footer note and the actions follow the role. |
 | `segments.spec.js` | The segment workbench: definition beside live audience insight, Search counting the audience, and the assistant living in a dialog rather than the form. |
 | `journey.spec.js` | The list opens first, a journey opens on the canvas and returns, Create your journey, the canvas is fitted on first open, the palette collapses, and the simulation strips are demo-only and share one clock. |
-| `versions.spec.js` | The journey model: Draft / Live / Past derived from versions, the lifecycle coverage strip, the version bar and locked structure, Activate → Closing, Stop (Closing / Closed), journey settings, Create with folder and phase. |
-| `nodes.spec.js` | The step inventory: palette groups and order, the Entry group swapping the entry type (and the API code sample), type-driven paths on waits and splits, the Wait slipped between two deliveries, the engagement split binding, validation blocking Activate, shuffle weights. |
-| `monitor.spec.js` | Journey Monitor: General (totals, channel totals, Marketing Agent alerts, versions), View version (read-only canvas with the stats strip), step export strategies, time range and the simulation driving the numbers, the validation panel. |
+| `versions.spec.js` | The journey model: the Drafts / Live / Past tabs derived from versions, the version bar (note, who activated, when) and locked structure, Submit for approval → Activate → Closing, Stop (Closing / Closed), journey settings (project, override unsubscribe, test users; phase / priority / end date are Phase 2), Create. |
+| `nodes.spec.js` | The step inventory in Phase 1: palette groups and order (no Phase 2 step), the Entry group swapping single / multiple contacts (and the API code sample), Segment split paths ending in Remaining and the next-free-path connect, the Wait slipped between two deliveries, the engagement split binding, validation blocking Submit, shuffle weights, Delivery parity (Email · SMS · Push, FR / EN, offer placeholders, SMS counter, the skip rule). |
+| `monitor.spec.js` | Journey Monitor: General (totals, channel totals with skipped, versions; no anomaly alerts or step export while `PHASE2` is off), View version (read-only canvas with the stats strip), the Contacts tab and the step history, time range and the simulation driving the numbers, the validation panel. |
 | `manual.spec.js` | The **User manual** button in the top bar: the dialog opens, closes three ways, renders the markdown as headings/lists/tables, the contents list jumps, and the embedded copy still matches `docs/user-manual.md`. |
 | `demo-data.spec.js` | No real person is named in the file; every e-mail address is on example.com; sample customers have masked ids and +90 5XX numbers; the top-bar user comes from `DEMO_USERS`. |
 | `screenshots.spec.js` | Writes reference screenshots of the main screens to `screenshots/`. |
@@ -41,7 +41,7 @@ Node scripts (run with `node <name>.js`; an empty error list is the pass conditi
 
 | Script | What it walks |
 | --- | --- |
-| `brand-audit.js` | AA contrast of every rendered text node on the four pages (two widths, menu open and collapsed) and a set of deep states: live and draft canvases, the step panels, a closed version, the filtered list, create, the execution report, the monitor's two tabs and the export, the segment workbench. |
+| `brand-audit.js` | AA contrast of every rendered text node on the four pages (two widths, menu open and collapsed) and a set of deep states: live and draft canvases, the step panels, a closed version, the three list tabs, create, the execution report, the monitor's three tabs, the segment workbench. |
 
 ## Screenshots
 
@@ -74,16 +74,17 @@ the screens it touches.
 
 These surprised us once, so they are asserted rather than assumed:
 
-- The prototype **boots on the Dashboard**, and the journey canvas is therefore
+- The prototype **boots on the journey list**, and the journey canvas is therefore
   fitted the first time the builder is opened rather than at boot — `fitView`
   measures the SVG, which is 0x0 while the view is hidden. `fitView` also has a
   zoom floor of 0.45, so a wide journey can still run off the right edge.
 - The Journey Monitor opens on **day 3**: the prototype runs three simulated days
-  at load so the monitor has something to show.
-- The **Offer step is not removed** for an Info campaign — it stays in the
-  stepper, disabled and marked `–`.
-- The **readiness panel refreshes when the step changes**, not on every
-  keystroke, so that typing in a field never steals focus.
+  at load, seeds the Closing version and sends eight events so the monitor and the
+  Contacts tab have something to show.
+- The journey list opens on the **Live** tab, so a spec that needs the Draft
+  journey clicks the Drafts tab first.
+- `prompt()` and `confirm()` are auto-dismissed in headless runs, so the version
+  note is an inline input and the approver's Activate asks for no confirmation.
 - Every dialog closes on **Escape**, including the segment assistant and the
   manual.
 

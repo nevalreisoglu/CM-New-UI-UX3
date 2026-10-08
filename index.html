@@ -1403,80 +1403,96 @@ Etiya Journey Studio: **nothing is sent and nothing is saved between reloads.**
 
 The role view in the top bar changes what you may do, not what you see:
 
-1. **Marketer** builds journeys and segments, edits step content and tests.
-2. **Approver** activates a Draft version and stops a live one (Closing or Closed).
-3. **Admin** does both, and maintains the lifecycle phase list and folders.
+1. **Marketer** builds journeys and segments, edits step content, tests and **submits a
+   version for approval**.
+2. **Approver** **activates** a submitted version and stops a live one (Closing or Closed).
+3. **Admin** does both, and maintains the projects.
 
 ## Journeys
 
-The page opens on the **journey list**: name, folder, lifecycle phase, status
-(Draft / Live / Past), active version, contacts entered in the last 30 days and the last
-activation. Search by name, description or id; filter by status, folder, phase and entry
-type. Tick rows for the bulk actions (duplicate, move to folder). **Open** puts a journey
-on the canvas; **More** offers Monitor, Execution report, Duplicate and Move to folder.
-
-Above the list, the **Lifecycle coverage** strip counts live journeys per phase and
-highlights the phases without one. Click a phase to filter the list by it.
+The page opens on the **journey list** with three tabs — **Drafts · Live · Past**; Live is
+the default. Columns: journey (name and description), project, event, channels, active
+version (its number and note; a Closing or Draft sibling as a chip), contacts entered in
+the last 30 days, last modified and modified by. Search by name, description or id; filter
+by project, event and channel. Tick rows for the bulk actions (duplicate, move to project).
+**Open** puts a journey on the canvas; **More** offers Monitor, Execution report, Duplicate
+and Move to project.
 
 ### Create your journey
 
-- **+ New journey** asks for a name, a description, a folder, a lifecycle phase and
-  what starts the journey — one of the seven entry types.
+- **+ New journey** asks for a name, a description, a project and what starts the
+  journey — **Event – single contact** (one contact per request) or **Event – multiple
+  contacts** (a batch).
 - **Start building** creates a Draft v1 with the entry and an Exit in place and opens
   the canvas. *Start from a template* copies a recent journey instead.
 
 ### Versions
 
 A journey is a container; its steps live in a **version**. The **version bar** on top of
-the canvas shows the version dropdown (status, who activated it and when) and the actions:
+the canvas shows the version dropdown (number, note, status, who activated it and when) and
+the actions:
 
-- **Activate** — approver or admin; a Draft only; blocked until the validation is green.
-  The current Active version goes to **Closing**: no new entries, the contacts inside
-  finish their steps, and it closes itself when empty.
+- **Version note** — a free text next to the dropdown (*V14 – new template*). Type it and
+  press Enter; it shows in the dropdown, the list and the monitor.
+- **Submit for approval** (marketer) — a Draft only; blocked until the validation is
+  green. The version reads *Pending approval*; **Withdraw** takes it back, and so does any
+  edit of the steps.
+- **Activate** (approver or admin) — approves and activates the submitted version. The
+  current Active version goes to **Closing**: no new entries, the contacts inside finish
+  their steps, and it closes itself when empty.
 - **Stop ▾** — *Closing* (gentle) or *Closed* (release everyone now). Closed is final.
 - **Copy to new version** — a new Draft with the same steps.
-- **Test ▾** — count the entry's matches, show the first 10 matching contacts, test-send
-  every Delivery to the journey's test users (mock).
+- **Test ▾** — **Send a test event** with an editable JSON payload (it goes through the
+  entry like a real BSS call; the contact then shows on the monitor's Contacts tab), count
+  the entry's matches, show the first 10 matching contacts, test-send every Delivery to the
+  test users in FR and EN (mock).
 - **Execution report** — one row per step executed for a simulated contact.
 
 An Active or Closing version has a **locked structure**: no adding, removing or
 re-connecting steps, but every step's content can still be edited. A Closed version is
-read-only.
+read-only. The pill on the right of the bar counts the contacts in the version.
 
 ### The canvas
 
 - The **palette** is grouped **Entry · Message · Wait · Split · Action**. Drag a step
   onto the canvas, or click it to add it after the selected step. The Entry group does not
-  add a step — it **swaps the type** of the one entry step.
+  add a step — it **swaps the type** of the one entry step (single or multiple contacts).
 - Drag a step to move it; drag from the orange port to connect it — a step with several
-  paths (a wait for event, a split) takes its next free path label; click a path label to
-  disconnect; × on a step or the Delete key removes it. Paths may merge.
+  paths (a split) takes its next free path label; click a path label to disconnect; × on
+  a step or the Delete key removes it. Paths may merge.
 - Two Deliveries in a row get a one-day **Wait** slipped in between.
 - Cards show the step type, its name, a one-line summary and — on live versions — a
-  **stats strip**: entered · waiting · exited, or sent · opened · clicked · conv for a Delivery.
+  **stats strip**: entered · waiting · exited, or sent · skipped · opened · clicked for a
+  Delivery.
 - **Validate** opens the validation panel above the canvas: every check, the failing ones
-  naming the step (click it to select the step). Activate opens the same panel when a check
-  fails.
+  naming the step (click it to select the step). Submit and Activate open the same panel
+  when a check fails.
 
 ### The right panel
 
-- **Journey settings** (collapsible): name, description, folder, lifecycle phase,
-  priority 1–100, end date and what happens then (Closing or Closed), *Ignore
-  unsubscribe* (service messages only — every Delivery step then has to confirm "send even
+- **Journey settings** (collapsible): name, description, **project**, **contact list**
+  (Customers or Prospects), **override unsubscribe** (asks for a confirmation and shows a
+  badge on the version bar and the list; every Delivery step then has to confirm "send even
   if unsubscribed" on its own), test users.
 - **Step details** for the selected step. Highlights:
-  - **Entry**: the type buttons, the type's fields (segment + frequency, date attribute +
-    offset, event + payload + *API code*, list, channel + inactivity, Digital Twin signal,
-    the Agent's rationale), include-project-segment and the re-entry rule.
-  - **Delivery**: channel, template, the journey's own text with parameters, content mode
-    (single, A/B, dynamic), control group, the **policies** applied at send time, test send.
-  - **Wait for event**: event, timeout and the explainer of the webhook and the one-time
-    release URL; its paths accepted · rejected · timeout with their targets.
-  - **Engagement split**: the Delivery it evaluates and the interactions, one path each
-    plus Remaining. **Segment split**: an ordered segment list. **Shuffle**: weights and
-    *Set equal*.
-  - **Call external**: the endpoint, labelled webhook or MCP tool. **Control group**: the
-    hold-out share, export and "build a segment from it".
+  - **Entry**: single or multiple contacts, the event (`order_abandoned`,
+    `account_created`, `device_back_in_stock`, `plan_changed`, `payment_failed`), its
+    payload fields (they become `{{payload.…}}` placeholders), *create the contact if
+    missing*, **API code** with a sample request, the re-entry rule. Events are processed
+    within 60 seconds.
+  - **Delivery**: channel (Email, SMS, Push) with its fields — subject, preheader and body;
+    SMS text with a character and segment counter; push title, text and link — in **FR and
+    EN** with a default language; an optional **offer** whose name and URL become
+    placeholders; control-group share; the **policies** applied at send time; test send per
+    language. A contact without an address, token or consent **skips** the step and
+    continues.
+  - **Segment split**: an ordered segment list, evaluated top-down, plus Remaining.
+    **Shuffle**: weights that add up to 100 and *Set equal*. **Engagement split**: the
+    Delivery it evaluates and the interactions (opened, clicked), one path each plus
+    Remaining.
+  - **Wait**: a duration in hours or days. **Control group**: a name and the hold-out
+    share — the contacts stay there and are reported as *held out*. **Exit**: optionally a
+    goal that counts as a conversion.
 
 ### The simulation strip — demo only
 
@@ -1484,34 +1500,36 @@ Both Journeys and Journey Monitor carry a dashed strip badged **⚗ Simulation �
 It is not part of the product. The prototype has no clock and sends nothing; the strip
 moves a simulated clock so you can watch contacts move:
 
-- **Send event** admits a contact through an Event entry (or releases a Wait for event).
-- **Advance 1 day** lets waits expire and scheduled entries admit new matches.
+- **Send event** admits a contact through the entry of every live journey listening to it.
+- **Advance 1 day / 5 days** lets waits expire and delivery outcomes come in.
+- **Reset** returns to day 0 with the sample contacts reloaded.
 - One simulated contact stands for about 6,500 real ones in every number shown.
 
 ## Journey Monitor
 
 Pick a journey. **General** shows:
 
-- **Entered · Active now · Exited · Conversions** as four tiles, and the channel totals.
-- **Anomaly alerts** from the Marketing Agent: steps whose daily volume deviates from the
-  30-day baseline, with a confidence level. *Open step* jumps to it; *Dismiss* hides it.
-- The **versions** table — status, activated by / when, entry, counters — with *View
-  version* and *Step export*.
-- The **participant list at a point in time**: drag the slider to see who was where on an
-  earlier day. *Download CSV* is a mock.
+- **Entered · In journey · Exited** as three tiles, and the channel totals (sent ·
+  skipped · opened · clicked).
+- The **versions** table — number and note, status, activated by / when, entry, counters —
+  with *View version*.
 
-**View version** draws the version read-only with the stats strip and the alert markers,
-lists the steps with their counters, and offers *Open in builder*. Click a step for its
-**export**: entered / exited / was in / entered and exited, the time range, the count and
-the columns. The **time range** (7 / 30 / 90 days / all) scales the numbers.
+**View version** draws the version read-only with the stats strip, lists the steps with
+their counters, and offers *Open in builder*. The **time range** (7 / 30 / 90 days / all)
+scales the numbers.
+
+**Contacts** lists every contact that entered the journey: contact, event, received at,
+version, current step, status (waiting · in step · exited · held out) and the last delivery
+result (the channel and outcome, or *skipped* with the reason). The lookup box narrows the
+list; a row opens the contact's **step history** and, for a test event, the payload it came
+in with.
 
 ## Segments
 
 Segments are built on a datamart and belong to a segment group. **+ New segment**
 opens the workbench: the definition on the left, the query builder and a live
 audience insight on the right. **Search** counts the audience. A segment can be
-an exclusion list for chosen channels. Journeys reference segments in entries, waits
-and splits.
+an exclusion list for chosen channels. Journeys reference segments in Segment splits.
 
 ## Policies
 
@@ -1522,13 +1540,17 @@ each policy; consent and exclusion lists always apply underneath.
 ## Tips for a demo
 
 - Append `?notour` to the URL for a clean start.
-- Open **Winback – unengaged 90d** as an Approver: the live version with its stats strip,
-  then **Copy to new version**, change a step, **Activate** — v4 goes to Closing.
-- Open **Payment failed – dunning**: a Draft whose validation fails on an unconnected path;
-  connect it and Activate.
-- In the Monitor, pick a journey, read the Agent's alerts, switch to **View version**, click
-  a step for its export, then **Advance 5 days** and watch the strip change.
-- Toasts tell you when an action is only pretended (test send, export, audience sync).
+- Open **Device order flow abandonment**: v14 Active with its stats strip, v13 Closing
+  with contacts still finishing. **Copy to new version**, give it a note, change a step,
+  **Submit for approval**; switch to Approver and **Activate** — v14 goes to Closing.
+- Open **Welcome – account created** for the Shuffle → control group and the Engagement
+  split to Push or SMS; **Test ▾ › Send a test event** and find the contact on the
+  monitor's Contacts tab.
+- Open **Plan change – confirmation** on the Drafts tab: a Draft whose validation fails on
+  an unconnected Delivery; connect it and Submit.
+- In the Monitor, pick a journey, read the channel totals (note the skipped column), switch
+  to **View version**, then **Advance 5 days** and watch the strip change.
+- Toasts tell you when an action is only pretended (test send, export).
 <!-- MANUAL:END -->
   </script>
 
@@ -1623,7 +1645,7 @@ function entryDefaults(kind){ const base={kind,includeProject:true,reentry:'afte
 const PHASE2=false;
 const p1=m=>PHASE2||!m.p2;   // "is this item shown in the current phase"
 const PHASES=['Acquire','Onboard','Grow','Retain','Winback'];
-const FOLDERS=['churn_reduction','free-trial','loyalty','console-marketing'];
+const FOLDERS=['relance_abandon','prospect_comm','onboarding','billing'];
 const CONTACT_LISTS=['Customers','Prospects'];
 const EXPIRY_ACTIONS=[['closing','Closing — no new entries, contacts inside finish'],['closed','Closed — stop everything']];
 const jCanAct=()=>ROLE==='approver'||ROLE==='admin';
@@ -1631,82 +1653,76 @@ const V_STATUS_CLS={Draft:'grey',Active:'ok',Closing:'warn',Closed:''};
 const J_STATUS_CLS={Draft:'grey',Live:'ok',Past:''};
 function jBlank(o){ return Object.assign({id:'',name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],priority:50,endDate:'',expiryAction:'closing',contactList:'Customers',overrideUnsub:false,testUsers:[DEMO_USERS.me+' (test MSISDN)'],created:TODAY,updated:TODAY,createdBy:DEMO_USERS.me,versions:[],cur:1},o); }
 /* step builders for the sample data — coordinates are canvas pixels */
-const E=(kind,cfg,x,y,next)=>({id:'e1',type:'entry',x,y,label:(ENTRY_KINDS[kind]||{}).k||'Entry',cfg:Object.assign({kind,includeProject:true,reentry:'after N days',reentryDays:30},cfg),next});
-const D=(id,label,ch,content,x,y,next,extra)=>({id,type:'delivery',x,y,label,cfg:Object.assign({channel:ch,content,variant:'Single content',stopAfter:'1 channel',controlGroup:'off',contentB:'',abSplit:20,dyn:'LANGUAGE',policies:['POL-C1'],sendUnsub:false},extra||{}),next});
+const E=(kind,cfg,x,y,next)=>({id:'e1',type:'entry',x,y,label:(ENTRY_KINDS[kind]||{}).k||'Entry',cfg:Object.assign({kind,includeProject:true,reentry:'after N days',reentryDays:30,payload:'',createContact:false},cfg),next});
+/* a Delivery carries its FR / EN content per channel field; the template is the channel's default design */
+const D=(id,label,ch,lang,x,y,next,extra)=>({id,type:'delivery',x,y,label,cfg:Object.assign({channel:ch,content:'',controlGroup:'off',policies:['POL-C1'],sendUnsub:false,offer:'',lang:Object.assign({default:'fr'},lang)},extra||{}),next});
 const X=(id,label,x,y,goal)=>({id,type:'exit',x,y,label,cfg:{goal:!!goal},next:[]});
 const N=(id,type,label,cfg,x,y,next)=>({id,type,x,y,label,cfg,next});
 const L=(to,label)=>({to,label});
-/* Fizz-flavoured sample journeys (mock, no real person). Contacts ≈ 1.96 M; the 30-row demo datamart drives the
-   simulation and the big numbers are display-scaled in the list and the monitor. */
+/* Fizz-flavoured sample journeys (mock: generic user names, placeholder FR/EN copy). Every journey starts from an
+   event (product decision of 8 Oct 2026). Contacts ≈ 1.96 M; the 30-row demo datamart drives the simulation and
+   the numbers shown are display-scaled. */
 const JOURNEYS = [
-  jBlank({id:'JRN-01', name:'Device order flow abandonment', desc:'A contact leaves the device checkout: route by language and account age, nudge once, exit.', folder:'console-marketing', phase:'Acquire', priority:70, created:'2026-03-02', createdBy:DEMO_USERS.growth, cur:13,
+  jBlank({id:'JRN-01', name:'Device order flow abandonment', desc:'A contact leaves the device checkout: one e-mail, different for a brand-new account, in the contact\'s language.', folder:'relance_abandon', contactList:'Customers', created:'2026-03-02', updated:'2026-10-06', createdBy:DEMO_USERS.growth, updatedBy:DEMO_USERS.me, cur:14,
    versions:(()=>{ const nodes=()=>[
-     E('eventSingle',{event:'order_abandoned',payload:'orderId, plan, language',createContact:true,reentry:'after N days',reentryDays:7},40,200,['s2']),
-     N('s2','splitSeg','Language × account age',{segments:['ML-2511 · FR · new account ≤ 30 days','ML-2512 · EN · new account ≤ 30 days','ML-2501 · Language · FR']},300,200,[L('s3','ML-2511'),L('s4','ML-2512'),L('s5','ML-2501'),L('s6','Remaining')]),
-     D('s3','Email FR · nouveau compte','email','EML-301 · Finish your order (FR)',560,40,['s8']),
-     D('s4','Email EN · new account','email','EML-302 · Finish your order (EN)',560,180,['s8']),
-     D('s5','Email FR','email','EML-303 · Your cart is waiting (FR)',560,320,['s8']),
-     D('s6','Email EN','email','EML-304 · Your cart is waiting (EN)',560,460,['s8']),
-     N('s8','waitDur','Hold 3 days',{n:3,unit:'days'},820,250,['s7']),
-     X('s7','Exit',1080,250)];
-     const vs=[]; for(let v=1;v<=11;v++) vs.push({v,status:'Closed',activatedAt:`2026-0${3+Math.floor((v-1)/4)}-${String(2+((v-1)%4)*7).padStart(2,'0')} 10:00`,activatedBy:v%2?DEMO_USERS.approver:DEMO_USERS.approver2,closedAt:`2026-0${3+Math.floor(v/4)}-${String(2+(v%4)*7).padStart(2,'0')} 10:00`,nodes:nodes()});
-     vs.push({v:12,status:'Closing',activatedAt:'2026-09-01 10:00',activatedBy:DEMO_USERS.approver,closingAt:'2026-09-12 09:40',nodes:nodes()});
-     vs.push({v:13,status:'Active',activatedAt:'2026-09-12 09:40',activatedBy:DEMO_USERS.approver,nodes:nodes()});
+     E('eventBatch',{event:'order_abandoned',createContact:true,reentry:'after N days',reentryDays:7},40,160,['s2']),
+     N('s2','splitSeg','Account created today?',{segments:['ML-2503 · Account created today']},300,160,[L('s3','ML-2503'),L('s4','Remaining')]),
+     D('s3','E-mail · nouveau compte','email',{fr:{subject:'Votre {{payload.deviceName}} vous attend',preheader:'Terminez votre commande en 2 minutes',body:'Bonjour {{FIRST_NAME}}, bienvenue chez Fizz! Votre {{payload.deviceName}} est réservé — finalisez votre commande ici : {{payload.cartUrl}}'},en:{subject:'Your {{payload.deviceName}} is waiting',preheader:'Finish your order in 2 minutes',body:'Hi {{FIRST_NAME}}, welcome to Fizz! Your {{payload.deviceName}} is reserved — finish your order here: {{payload.cartUrl}}'}},560,60,['s5']),
+     D('s4','E-mail · panier abandonné','email',{fr:{subject:'Votre panier vous attend',preheader:'{{payload.deviceName}} — toujours disponible',body:'Bonjour {{FIRST_NAME}}, votre {{payload.deviceName}} est toujours dans votre panier : {{payload.cartUrl}}'},en:{subject:'Your cart is waiting',preheader:'{{payload.deviceName}} — still available',body:'Hi {{FIRST_NAME}}, your {{payload.deviceName}} is still in your cart: {{payload.cartUrl}}'}},560,260,['s5']),
+     X('s5','Exit',820,160)];
+     const vs=[]; const notes=['V1 – première version','V2 – EN copy','V3 – ajout du nom de l\'appareil','V4 – preheader','V5 – batch entry','V6 – délai de ré-entrée 7 j','V7 – politique de fréquence','V8 – copy FR','V9 – nouveau compte: ton','V10 – lien panier','V11 – template hero','V12 – corrections typo'];
+     for(let v=1;v<=12;v++) vs.push({v,status:'Closed',note:notes[v-1],activatedAt:`2026-0${3+Math.floor((v-1)/3)}-${String(2+((v-1)%3)*9).padStart(2,'0')} 10:00`,activatedBy:v%2?DEMO_USERS.approver:DEMO_USERS.approver2,closedAt:`2026-0${3+Math.floor(v/3)}-${String(2+(v%3)*9).padStart(2,'0')} 10:00`,nodes:nodes()});
+     vs.push({v:13,status:'Closing',note:'V13 – FR copy fix',activatedAt:'2026-09-01 10:00',activatedBy:DEMO_USERS.approver,closingAt:'2026-10-06 09:40',nodes:nodes()});
+     vs.push({v:14,status:'Active',note:'V14 – new template',activatedAt:'2026-10-06 09:40',activatedBy:DEMO_USERS.approver,approvedBy:DEMO_USERS.approver,submittedBy:DEMO_USERS.me,nodes:nodes()});
      return vs; })()}),
-  jBlank({id:'JRN-02', name:'Free trial – communication après la fin', desc:'The day after a trial ends: an email in the contact\'s language, a reminder by SMS when it is not opened.', folder:'free-trial', phase:'Onboard', priority:60, created:'2026-06-14', createdBy:DEMO_USERS.me, cur:2,
-   versions:[{v:1,status:'Closed',activatedAt:'2026-06-15 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-08-20 09:00',nodes:[E('dateAttr',{attr:'TRIAL_END_DATE',offset:1,dir:'after',yearly:false},40,120,['s2']),D('s2','Email · après l\'essai','email','EML-311 · Votre essai est terminé (FR/EN)',300,120,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),X('s3','Exit',560,120)]},
-    {v:2,status:'Active',activatedAt:'2026-08-20 09:00',activatedBy:DEMO_USERS.approver2,nodes:[
-     E('dateAttr',{attr:'TRIAL_END_DATE',offset:1,dir:'after',yearly:false},40,160,['s2']),
-     D('s2','Email · après l\'essai','email','EML-311 · Votre essai est terminé (FR/EN)',300,160,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),
-     N('s3','waitDur','Wait 3 days',{n:3,unit:'days'},560,160,['s4']),
-     N('s4','splitEng','Opened?',{delivery:'s2',interactions:['opened']},820,160,[L('s6','opened'),L('s5','Remaining')]),
-     D('s5','SMS rappel','sms','SMS-321 · Rappel essai (FR/EN)',1080,280,['s6'],{variant:'Dynamic content (rule on categorical attribute)'}),
+  jBlank({id:'JRN-02', name:'Device back in stock – Inscription', desc:'A prospect asked to be told when a device is back: one e-mail, sent even to unsubscribed prospects (service message).', folder:'prospect_comm', contactList:'Prospects', overrideUnsub:true, created:'2026-05-14', updated:'2026-09-20', createdBy:DEMO_USERS.me, updatedBy:DEMO_USERS.me, cur:1,
+   versions:[{v:1,status:'Active',note:'V1 – inscription appareil',activatedAt:'2026-05-15 09:00',activatedBy:DEMO_USERS.approver2,nodes:[
+     E('eventSingle',{event:'device_back_in_stock',createContact:true,reentry:'always'},40,120,['s2']),
+     D('s2','E-mail · de retour en stock','email',{fr:{subject:'{{payload.deviceName}} est de retour',preheader:'Vous nous l\'aviez demandé',body:'Bonjour {{FIRST_NAME}}, le {{payload.deviceName}} est de nouveau disponible : {{payload.productUrl}}'},en:{subject:'{{payload.deviceName}} is back in stock',preheader:'You asked us to let you know',body:'Hi {{FIRST_NAME}}, the {{payload.deviceName}} is available again: {{payload.productUrl}}'}},300,120,['s3'],{sendUnsub:true,policies:[]}),
+     X('s3','Exit',560,120)]}]}),
+  jBlank({id:'JRN-03', name:'Welcome – account created', desc:'A new account: a welcome e-mail with an offer for 90 %, a control group for 10 %, then a push or an SMS depending on the open.', folder:'onboarding', contactList:'Customers', created:'2026-04-08', updated:'2026-09-30', createdBy:DEMO_USERS.crm, updatedBy:DEMO_USERS.crm, cur:2,
+   versions:[{v:1,status:'Closed',note:'V1 – bienvenue simple',activatedAt:'2026-04-10 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-09-05 09:00',nodes:[
+     E('eventSingle',{event:'account_created',reentry:'never'},40,120,['s2']),
+     D('s2','E-mail · bienvenue','email',{fr:{subject:'Bienvenue chez Fizz, {{FIRST_NAME}}',preheader:'Votre forfait {{payload.plan}} est prêt',body:'Bonjour {{FIRST_NAME}}, votre compte est créé. Voici comment profiter de votre forfait {{payload.plan}}.'},en:{subject:'Welcome to Fizz, {{FIRST_NAME}}',preheader:'Your {{payload.plan}} plan is ready',body:'Hi {{FIRST_NAME}}, your account is set up. Here is how to get the most out of your {{payload.plan}} plan.'}},300,120,['s3']),
+     X('s3','Exit',560,120)]},
+    {v:2,status:'Active',note:'V2 – add control group',activatedAt:'2026-09-05 09:00',activatedBy:DEMO_USERS.approver,approvedBy:DEMO_USERS.approver,submittedBy:DEMO_USERS.crm,nodes:[
+     E('eventSingle',{event:'account_created',reentry:'never'},40,200,['s2']),
+     N('s2','splitShuffle','90 / 10',{paths:[{label:'A',w:90},{label:'B',w:10}]},300,200,[L('s4','A'),L('s3','B')]),
+     N('s3','ctrlGroup','Welcome – CG',{name:'Welcome – CG',share:100},560,360,[]),
+     D('s4','E-mail · bienvenue + offre','email',{fr:{subject:'Bienvenue chez Fizz, {{FIRST_NAME}} — {{offer.name}}',preheader:'Votre forfait {{payload.plan}} est prêt',body:'Bonjour {{FIRST_NAME}}, votre compte est créé. Pour commencer : {{offer.name}} → {{offer.url}}'},en:{subject:'Welcome to Fizz, {{FIRST_NAME}} — {{offer.name}}',preheader:'Your {{payload.plan}} plan is ready',body:'Hi {{FIRST_NAME}}, your account is set up. To get started: {{offer.name}} → {{offer.url}}'}},560,200,['s5'],{offer:'OFR-10'}),
+     N('s5','waitDur','Wait 3 days',{n:3,unit:'days'},820,200,['s6']),
+     N('s6','splitEng','Opened the welcome?',{delivery:'s4',interactions:['opened']},1080,200,[L('s7','opened'),L('s8','Remaining')]),
+     D('s7','Push · découvrez l\'app','push',{fr:{title:'Votre app Fizz',text:'Gérez votre forfait et vos Go en un clic.',link:'fizz://app/home'},en:{title:'Your Fizz app',text:'Manage your plan and your GB in one tap.',link:'fizz://app/home'}},1340,80,['s9'],{policies:['POL-C1','POL-C2']}),
+     D('s8','SMS · rappel bienvenue','sms',{fr:{text:'Fizz: votre compte est prêt. Découvrez votre forfait: fizz.ca/bienvenue'},en:{text:'Fizz: your account is ready. Explore your plan: fizz.ca/welcome'}},1340,320,['s9'],{policies:['POL-C1','POL-C2']}),
+     X('s9','Exit',1600,200)]}]}),
+  jBlank({id:'JRN-04', name:'Payment failed – reminder', desc:'A declined payment: an SMS at once, two days later an e-mail for those who did not click.', folder:'billing', contactList:'Customers', created:'2026-06-02', updated:'2026-09-12', createdBy:DEMO_USERS.me, updatedBy:DEMO_USERS.me, cur:1,
+   versions:[{v:1,status:'Active',note:'V1 – rappel paiement',activatedAt:'2026-06-03 11:15',activatedBy:DEMO_USERS.approver,approvedBy:DEMO_USERS.approver,submittedBy:DEMO_USERS.me,nodes:[
+     E('eventSingle',{event:'payment_failed',reentry:'always'},40,160,['s2']),
+     D('s2','SMS · paiement refusé','sms',{fr:{text:'Fizz: votre paiement de {{payload.amount}} $ a été refusé. Mettez votre carte à jour: {{payload.payUrl}}'},en:{text:'Fizz: your {{payload.amount}} $ payment was declined. Update your card: {{payload.payUrl}}'}},300,160,['s3'],{policies:[]}),
+     N('s3','waitDur','Wait 2 days',{n:2,unit:'days'},560,160,['s4']),
+     N('s4','splitEng','Clicked the link?',{delivery:'s2',interactions:['clicked']},820,160,[L('s6','clicked'),L('s5','Remaining')]),
+     D('s5','E-mail · rappel paiement','email',{fr:{subject:'Votre paiement est en attente',preheader:'Facture {{payload.invoiceId}}',body:'Bonjour {{FIRST_NAME}}, le paiement de la facture {{payload.invoiceId}} ({{payload.amount}} $) n\'a pas abouti. Mettez votre carte à jour : {{payload.payUrl}}'},en:{subject:'Your payment is pending',preheader:'Invoice {{payload.invoiceId}}',body:'Hi {{FIRST_NAME}}, the payment for invoice {{payload.invoiceId}} ({{payload.amount}} $) did not go through. Update your card: {{payload.payUrl}}'}},1080,300,['s6'],{policies:[]}),
      X('s6','Exit',1340,160)]}]}),
-  jBlank({id:'JRN-03', name:'Birthday reward', desc:'A bonus on the contact\'s birthday, every year.', folder:'loyalty', phase:'Grow', priority:40, created:'2026-01-20', createdBy:DEMO_USERS.crm, cur:1,
-   versions:[{v:1,status:'Active',activatedAt:'2026-01-22 11:15',activatedBy:DEMO_USERS.approver,nodes:[
-     E('dateAttr',{attr:'BIRTHDAY',offset:0,dir:'on',yearly:true,reentry:'after N days',reentryDays:300},40,120,['s2']),
-     N('s2','setAttr','Flag the reward',{attr:'LAST_NUDGE_AT',mode:'timestamp',value:''},300,120,['s3']),
-     D('s3','Email · bonne fête','email','EML-331 · Joyeux anniversaire · 2 GB (FR/EN)',560,120,['s4'],{variant:'Dynamic content (rule on categorical attribute)'}),
-     X('s4','Exit',820,120)]}]}),
-  jBlank({id:'JRN-04', name:'Winback – unengaged 90d', desc:'No email engagement for 90 days: a winback email, then an SMS for those who did not open or click.', folder:'churn_reduction', phase:'Winback', priority:85, created:'2026-04-08', createdBy:DEMO_USERS.me, cur:4,
-   versions:[{v:3,status:'Closed',activatedAt:'2026-07-01 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-09-05 09:00',nodes:[E('unengaged',{channel:'email',days:90},40,160,['s2']),D('s2','Email winback','email','EML-341 · We miss you (FR/EN)',300,160,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),X('s3','Exit',560,160)]},
-    {v:4,status:'Active',activatedAt:'2026-09-05 09:00',activatedBy:DEMO_USERS.approver,nodes:[
-     E('unengaged',{channel:'email',days:90,reentry:'after N days',reentryDays:180},40,200,['s2']),
-     D('s2','Email winback','email','EML-341 · We miss you (FR/EN)',300,200,['s3'],{variant:'A/B test (2 variants, winner by open rate)',contentB:'EML-342 · 10 GB on us (FR/EN)',abSplit:30,controlGroup:'5% per channel'}),
-     N('s3','waitDur','Wait 5 days',{n:5,unit:'days'},560,200,['s4']),
-     N('s4','splitEng','Engaged?',{delivery:'s2',interactions:['clicked','opened']},820,200,[L('s7','clicked'),L('s6','opened'),L('s5','Remaining')]),
-     D('s5','SMS fallback','sms','SMS-351 · Winback SMS (FR/EN)',1080,340,['s6'],{variant:'Dynamic content (rule on categorical attribute)',policies:['POL-C1','POL-C3']}),
-     X('s6','Exit',1340,200),
-     X('s7','Won back',1080,60,true)]}]}),
-  jBlank({id:'JRN-05', name:'Loyalty level up', desc:'A contact reaches a new loyalty level: store the tier, congratulate by push.', folder:'loyalty', phase:'Grow', priority:30, created:'2026-05-11', createdBy:DEMO_USERS.crm, cur:1,
-   versions:[{v:1,status:'Active',activatedAt:'2026-05-12 15:30',activatedBy:DEMO_USERS.approver2,nodes:[
-     E('eventSingle',{event:'level_up',payload:'from, to, perk',createContact:false,reentry:'always'},40,120,['s2']),
-     N('s2','setAttr','Store the tier',{attr:'LOYALTY_TIER',mode:'static',value:'{{payload.to}}'},300,120,['s3']),
-     D('s3','Push · niveau supérieur','push','PSH-361 · Level up! (FR/EN)',560,120,['s4'],{variant:'Dynamic content (rule on categorical attribute)',policies:[]}),
-     X('s4','Exit',820,120)]}]}),
-  jBlank({id:'JRN-06', name:'Payment failed – dunning', desc:'Draft: a card is declined — ask for a new one, wait for the payment, remind by SMS.', folder:'churn_reduction', phase:'Retain', priority:95, created:'2026-09-10', createdBy:DEMO_USERS.me, cur:1,
-   versions:[{v:1,status:'Draft',createdAt:'2026-09-10 16:20',nodes:[
-     E('eventSingle',{event:'payment_failed',payload:'invoiceId, amount, reason',createContact:false,reentry:'always'},40,160,['s2']),
-     D('s2','Email · paiement refusé','email','EML-371 · Payment declined (FR/EN)',300,160,['s3'],{variant:'Dynamic content (rule on categorical attribute)',policies:[]}),
-     N('s3','waitEvent','Paid?',{event:'payment_received',timeoutN:3,timeoutUnit:'days'},560,160,[L('s6','accepted'),L('s4','timeout')]),
-     D('s4','SMS rappel paiement','sms','SMS-381 · Payment reminder (FR/EN)',820,300,['s5'],{policies:[]}),
-     X('s5','Exit',1080,300),
-     X('s6','Paid',820,40,true)]}]}),
-  jBlank({id:'JRN-07', name:'Summer referral push', desc:'Past: a monthly referral nudge to active members over the summer.', folder:'console-marketing', phase:'Grow', priority:20, endDate:'2026-08-31', created:'2026-05-28', createdBy:DEMO_USERS.growth, cur:1,
-   versions:[{v:1,status:'Closed',activatedAt:'2026-06-01 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-08-31 23:59',nodes:[
-     E('segment',{segment:'ML-2520 · Active members · 6+ months',freq:'monthly',slot:'09:00',reentry:'after N days',reentryDays:30},40,120,['s2']),
-     D('s2','Email · parrainage','email','EML-391 · Refer a friend (FR/EN)',300,120,['s3'],{variant:'Dynamic content (rule on categorical attribute)'}),
+  jBlank({id:'JRN-05', name:'Plan change – confirmation', desc:'Draft: confirm a plan change by e-mail, with the new plan and the effective date.', folder:'billing', contactList:'Customers', created:'2026-10-05', updated:'2026-10-07', createdBy:DEMO_USERS.me, updatedBy:DEMO_USERS.me, cur:1,
+   versions:[{v:1,status:'Draft',note:'V1 – première version',createdAt:'2026-10-05 16:20',createdBy:DEMO_USERS.me,nodes:[
+     E('eventSingle',{event:'plan_changed',reentry:'always'},40,120,['s2']),
+     D('s2','E-mail · changement de forfait','email',{fr:{subject:'Votre forfait change le {{payload.effectiveOn}}',preheader:'{{payload.from}} → {{payload.to}}',body:'Bonjour {{FIRST_NAME}}, votre forfait passe de {{payload.from}} à {{payload.to}} le {{payload.effectiveOn}}.'},en:{}},300,120,[],{policies:[]}),
+     X('s3','Exit',560,120)]}]}),
+  jBlank({id:'JRN-06', name:'SIM activation – bienvenue (2025)', desc:'Past: the previous welcome flow, closed when "Welcome – account created" replaced it.', folder:'onboarding', contactList:'Customers', created:'2025-11-10', updated:'2026-04-10', createdBy:DEMO_USERS.growth, updatedBy:DEMO_USERS.crm, cur:1,
+   versions:[{v:1,status:'Closed',note:'V1 – ancien parcours',activatedAt:'2025-11-12 09:00',activatedBy:DEMO_USERS.approver,closedAt:'2026-04-10 09:00',nodes:[
+     E('eventSingle',{event:'account_created',reentry:'never'},40,120,['s2']),
+     D('s2','E-mail · SIM activée','email',{fr:{subject:'Votre SIM est activée',preheader:'',body:'Bonjour {{FIRST_NAME}}, votre carte SIM est active.'},en:{subject:'Your SIM is active',preheader:'',body:'Hi {{FIRST_NAME}}, your SIM card is active.'}},300,120,['s3']),
      X('s3','Exit',560,120)]}]}),
 ];
 /* communication and invitation policies — read-only list, picked on the Delivery step */
 const POLICIES=[
   {id:'POL-C1',kind:'Communication',name:'Marketing cap',rule:'max 2 marketing messages / 7 days',level:'Contact',window:'Rolling',applies:'All marketing journeys'},
   {id:'POL-C2',kind:'Communication',name:'Quiet hours',rule:'no SMS or push 21:00–09:00 local',level:'Contact',window:'Daily',applies:'SMS, push'},
-  {id:'POL-C3',kind:'Communication',name:'Winback frequency',rule:'max 1 winback message / 30 days',level:'Contact',window:'Rolling',applies:'Folder churn_reduction'},
+  {id:'POL-C3',kind:'Communication',name:'Billing frequency',rule:'max 1 billing reminder / 7 days',level:'Contact',window:'Rolling',applies:'Project billing'},
   {id:'POL-C4',kind:'Communication',name:'Email daily cap',rule:'max 1 marketing email / day',level:'Contact',window:'Daily',applies:'Email'},
-  {id:'POL-I1',kind:'Invitation',name:'Winback quiet period',rule:'45 days out of winback journeys after an exit',level:'Contact',window:'Rolling',applies:'Folder churn_reduction'},
-  {id:'POL-I2',kind:'Invitation',name:'Trial follow-up once',rule:'365 days after the trial follow-up',level:'Account',window:'Fixed',applies:'JRN-02'},
-  {id:'POL-I3',kind:'Invitation',name:'Birthday once a year',rule:'300 days after the birthday reward',level:'Contact',window:'Rolling',applies:'JRN-03'},
+  {id:'POL-I1',kind:'Invitation',name:'Abandonment quiet period',rule:'7 days out of relance_abandon journeys after an exit',level:'Contact',window:'Rolling',applies:'Project relance_abandon'},
+  {id:'POL-I2',kind:'Invitation',name:'Welcome once',rule:'never re-enter the welcome journey',level:'Account',window:'Fixed',applies:'JRN-03'},
+  {id:'POL-I3',kind:'Invitation',name:'Billing reminders',rule:'max 1 reminder flow per invoice',level:'Contact',window:'Per invoice',applies:'JRN-04'},
 ];
 /* version helpers */
 const jVer=(j,v)=>j.versions.find(x=>x.v===v);
@@ -1746,6 +1762,7 @@ const MLS=[
   {id:'ML-2502',name:'Language · EN',desc:'Contacts whose preferred language is English',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'en'}]},
   {id:'ML-2511',name:'FR · new account ≤ 30 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'fr'},{col:'TENURE_DAYS',op:'lower and equal',val:'30'}]},
   {id:'ML-2512',name:'EN · new account ≤ 30 days',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-02-10',by:DEMO_USERS.growth,filters:[{col:'LANGUAGE',op:'equals',val:'en'},{col:'TENURE_DAYS',op:'lower and equal',val:'30'}]},
+  {id:'ML-2503',name:'Account created today',desc:'Accounts opened in the last 24 hours — brand-new customers get the welcome tone',group:'Onboarding',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-03-01',by:DEMO_USERS.growth,filters:[{col:'TENURE_DAYS',op:'lower and equal',val:'1'}]},
   {id:'ML-2520',name:'Active members · 6+ months',group:'Upsell',dm:'Main',method:'Dynamic query',logic:'AND',excl:false,status:'Active',created:'2026-05-20',by:DEMO_USERS.growth,filters:[{col:'TENURE_DAYS',op:'greater and equal',val:'180'}]},
 ];
 const mlLabel=m=>`${m.id} · ${m.name}`;
@@ -1842,9 +1859,6 @@ const CONTENTS = {order:['— no content (order only)']};
 ['sms','email','push','wsc','chatbot','tm'].forEach(ch=>{ CONTENTS[ch]=tplFor(ch).map(t=>`${t.id} · ${t.name}`); });
 CONTENTS.whatsapp=tplFor('chatbot').map(t=>`${t.id} · ${t.name}`);
 CONTENTS.sms=CONTENTS.sms.concat(tplFor('isms').map(t=>`${t.id} · ${t.name}`));
-/* sample journeys name their copy in the content field; give each Delivery the channel's default template and keep the copy as text */
-const SAMPLE_COPY={'EML-301':'Votre commande vous attend — finalisez-la en 2 minutes et recevez votre carte SIM gratuitement.','EML-302':'Your order is waiting — finish it in 2 minutes and get your SIM card free.','EML-303':'Votre panier vous attend. Besoin d\'aide pour choisir votre forfait ?','EML-304':'Your cart is waiting. Need help picking a plan?','EML-311':'Votre essai est terminé. Gardez la connexion : votre forfait continue à {{PLAN}} dès aujourd\'hui. / Your trial has ended — keep the connection: your plan continues as {{PLAN}} from today.','SMS-321':'Fizz: votre essai est terminé. Continuez sans interruption: fizz.ca/continuer / Your trial ended. Keep going: fizz.ca/continue','EML-331':'Joyeux anniversaire {{FIRST_NAME}}! 2 Go de bonus vous attendent dans votre compte. / Happy birthday {{FIRST_NAME}}! 2 GB of bonus data is waiting in your account.','EML-341':'Ça fait longtemps, {{FIRST_NAME}}. Voici ce qui a changé chez Fizz — et une offre pour revenir. / It\'s been a while, {{FIRST_NAME}}. Here is what changed at Fizz — and an offer to come back.','EML-342':'10 Go offerts pour votre retour, {{FIRST_NAME}}. / 10 GB on us for coming back, {{FIRST_NAME}}.','SMS-351':'Fizz: 10 Go offerts si vous revenez ce mois-ci. fizz.ca/retour / 10 GB on us if you come back this month. fizz.ca/back','PSH-361':'Niveau {{LOYALTY_TIER}} atteint! Votre récompense est prête. / Level {{LOYALTY_TIER}} reached! Your perk is ready.','EML-371':'Votre paiement a été refusé. Mettez à jour votre carte pour garder votre forfait actif. / Your payment was declined. Update your card to keep your plan active.','SMS-381':'Fizz: paiement en attente — mettez à jour votre carte: fizz.ca/paiement / Payment pending — update your card: fizz.ca/payment','EML-391':'Parrainez un ami: 25 $ pour vous, 25 $ pour lui. / Refer a friend: $25 for you, $25 for them.'};
-JOURNEYS.forEach(j=>j.versions.forEach(V=>V.nodes.forEach(n=>{ if(n.type!=='delivery') return; const fix=k=>{ const v=String(n.cfg[k]||''); const id=v.split(' ·')[0]; if(SAMPLE_COPY[id]){ if(k==='content') n.cfg.text=SAMPLE_COPY[id]; else n.cfg.textB=SAMPLE_COPY[id]; const t=tplOf(tplDefault(n.cfg.channel)); n.cfg[k]=t?`${t.id} · ${t.name}`:v; } }; fix('content'); if(n.cfg.contentB) fix('contentB'); })));
 const PARAMS=['FIRST_NAME','MSISDN','PLAN','PACKAGE_EXPIRY_DATE','BALANCE_CAD','DATA_USAGE_GB','TENURE_DAYS','REGION'];
 function resolveParams(t,cust,mark){ const r=cust?cust.row:null; return String(t||'').replace(/\{\{(\w+)\}\}/g,(m,k)=>{ const v=r&&r[k]!==undefined?r[k]:(k==='AGENT'?'Olena':null); if(v===null) return mark?`<span class="param">{{${k}}}</span>`:m; const out=k==='PACKAGE_EXPIRY_DATE'||k.endsWith('_DATE')?String(v).split('-').reverse().join('.'):v; return mark?`<b class="rv">${esc(out)}</b>`:out; }); }
 function pickVariant(item,cust){ const vs=item.variants||{}; if(item.dyn==='LANGUAGE'&&cust&&vs[cust.row.LANGUAGE]) return cust.row.LANGUAGE; return Object.keys(vs)[0]||'en'; }
@@ -2068,7 +2082,7 @@ const custByCid=cid=>CUSTOMERS.find(c=>c.cid===String(cid));
 
 /* ---------- STATE ---------- */
 let quietInit=false;
-let curJ = 'JRN-07', selNode = null, day = 0, ptimeFollow = true;
+let curJ = 'JRN-01', selNode = null, day = 0, ptimeFollow = true;
 const sim = {}; const log = [];
 const rnd = Math.random;
 /* deterministic "coin" per customer + step, so a split sends the same contact the same way on every render */
@@ -2101,7 +2115,7 @@ function initSim(){
     const parts={};
     /* Active and Closing versions start with their entry pool loaded (a Closing one has fewer, still inside) */
     const live=j.status==='Active'||j.status==='Closing';
-    const pool = !live ? [] : entryIsEvent(j) ? (j.status==='Closing'?CUSTOMERS.filter(c=>!excludedCids().has(c.cid)&&hashOf(c.id+j.id)<0.3):[]) : entryPool(j);
+    const pool = (!live||entryIsEvent(j)) ? [] : entryPool(j);
     pool.forEach((c,i)=>{ if(j.status==='Closing'&&!entryIsEvent(j)&&i%3) return; parts[c.id]={pos:[j.nodes[0].id],status:'active',since:0,visited:new Set([j.nodes[0].id]),opened:null,eng:{},timers:{},attrs:{}}; });
     sim[j.id]={parts,history:[snapshot(parts)]};
   });
@@ -2160,8 +2174,10 @@ function tick(){
   });
   autoClose(); render();
 }
+/* demo seed: a Closing version still has contacts inside, received through the event before the switch; they finish over the next days */
+function seedClosing(){ allCtx().filter(C=>C.status==='Closing').forEach(C=>{ const S=simOf(C); CUSTOMERS.filter(c=>!excludedCids().has(c.cid)&&hashOf(c.id+C.id)<0.3).forEach(c=>{ if(admit(C,S,c.id,C.nodes[0].cfg.event||'event')==='ok') { S.parts[c.id].since=Math.max(0,day-1); } }); S.history[S.history.length-1]=snapshot(S.parts); }); }
 /* a Closing version with nobody left inside becomes Closed on its own */
-function autoClose(){ allCtx().forEach(C=>{ if(C.status!=='Closing') return; const S=simOf(C); if(Object.values(S.parts).some(p=>p.status==='active')) return; C.V.status='Closed'; C.V.closedAt=stamp(); addLog('',`${C.id}  closed — last contact left the version`,{j:C.id,node:C.nodes[0].id,kind:'system'}); if(!quietInit) toast(`Closed · ${C.jid} v${C.v}`,'The Closing version emptied and closed itself.'); }); }
+function autoClose(){ if(quietInit) return; /* the boot seeds Closing versions after its warm-up ticks */ allCtx().forEach(C=>{ if(C.status!=='Closing') return; const S=simOf(C); if(Object.values(S.parts).some(p=>p.status==='active')) return; C.V.status='Closed'; C.V.closedAt=stamp(); addLog('',`${C.id}  closed — last contact left the version`,{j:C.id,node:C.nodes[0].id,kind:'system'}); if(!quietInit) toast(`Closed · ${C.jid} v${C.v}`,'The Closing version emptied and closed itself.'); }); }
 const stamp=()=>{ const d=new Date(); return `${TODAY} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 /* a wait's length in simulated days (minutes and hours resolve on the next day) */
 const waitDays=(n,unit)=>unit==='days'?Math.max(1,+n||1):1;
@@ -2707,7 +2723,7 @@ function applyRole(r){ ROLE=r; document.getElementById('role-lbl').textContent=R
   document.querySelectorAll('.nav .grp[data-grp]').forEach(g=>{ g.hidden=![...document.querySelectorAll(`.nav button[data-grp="${g.dataset.grp}"]`)].some(b=>!b.hidden); });
   const cur=document.querySelector(`.nav button[data-view="${curView}"]`);
   if(!cur||cur.hidden){ const first=[...document.querySelectorAll('.nav button[data-view]')].find(b=>!b.hidden); if(first) showView(first.dataset.view); else showView('monitor'); } else render();
-  document.getElementById('nav-foot').textContent=r==='admin'?'Admin: everything a marketer and an approver can do, plus the lifecycle phase list and journey settings for every folder.':r==='approver'?'Approver: reviews what marketers build, activates and stops journey versions.':'Marketer: builds journeys and segments; an approver activates them.'; }
+  document.getElementById('nav-foot').textContent=r==='admin'?'Admin: everything a marketer and an approver can do, plus the projects and the journey settings of every project.':r==='approver'?'Approver: reviews what marketers build, activates and stops journey versions.':'Marketer: builds journeys and segments and submits a version for approval; an approver activates it.'; }
 document.getElementById('role-sel').onchange=e=>{ applyRole(e.target.value); };
 /* main menu collapse: icons stay, labels move to tooltips */
 document.querySelectorAll('.nav button .nl').forEach(l=>l.parentElement.title=l.textContent.trim());
@@ -2742,7 +2758,7 @@ window.addEventListener('resize',()=>{ if(document.getElementById('view-journeys
 msel.onchange=()=>{ monV=null; monSel=null; conOpen=null; conQ=''; monTab='general'; renderMonitor(); };
 document.getElementById('btn-tick').onclick=tick;
 document.getElementById('btn-tick5').onclick=()=>{ for(let i=0;i<5;i++) tick(); };
-document.getElementById('btn-reset').onclick=()=>{ initSim(); render(); };
+document.getElementById('btn-reset').onclick=()=>{ initSim(); seedClosing(); render(); };
 document.getElementById('btn-validate').onclick=()=>{ const j=curCtx(); validOpen=!validOpen; renderValidation(j); const r=jValidate(j), miss=r.items.filter(i=>!i.ok); if(validOpen) toast(miss.length?'Validation':'Validation passed',miss.length?`${miss.length} check(s) to fix — listed above the canvas.`:`${r.total} checks green — v${j.v} can be activated.`,miss.length?'warn':''); };
 document.getElementById('btn-del').onclick=()=>{ if(!selNode){ toast('Delete','Select a step first (click its header), then delete.','warn'); return; } deleteNode(selNode); };
 window.addEventListener('keydown',e=>{ if((e.key==='Delete'||e.key==='Backspace') && selNode && jMode==='canvas' && !e.target.closest('input,select,textarea') && document.getElementById('view-journeys').classList.contains('active')){ e.preventDefault(); deleteNode(selNode); } });
@@ -2787,7 +2803,7 @@ function renderVersionBar(C,active,conv){
     <span class="vb-sep"></span>
     <label for="vsel" style="color:var(--ink-2)">Version</label><select id="vsel" class="btn sm outline" style="background:#fff">${vopt}</select>
     <span class="pill ${vPending(V)?'warn':V_STATUS_CLS[V.status]}" data-tour="v-status">${vPending(V)?'Pending approval':V.status}</span><input class="vb-note" id="vb-note" value="${esc(V.note||'')}" placeholder="V${V.v} – version note" title="Version note — what changes in this version" ${V.status==='Closed'?'disabled':''} aria-label="Version note"><span class="vb-who">${who}</span>
-    ${live?`<span class="pill acc" title="one simulated contact ≈ ${DEMO_K.toLocaleString()} real contacts">${fmtK(active*DEMO_K)} inside · ${fmtK(conv*DEMO_K)} converted</span>`:''}
+    ${live?`<span class="pill acc" title="one simulated contact ≈ ${DEMO_K.toLocaleString()} real contacts">${fmtK(active*DEMO_K)} in journey</span>`:''}
     <div class="grow"></div>
     ${V.status==='Draft'&&!vPending(V)&&!jCanAct()?`<button class="btn sm primary" id="btn-submit">Submit for approval</button>`:''}
     ${V.status==='Draft'&&vPending(V)&&!jCanAct()?`<button class="btn sm outline" id="btn-withdraw">Withdraw</button>`:''}
@@ -2868,7 +2884,7 @@ function jValidate(j){ if(j.versions) j=mainCtx(j); const ids=new Set(j.nodes.ma
   const noWait=j.nodes.filter(n=>(n.type==='waitDur'&&!(+n.cfg.n>0))||(n.type==='waitDate'&&(n.cfg.mode==='weekday'?!(n.cfg.weekdays||[]).length:n.cfg.mode==='dom'?!(+n.cfg.dom>0):!n.cfg.date))||((n.type==='waitEvent'||n.type==='waitSeg')&&!(+n.cfg.timeoutN>0)));
   const noSeg=j.nodes.filter(n=>(n.type==='splitSeg'&&!(n.cfg.segments||[]).length)||(n.type==='waitSeg'&&!n.cfg.segment));
   const unbound=j.nodes.filter(n=>n.type==='splitEng'&&(!n.cfg.delivery||!j.nodes.some(d=>d.id===n.cfg.delivery&&d.type==='delivery')));
-  const dangling=j.nodes.filter(n=>n.type!=='exit'&&!n.label.startsWith('[off]')&&(pathsOf(n)?pathsOf(n).some(l=>!n.next.some(x=>typeof x!=='string'&&x.label===l)):n.next.length===0));
+  const dangling=j.nodes.filter(n=>n.type!=='exit'&&n.type!=='ctrlGroup'&&!n.label.startsWith('[off]')&&(pathsOf(n)?pathsOf(n).some(l=>!n.next.some(x=>typeof x!=='string'&&x.label===l)):n.next.length===0));
   const noContent=j.nodes.filter(n=>n.type==='delivery'&&!dText(n).trim());
   const badShuffle=j.nodes.filter(n=>n.type==='splitShuffle'&&(n.cfg.paths||[]).reduce((t,p)=>t+(+p.w||0),0)!==100);
   const items=[
@@ -2923,7 +2939,7 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
     <table class="tbl" id="jl-table"><thead><tr><th style="width:28px"><input type="checkbox" id="jl-all" aria-label="Select all on this page" ${page.length&&page.every(j=>jSel.has(j.id))?'checked':''}></th><th>Journey</th><th>Project</th><th>Event</th><th>Channels</th><th>Active version</th><th class="num" title="Contacts admitted in the last 30 days">Entered (30d)</th><th>Last modified</th><th>Modified by</th><th>Actions</th></tr></thead>
     <tbody>${page.map(j=>{ const t=jTrigger(j), s=jStats(j), st=jStatus(j), A=jActive(j), cl=j.versions.filter(v=>v.status==='Closing'), D=j.versions.filter(v=>v.status==='Draft');
       return `<tr class="row" data-jid="${j.id}"><td><input type="checkbox" data-jsel="${j.id}" ${jSel.has(j.id)?'checked':''} aria-label="Select ${esc(j.name)}"></td>
-        <td><span class="lnk">${esc(j.name)}</span>${j.overrideUnsub?' <span class="pill warn" title="Override unsubscribe is on">override unsubscribe</span>':''}<br><span style="color:var(--ink-3);font-size:11px"><span class="mono">${j.id}</span> · ${esc(j.contactList||'Customers')}${j.desc?' · '+esc(j.desc):''}</span></td>
+        <td><span class="lnk">${esc(j.name)}</span>${j.overrideUnsub?' <span class="pill warn" title="Override unsubscribe is on">override unsubscribe</span>':''}<br><span style="color:var(--ink-3);font-size:11px"><span class="mono">${j.id}</span> · ${esc(j.contactList||'Customers')}${j.desc?' · '+esc(j.desc.length>70?j.desc.slice(0,69)+'…':j.desc):''}</span></td>
         <td><span class="chip">${esc(j.folder)}</span></td><td>${jEvent(j)?`<span class="mono">${esc(jEvent(j))}</span><br><span style="color:var(--ink-3);font-size:11px">${esc(t.k)}</span>`:esc(t.k)}</td>
         <td>${jChannels(j).map(c=>`<span class="chip">${esc(chName(c))}</span>`).join(' ')||'<span style="color:var(--ink-3)">—</span>'}</td>
         <td>${A?`<b>v${A.v}</b>${A.note?`<br><span style="color:var(--ink-2);font-size:11px">${esc(A.note)}</span>`:''}`:'<span style="color:var(--ink-3)">—</span>'}${cl.length?` <span class="pill warn" title="Closing: no new entries, contacts finish">v${cl.map(v=>v.v).join(', v')} closing</span>`:''}${D.length?` <span class="pill ${D.some(vPending)?'warn':'grey'}">v${D.map(v=>v.v).join(', v')} ${D.some(vPending)?'pending approval':'draft'}</span>`:''}</td>
@@ -3205,7 +3221,7 @@ function renderSegmentation(){ renderSegList(); if(curView==='segmentation') set
 
 
 buildPalette(); initSim(); selNode=null;
-quietInit=true; for(let i=0;i<3;i++) tick(); sendEvent('order_abandoned',CUSTOMERS[20].id); sendEvent('payment_failed',CUSTOMERS[4].id); quietInit=false;
+quietInit=true; for(let i=0;i<3;i++) tick(); seedClosing(); [['order_abandoned',20],['order_abandoned',3],['account_created',4],['account_created',9],['account_created',15],['payment_failed',7],['payment_failed',12],['device_back_in_stock',11]].forEach(([ev,i])=>sendEvent(ev,CUSTOMERS[i].id)); quietInit=false;
 /* ---- user manual ----------------------------------------------------------
    The manual is embedded as markdown (#man-src) and rendered here, so a
    downloaded index.html carries it with no server and no network. The renderer

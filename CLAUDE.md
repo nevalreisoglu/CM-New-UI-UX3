@@ -15,10 +15,14 @@ Related reading, load when relevant:
 
 A **click-through prototype** of Etiya's **Journey Studio** — a single self-contained
 `index.html` (HTML + CSS + vanilla JS). It is the journey-only descendant of the CM
-"new UI/UX" prototype: it covers every journey capability of Symplify (the tool Fizz
-uses today) and keeps the few CM capabilities Symplify lacks (policies, Digital Twin and
-Agent entries, Marketing Agent alerts). Audience: a product demo to **Fizz** (Canadian
-telco, French/English, email-heavy, ~2 M contacts).
+"new UI/UX" prototype. **Phase 1** (the current brief, v3 of 8 Oct 2026) covers
+**event-triggered journeys** end to end — event entries, Delivery at CM parity, splits,
+waits, control groups, versions with an approval step, a monitor with a Contacts tab —
+plus the CM capabilities Symplify lacks (policies). Everything from the earlier Journey
+Studio round that is not in Phase 1 stays in the file behind **one `PHASE2` flag**
+(default `false`) and must not appear in the palette, the menus or the sample data while
+it is off. Audience: a product demo to **Fizz** (Canadian telco, French/English,
+email-heavy, ~2 M contacts).
 
 Owner: Neval Reisoğlu (Senior PM). The code is a reference for the development team,
 not the product itself.
@@ -46,50 +50,71 @@ not the product itself.
 - **Views**: `journeys`, `monitor`, `segmentation`, `policies` — switched by `data-view`
   on the left nav; each has a `render<View>()` called from `render()`. **Roles**
   (`marketer`, `approver`, `admin`) are applied by `applyRole()`; all roles see all four
-  pages, the role decides what a page lets you do (`jCanAct()` — activate / stop).
+  pages, the role decides what a page lets you do (`jCanAct()` — activate / stop; a
+  marketer submits). **`PHASE2`** (next to `PHASES`) gates every Phase 2 item;
+  `p1(m)` filters `ENTRY_KINDS` / `NODE_META` entries marked `p2:true`.
 - **Journey model** (`JOURNEYS`, `jBlank`): a journey is a container — name, description,
-  `folder` (`FOLDERS`), lifecycle `phase` (`PHASES`), priority, end date + `expiryAction`,
-  `ignoreUnsub`, `testUsers`. Its steps live in **versions** (`j.versions[]`, each
-  `{v, status, nodes, activatedAt, activatedBy}`) with `Draft → Active → Closing → Closed`.
-  One Active version per journey: `activateVersion` demotes the current Active to Closing;
-  `autoClose` closes a Closing version when nobody is left inside; `stopVersion(mode)`;
-  `copyVersion` makes a new Draft. Journey status is derived: `jStatus(j)` = Draft / Live /
-  Past. `vLocked(V)` — Active/Closing lock the structure (no add / delete / relink), Closed
-  is read-only.
+  `folder` (`FOLDERS`, shown as **Project**), `contactList` (Customers / Prospects),
+  `overrideUnsub`, `testUsers`, `updated` / `updatedBy`; Phase 2 fields `phase`
+  (`PHASES`), priority, end date + `expiryAction` stay in the data. Its steps live in
+  **versions** (`j.versions[]`, each `{v, status, note, nodes, activatedAt, activatedBy,
+  submittedBy, submittedAt, approval}`) with `Draft → Active → Closing → Closed`.
+  **Approval**: `submitVersion` (marketer, validation green) marks the Draft pending
+  (`vPending(V)`); `vTouch(j)` on any edit withdraws it (`withdrawVersion`);
+  `activateVersion` (approver / admin) activates and demotes the current Active to
+  Closing; `autoClose` closes a Closing version when nobody is left inside (skipped while
+  `quietInit`); `stopVersion(mode)`; `copyVersion` makes a new Draft. Journey status is
+  derived: `jStatus(j)` = Draft / Live / Past. `vLocked(V)` — Active/Closing lock the
+  structure (no add / delete / relink), Closed is read-only.
 - **Run context** (`ctxOf(j,V)`, `curCtx()`, `mainCtx(j)`, `allCtx()`): the engine, the
   canvas and the monitor work on one version through an object that looks like the old
   journey (`id` = `"JRN-04@4"`, `nodes`, `status`, `j`, `V`). The simulation is keyed by
   that id: `sim['JRN-04@4'] = {parts, history}`.
 - **Steps** (`NODE_META`, grouped by `NODE_GROUPS`): exactly one `entry` step per version,
-  whose `cfg.kind` is one of `ENTRY_KINDS` (segment, dateAttr, event, joinsList, unengaged,
-  twin, agent); `delivery`; waits `waitDur`, `waitDate`, `waitEvent`, `waitSeg`,
-  `waitPrio`; splits `splitEng`, `splitSeg`, `splitShuffle`; actions `setAttr`, `callExt`,
-  `ctrlGroup`, `audSync`, `exit`. `pathsOf(n)` gives a step's labelled paths; `connect()`
-  takes the next free path; `prunePaths()` drops edges whose path disappeared.
-  `nodeDefaults`, `nodeSummary`, `nodeStats` and `renderNodePanel` hold the per-type
-  config; `entryDefaults`, `entryPool`, `entryText` the per-entry-type logic.
+  whose `cfg.kind` is one of `ENTRY_KINDS` — Phase 1: `eventSingle`, `eventBatch`
+  (`isEventKind`, `EVENT_NAMES`, `EVENT_PAYLOADS`, `payloadFields`, `placeholdersFor`);
+  Phase 2 (`p2:true`): segment, dateAttr, joinsList, unengaged, twin, agent. Phase 1
+  steps: `delivery`, `waitDur`, `splitEng`, `splitSeg`, `splitShuffle`, `ctrlGroup`
+  (named; a legitimate end of a path), `exit`; Phase 2: `waitDate`, `waitEvent`,
+  `waitSeg`, `waitPrio`, `setAttr`, `callExt`, `audSync`. `pathsOf(n)` gives a step's
+  labelled paths; `connect()` takes the next free path; `prunePaths()` drops edges whose
+  path disappeared. `nodeDefaults`, `nodeSummary`, `nodeStats` and `renderNodePanel` hold
+  the per-type config; `entryDefaults`, `entryPool`, `entryText` the per-entry-type logic.
+- **Delivery** (`CHANNELS` = email / sms / push, `CH_FIELDS`, `LANGS`): content lives in
+  `cfg.lang = {default, fr:{…}, en:{…}}` (`jPlanDefaults`, `jPlanEnsure` migrates old
+  `text`; `dText(n)` = default-language primary field); `OFFERS` / `offerOf` for the
+  offer placeholders; `policies`, `controlGroup`, `sendUnsub`. The engine's **skip rule**
+  writes `p.eng[nid] = {skipped, reason}` when a contact has no address / token / consent;
+  `nodeStats` and `channelTotals` count `skipped`. `openTestEvent` (`#tev-modal`) sends a
+  test event with an editable payload through the real entry (`lastPayload`).
 - **Engine**: `initSim` preloads live versions from their entry pool; `tick` is one
   simulated day (scheduled entries admit new matches, `processCustomer` moves every
   contact one step, `autoClose` runs); `sendEvent` admits into event entries and resolves
   `waitEvent` steps; `runNow` chains immediate steps. Splits route deterministically
   (`hashOf`). Deliveries write `p.eng[nodeId]` (sent / opened / clicked / converted /
-  bounced) that `splitEng` and the stats read.
+  bounced / skipped) that `splitEng` and the stats read. Boot: `quietInit = true`, three
+  `tick`s, `seedClosing()` (contacts into Closing versions), eight `sendEvent`s, then
+  `quietInit = false`; Reset repeats it.
 - **Canvas**: `drawVersion(svg, C, view, opts)` draws a version (used by the builder with
   handles, by the monitor read-only); `renderCanvas` adds interaction; `renderVersionBar`
-  (version dropdown, Activate, Stop ▾, Copy to new version, Test ▾, Execution report);
+  (version dropdown with notes, inline note `#vb-note`, Submit for approval / Withdraw or
+  Activate, Stop ▾, Copy to new version, Test ▾ incl. the test event, Execution report);
   `renderValidation` is the panel above the canvas fed by `jValidate` (blocking rules);
   `renderJSettings` is the journey-settings block on the right panel.
 - **Scale**: the simulation runs on the 30-row demo datamart (`DATAMART_ROWS` →
   `CUSTOMERS`); every displayed number is multiplied by `DEMO_K` (one simulated contact ≈
   6,500 real ones; `CONTACTS_TOTAL` = 1.96 M). The monitor adds a time-range factor
-  (`RANGE_K`). The execution report and the participant list stay per simulated contact.
-- **Journey list**: `renderJList` (filters, bulk duplicate / move to folder, the
-  **Lifecycle coverage** strip `coverageHtml`), `renderJCreate` (name, folder, phase, entry
+  (`RANGE_K`). The execution report and the Contacts tab stay per simulated contact.
+- **Journey list**: `renderJList` — tabs `J_TABS` (Drafts / Live / Past, `jStatusF`
+  defaults to Live, `#jtabs [data-jst]`), filters `jFilter` (folder, event, channel;
+  `jEvent`, `jChannels`), bulk duplicate / move to project; the **Lifecycle coverage**
+  strip `coverageHtml` is Phase 2. `renderJCreate` (name, description, project, entry
   type). `jOpen(id, nodeId, v)` is the only way onto the canvas.
-- **Monitor**: `renderMonitor` → `renderMonGeneral` (totals, `channelTotals`,
-  `anomaliesFor` = Marketing Agent alerts, versions table, participants) and
-  `renderMonVersion` (read-only canvas + steps table); `openExport` is the step export
-  modal (`EXPORT_STRATEGIES`).
+- **Monitor**: `renderMonitor` with `monTab` general / version / contacts →
+  `renderMonGeneral` (totals, `channelTotals`, versions table), `renderMonVersion`
+  (read-only canvas + steps table) and `renderMonContacts` (`#ctable`, `contactState`,
+  `lastDelivery`, lookup `conQ`, step history `.chist` / `.clog`). `anomaliesFor` and
+  `openExport` (`EXPORT_STRATEGIES`) are Phase 2.
 - **Segments** (`MLS`) and the datamart catalogue are kept from CM as a read-only-ish
   list + workbench; `POLICIES` feed the Policies page and the Delivery policy picker.
   `TEMPLATES` / `CONTENT_ITEMS` are only reachable from the Delivery step.
@@ -118,6 +143,10 @@ not the product itself.
   they were removed on purpose (decision J-A).
 - Do not add a second entry step, message-level versioning or a separate Delivery
   module — see the assumptions in `docs/decisions.md`.
+- Do not surface a Phase 2 item (segment / date / list / unengaged / Twin / Agent entries,
+  schedules, the extra waits and actions, lifecycle phase, priority, end date, anomaly
+  alerts, step export) while `PHASE2` is off, and do not delete it either — gate it
+  (decision P1-A). Sample data uses Phase 1 steps only.
 - Do not restructure the flow or restyle while doing a copy or data task.
 - Do not add dependencies, a router, or a component framework.
 - Do not put real integration calls, authentication or i18n into the prototype

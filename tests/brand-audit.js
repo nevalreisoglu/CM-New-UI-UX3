@@ -120,16 +120,16 @@ const probe = () => {
   await page.selectOption('#role-sel', 'admin');
   const deep = [
     ['journey-canvas-live', async () => { await page.click('.nav button[data-view="journeys"]'); await page.click('#jl-table [data-jopen="JRN-04"]'); await page.click('#canvas .node[data-id="s4"]'); }],
-    ['journey-canvas-draft-validation', async () => { await page.click('#btn-jback'); await page.click('#jl-table [data-jopen="JRN-06"]'); await page.click('#btn-validate'); await page.click('#canvas .node[data-id="s3"]'); }],
+    ['journey-canvas-draft-validation', async () => { await page.click('#btn-jback'); await page.click('#jtabs [data-jst="Draft"]'); await page.click('#jl-table [data-jopen="JRN-05"]'); await page.click('#btn-validate'); await page.click('#canvas .node[data-id="s3"]'); }],
     ['journey-delivery-panel', async () => { await page.click('#canvas .node[data-id="s2"]'); }],
     ['journey-entry-panel', async () => { await page.click('#canvas .node[data-id="e1"]'); await page.click('#btn-apicode'); }],
-    ['journey-version-closed', async () => { await page.click('#btn-jback'); await page.click('#jl-table [data-jopen="JRN-01"]'); await page.selectOption('#vsel', '11'); }],
-    ['journey-list-filtered', async () => { await page.click('#btn-jback'); await page.click('.cover .cv[data-cvp="Grow"]'); await page.click('#jl-all'); }],
-    ['journey-create', async () => { await page.click('#jl-bclear'); await page.click('#jl-new'); await page.click('[data-trig="dateAttr"]'); }],
-    ['journey-report', async () => { await page.click('#jc-back'); await page.click('#jl-table [data-jopen="JRN-03"]'); await page.click('#btn-report'); }],
+    ['journey-version-closed', async () => { await page.click('#btn-jback'); await page.click('#jtabs [data-jst="Live"]'); await page.click('#jl-table [data-jopen="JRN-01"]'); await page.selectOption('#vsel', '12'); }],
+    ['journey-list-filtered', async () => { await page.click('#btn-jback'); await page.click('#jtabs [data-jst="Past"]'); await page.click('#jl-all'); }],
+    ['journey-create', async () => { await page.click('#jl-bclear'); await page.click('#jl-new'); await page.click('[data-trig="eventBatch"]'); }],
+    ['journey-report', async () => { await page.click('#jc-back'); await page.click('#jtabs [data-jst="Live"]'); await page.click('#jl-table [data-jopen="JRN-03"]'); await page.click('#btn-report'); }],
     ['monitor-general', async () => { await page.keyboard.press('Escape'); await page.click('.nav button[data-view="monitor"]'); await page.selectOption('#msel', 'JRN-04'); }],
     ['monitor-version', async () => { await page.click('#mon-tabs [data-mt="version"]'); }],
-    ['monitor-export', async () => { await page.click('#mcanvas .node[data-id="s2"]'); }],
+    ['monitor-contacts', async () => { await page.click('#mon-tabs [data-mt="contacts"]'); await page.click('#ctable tr[data-ck]'); }],
     ['segment-workbench', async () => { await page.keyboard.press('Escape'); await page.click('.nav button[data-view="segmentation"]'); await page.click('#seg-new'); await page.click('#seg-search'); }],
   ];
   for (const [name, go] of deep) {

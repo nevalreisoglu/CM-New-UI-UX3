@@ -2,6 +2,13 @@
 
 Version numbers follow the published artifact versions.
 
+## v67 — 8 Oct 2026
+**Journey Studio Phase 1, step (e): Fizz sample data, polish, docs.**
+- **Sample data is the Fizz Phase 1 estate** (decision P1-L): projects relance_abandon · prospect_comm · onboarding · billing; four live journeys — *Device order flow abandonment* (v14 Active "V14 – new template", v13 Closing with contacts still inside, v1–v12 Closed), *Device back in stock – Inscription* (Prospects, override unsubscribe), *Welcome – account created* (Shuffle 90 / 10 → control group "Welcome – CG", email with an offer, Wait 3 days, Engagement split → Push / SMS, two versions), *Payment failed – reminder* (SMS → Wait 2 days → Engagement split clicked → Exit / Remaining → Email) — one Draft *Plan change – confirmation* with an unconnected Delivery, one Past journey. Segments gain *Account created today*; policies are repointed to the new journeys; the old CM sample copy is gone.
+- Boot seeds the live versions, the Closing v13 and eight events so the stats strips, the version bar ("n in journey") and the Contacts tab are populated on first open; *Reset* reseeds the same state.
+- A named **Control group** ends a path legitimately — validation no longer flags it as dangling.
+- Docs rewritten for Phase 1: `CLAUDE.md`, `README.md`, `docs/product-description.md`, `docs/user-manual.md` (re-embedded), `docs/decisions.md` (P1-A … P1-L), `tests/README.md`; specs and the brand audit follow the new ids, tabs and states; screenshots refreshed.
+
 ## v66 — 8 Oct 2026
 **Journey Studio Phase 1, step (d): monitoring.**
 - Journey Monitor · General: totals **entered / in journey / exited**, channel totals with the skipped column, the versions table. The participant slider is gone.
