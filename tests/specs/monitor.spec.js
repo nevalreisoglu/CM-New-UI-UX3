@@ -71,6 +71,7 @@ test.describe('journey monitor', () => {
 
   test('the validation panel opens above the canvas and names the step to fix', async ({ app }) => {
     await setRole(app, 'approver');
+    await app.locator('#jtabs [data-jst="Draft"]').click();
     await app.locator('#jl-table [data-jopen="JRN-06"]').click();
     await expect(app.locator('#jvalid')).toBeHidden();
     await app.locator('#btn-activate').click();

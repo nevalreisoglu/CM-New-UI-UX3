@@ -15,7 +15,7 @@ test.describe('journey builder and monitor', () => {
     await expect(app.locator('#jsplit')).toBeHidden();
     await expect(app.locator('#crumb .cur')).toHaveText('Journeys');
     const heads = await app.$$eval('#jl-table thead th', (t) => t.map((x) => x.textContent.trim()));
-    expect(heads).toEqual(expect.arrayContaining(['Journey', 'Folder', 'Phase', 'Status', 'Active version', 'Entered (30d)', 'Last activated', 'Actions']));
+    expect(heads).toEqual(expect.arrayContaining(['Journey', 'Project', 'Event', 'Channels', 'Active version', 'Entered (30d)', 'Last modified', 'Modified by', 'Actions']));
     // the old modal and its List button are gone
     await expect(app.locator('#jlist-modal, #jnew-modal, #btn-jlist')).toHaveCount(0);
   });

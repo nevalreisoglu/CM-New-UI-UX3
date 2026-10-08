@@ -2,6 +2,13 @@
 
 Version numbers follow the published artifact versions.
 
+## v64 — 8 Oct 2026
+**Journey Studio Phase 1, step (b): versions, notes, approval, management.**
+- Every version has a free-text **version note**, edited inline on the version bar and shown in the version dropdown and the list's active-version column.
+- **Activation = approval**: a marketer *Submits for approval* (validation must be green); the version reads *Pending approval*; any structural or content edit withdraws the submission; an approver / admin *Activates*. Reuses the maker/checker roles (C5) on the version bar — no new approval UI.
+- Journey settings: **Project** (was Folder), **contact list** (Customers / Prospects), **override unsubscribe** (was ignore unsubscribe) with a visible badge on the version bar and the list; last modified / modified by are tracked.
+- Journey list: tabs **Drafts / Live / Past** (Live is the default); columns name · project · event · channels · active version (with note) · entered 30d · last modified · modified by; filters project / event / channel; row actions open · duplicate · move to project.
+
 ## v63 — 8 Oct 2026
 **Journey Studio Phase 1, step (a): the `PHASE2` flag.** The Phase 1 brief (v3, 8 Oct) narrows the prototype to event-triggered journeys. Everything built from the earlier brief that is now Phase 2 stays in the file behind one flag (`PHASE2=false`, next to `PHASES`): Segment / Date attribute / Joins list / Unengaged / Digital Twin / Agent entries and the schedule component, Until date / For event / For segment match / Priority waits, Set attribute / Call external / Audience sync, lifecycle phase + coverage strip, priority, end date + expiry action, anomaly alerts, step export, the Engagement split's converted / bounced. Palette, create screen, entry panel, settings, list filters, monitor and validation read the flag. Specs follow the Phase 1 state.
 

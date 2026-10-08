@@ -8,6 +8,7 @@ const { test, expect, setRole } = require('./fixtures');
  */
 async function openDraft(app) {
   await app.locator('.nav button[data-view="journeys"]').click();
+  await app.locator('#jtabs [data-jst="Draft"]').click();
   await app.locator('#jl-table [data-jopen="JRN-06"]').click();
   await expect(app.locator('#jsplit')).toBeVisible();
   await expect(app.locator('#vbar [data-tour="v-status"]')).toHaveText('Draft');

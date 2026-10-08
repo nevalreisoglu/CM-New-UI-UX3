@@ -303,6 +303,9 @@ svg.canvas{display:block;width:100%;height:100%;user-select:none}
 .vbar .vb-name{display:inline-flex;align-items:center;gap:6px;font-size:13px;max-width:380px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vbar .vb-sep{width:1px;height:20px;background:var(--line)}
 .vbar .vb-who{font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.vbar input.vb-note{font-size:12px;color:var(--ink);width:220px;padding:3px 6px;border-radius:4px;border:1px dashed var(--line);background:transparent}
+.vbar input.vb-note:focus{border-style:solid;background:#fff;outline:none}
+.vbar input.vb-note::placeholder{color:var(--ink-3)}
 .vbar #vsel{max-width:260px}
 .vbar .dm-menu{position:relative}
 .vbar .dm-menu .pop{position:fixed;min-width:260px}
@@ -324,6 +327,8 @@ svg.canvas{display:block;width:100%;height:100%;user-select:none}
 .cover .cv.gap b{color:var(--warn)}
 .cover .cv.on{outline:2px solid var(--cta-bright)}
 .cover .cv:hover{background:var(--surface-2)}
+.jtabs{margin:0 20px 6px}.jtabs button .n{font-size:10.5px;color:var(--ink-3);margin-left:4px}
+.dm-menu .pop .pop-l{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding:6px 10px 2px}
 .bulk{display:flex;align-items:center;gap:10px;margin:0 20px 8px;padding:8px 12px;border-radius:8px;background:var(--cta-soft);font-size:12.5px}
 .bulk label{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
 .bulk select{border:1px solid var(--line);border-radius:4px;padding:4px 8px;background:#fff}
@@ -1596,11 +1601,12 @@ const PHASE2=false;
 const p1=m=>PHASE2||!m.p2;   // "is this item shown in the current phase"
 const PHASES=['Acquire','Onboard','Grow','Retain','Winback'];
 const FOLDERS=['churn_reduction','free-trial','loyalty','console-marketing'];
+const CONTACT_LISTS=['Customers','Prospects'];
 const EXPIRY_ACTIONS=[['closing','Closing — no new entries, contacts inside finish'],['closed','Closed — stop everything']];
 const jCanAct=()=>ROLE==='approver'||ROLE==='admin';
 const V_STATUS_CLS={Draft:'grey',Active:'ok',Closing:'warn',Closed:''};
 const J_STATUS_CLS={Draft:'grey',Live:'ok',Past:''};
-function jBlank(o){ return Object.assign({id:'',name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],priority:50,endDate:'',expiryAction:'closing',ignoreUnsub:false,testUsers:[DEMO_USERS.me+' (test MSISDN)'],created:TODAY,updated:TODAY,createdBy:DEMO_USERS.me,versions:[],cur:1},o); }
+function jBlank(o){ return Object.assign({id:'',name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],priority:50,endDate:'',expiryAction:'closing',contactList:'Customers',overrideUnsub:false,testUsers:[DEMO_USERS.me+' (test MSISDN)'],created:TODAY,updated:TODAY,createdBy:DEMO_USERS.me,versions:[],cur:1},o); }
 /* step builders for the sample data — coordinates are canvas pixels */
 const E=(kind,cfg,x,y,next)=>({id:'e1',type:'entry',x,y,label:(ENTRY_KINDS[kind]||{}).k||'Entry',cfg:Object.assign({kind,includeProject:true,reentry:'after N days',reentryDays:30},cfg),next});
 const D=(id,label,ch,content,x,y,next,extra)=>({id,type:'delivery',x,y,label,cfg:Object.assign({channel:ch,content,variant:'Single content',stopAfter:'1 channel',controlGroup:'off',contentB:'',abSplit:20,dyn:'LANGUAGE',policies:['POL-C1'],sendUnsub:false},extra||{}),next});
@@ -1683,6 +1689,9 @@ const POLICIES=[
 const jVer=(j,v)=>j.versions.find(x=>x.v===v);
 const jCurV=j=>jVer(j,j.cur)||j.versions[j.versions.length-1];
 const jActive=j=>j.versions.find(x=>x.status==='Active');
+/* a Draft version waits for the approver once the marketer submits it; any structural or content edit withdraws it */
+const vPending=V=>V.status==='Draft'&&V.approval==='pending';
+function vTouch(j){ const V=j.V||j; if(vPending(V)){ delete V.approval; delete V.submittedAt; delete V.submittedBy; toast('Submission withdrawn',`v${V.v} changed after it was submitted — submit it for approval again when it is ready.`,'warn'); } (j.j||j).updated=TODAY; (j.j||j).updatedBy=DEMO_USERS.me; }
 const jLiveVs=j=>j.versions.filter(x=>x.status==='Active'||x.status==='Closing');
 const jLatest=j=>j.versions[j.versions.length-1];
 function jStatus(j){ if(jLiveVs(j).length) return 'Live'; if(j.versions.some(v=>v.status==='Draft')) return 'Draft'; return j.versions.length?'Past':'Draft'; }
@@ -2364,16 +2373,16 @@ function renderValidation(j){ const box=document.getElementById('jvalid'); if(!b
 })();
 function toast(title,msg,cls){ const t=document.getElementById('toast'); const d=document.createElement('div'); if(cls) d.className=cls; d.innerHTML=`<b>${esc(title)}</b>${esc(msg||'')}`; t.appendChild(d); setTimeout(()=>{ d.style.opacity='0'; d.style.transition='opacity .3s'; setTimeout(()=>d.remove(),320); },4200); }
 /* connect two steps; a multi-path step takes its next free path label, a single-output step an unlabelled edge */
-function connect(j,from,to){ const s=node(j,from); if(!s||from===to) return false; const already=s.next.some(x=>(typeof x==='string'?x:x.to)===to); if(already) return false;
+function connect(j,from,to){ const s=node(j,from); if(!s||from===to) return false; const already=s.next.some(x=>(typeof x==='string'?x:x.to)===to); if(already) return false; if(j.V) vTouch(j);
   const paths=pathsOf(s);
   if(paths){ const free=paths.find(l=>!s.next.some(x=>typeof x!=='string'&&x.label===l)); if(!free){ toast('All paths connected',`${s.label}: ${paths.join(', ')} already have a target. Remove a connection first.`,'warn'); return false; } s.next.push({to,label:free}); }
   else s.next.push(to);
   return true; }
 function deleteNode(id){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: steps cannot be added or removed. Copy to a new version to change the structure.`,'warn'); return; } const n=node(j,id); if(!n||n.type==='entry') return;
-  j.nodes=j.nodes.filter(x=>x.id!==id); j.nodes.forEach(x=>x.next=x.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==id));
+  vTouch(j); j.nodes=j.nodes.filter(x=>x.id!==id); j.nodes.forEach(x=>x.next=x.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==id));
   const S=simOf(j); for(const cid in S.parts){ const p=S.parts[cid]; p.pos=p.pos.filter(x=>x!==id); if(p.pos.length===0&&p.status==='active') p.status='completed'; }
   if(selNode===id) selNode=null; renderCanvas(); renderNodePanel(); }
-function removeEdge(from,to){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: connections cannot change. Copy to a new version first.`,'warn'); return; } const n=node(j,from); if(!n) return; n.next=n.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==to); renderCanvas(); renderNodePanel(); }
+function removeEdge(from,to){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: connections cannot change. Copy to a new version first.`,'warn'); return; } const n=node(j,from); if(!n) return; vTouch(j); n.next=n.next.filter(nx=>(typeof nx==='string'?nx:nx.to)!==to); renderCanvas(); renderNodePanel(); }
 function fitView(){ const j=curCtx(); const svg=document.getElementById('canvas'); const r=svg.getBoundingClientRect(); const H=NH+20; const minX=Math.min(...j.nodes.map(n=>n.x)), minY=Math.min(...j.nodes.map(n=>n.y)), maxX=Math.max(...j.nodes.map(n=>n.x))+NW, maxY=Math.max(...j.nodes.map(n=>n.y+H)); const k=Math.min(1,Math.max(.6,Math.min((r.width-48)/(maxX-minX),(r.height-48)/(maxY-minY)))); view.k=k; view.x=24-minX*k; view.y=24-minY*k; renderCanvas(); }
 /* the Entry group of the palette changes the type of the one entry step instead of adding a step */
 function setEntryKind(kind){ const j=curCtx(); if(vLocked(j.V)){ toast('Structure is locked',`v${j.v} is ${j.status}: the entry type is part of the structure. Copy to a new version to change it.`,'warn'); return; }
@@ -2384,7 +2393,7 @@ function addNode(t,opt){
   const s=selNode?node(j,selNode):null;
   let x=opt.x, y=opt.y; if(x===undefined){ if(!s){ toast('Add step','Select a step first, or drag the component onto the canvas.','warn'); return; } x=s.x+NW+40; y=s.y+(s.next.length?130:0); }
   const id='n'+(Date.now()%100000);
-  const n={id,type:t,x,y,label:m.k,cfg:nodeDefaults(t),next:[]}; if(t==='splitEng'&&s&&s.type==='delivery') n.cfg.delivery=s.id; j.nodes.push(n);
+  vTouch(j); const n={id,type:t,x,y,label:m.k,cfg:nodeDefaults(t),next:[]}; if(t==='splitEng'&&s&&s.type==='delivery') n.cfg.delivery=s.id; j.nodes.push(n);
   /* two deliveries back to back: a Wait is slipped in between so the second one is not sent in the same second */
   if(opt.connect&&s&&s.type==='delivery'&&t==='delivery'){ const w={id:'n'+((Date.now()+1)%100000),type:'waitDur',x,y,label:'Wait duration',cfg:{n:1,unit:'days'},next:[id]}; n.x=x+NW+40; j.nodes.push(w); connect(j,s.id,w.id); toast('Wait added','Two deliveries in a row: a 1-day Wait was placed between them. Change its length or remove it.'); }
   else if(opt.connect&&s) connect(j,s.id,id);
@@ -2426,7 +2435,7 @@ function renderNodePanel(){
       +(isDyn?sel('dyn','Variant by attribute',['LANGUAGE','CUSTOMER_TYPE','REGION','DEVICE_5G','APP_INSTALLED']):'')
       +(String(pc.channel).startsWith('Preferred')?sel('stopAfter','Stop cascade after',STOPS):'')+sel('controlGroup','Control group',CGS)
       +`<div class="sec">Communication rules</div><div class="fld"><label>Policies applied at send time <span style="color:var(--ink-3)">— consent and exclusion lists always apply</span></label><div class="pols">${POLICIES.filter(p=>p.kind==='Communication').map(p=>`<label class="ck"><input type="checkbox" data-pol="${p.id}" ${(pc.policies||[]).includes(p.id)?'checked':''}> <b>${esc(p.name)}</b> <small>${esc(p.rule)}</small></label>`).join('')}</div></div>`
-      +(j.j.ignoreUnsub?`<label class="ck warn"><input type="checkbox" data-ck="sendUnsub" ${pc.sendUnsub?'checked':''}> Send even if unsubscribed <span class="tip" data-tip="The journey has 'ignore unsubscribe' on. Confirm it for this step: service messages only.">i</span></label>`:'')
+      +(j.j.overrideUnsub?`<label class="ck warn"><input type="checkbox" data-ck="sendUnsub" ${pc.sendUnsub?'checked':''}> Send even if unsubscribed <span class="tip" data-tip="The journey has 'ignore unsubscribe' on. Confirm it for this step: service messages only.">i</span></label>`:'')
       +`<div class="sec">Engagement</div><div style="font-size:11.5px;color:var(--ink-2)">Opened · clicked · converted · bounced feed an <b>Engagement split</b> placed later in the journey.</div>`
       +`<div class="sec">Test</div><div class="chips">${j.j.testUsers.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}<button class="btn sm outline" id="btn-testsend">Send test</button></div>`; break; }
     case 'waitDur': html+=two(f('n','Wait',n.cfg.n,'number','min="1" max="365"'),selP('unit','Unit',[['minutes','minutes'],['hours','hours'],['days','days']]))+`<div class="note">In the prototype minutes and hours resolve on the next "Advance 1 day"; days count days.</div>`; break;
@@ -2450,7 +2459,7 @@ function renderNodePanel(){
   body.innerHTML=html; if(closed) body.querySelectorAll('input,select,textarea,button').forEach(el=>el.disabled=true);
   const rerender=()=>{ renderCanvas(); renderNodePanel(); };
   const structural=k=>['kind','interactions','segments','paths','delivery'].includes(k);
-  body.querySelectorAll('[data-k]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.k; if(k==='__label') n.label=el.value; else n.cfg[k]=el.type==='number'?+el.value:el.value;
+  body.querySelectorAll('[data-k]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.k; vTouch(j); if(k==='__label') n.label=el.value; else n.cfg[k]=el.type==='number'?+el.value:el.value;
     if(k==='channel') n.cfg.content=contentsFor(el.value)[0]; if(k==='content'){ const id=String(el.value).split(' ·')[0]; n.cfg.text=contentTextOf(id); } if(k==='endpoint') n.cfg.kind=(ENDPOINTS.find(x=>x[0]===el.value)||[])[1]||'webhook';
     renderCanvas(); if(el.tagName==='SELECT'&&['channel','variant','content','mode','reentry','event','endpoint','kind','delivery'].includes(k)) renderNodePanel(); }));
   body.querySelectorAll('[data-ck]').forEach(el=>el.onchange=()=>{ const k=el.dataset.ck; if(k==='sendUnsub'&&el.checked&&!confirm('Send even if unsubscribed — service messages only. Confirm for this step?')){ el.checked=false; return; } n.cfg[k]=el.checked; rerender(); });
@@ -2672,12 +2681,19 @@ function activateVersion(j,V){
   if(V.status!=='Draft'){ toast('Not a draft',`v${V.v} is ${V.status}. Only a Draft version can be activated.`,'warn'); return; }
   const r=jValidate(C); const miss=r.items.filter(i=>!i.ok); if(miss.length){ validOpen=true; renderValidation(C); toast('Cannot activate',`Fix the validation first: ${miss.map(i=>i.l+(i.why?' ('+i.why+')':'')).join('; ')}.`,'bad'); return; }
   const prev=jActive(j); if(prev){ prev.status='Closing'; prev.closingAt=stamp(); addLog('warn',`${j.id}@${prev.v}  closing — v${V.v} activated; contacts inside finish their steps, no new entries`,{j:j.id+'@'+prev.v,node:prev.nodes[0].id,kind:'system'}); }
-  V.status='Active'; V.activatedAt=stamp(); V.activatedBy=DEMO_USERS.me; j.updated=TODAY; j.cur=V.v;
+  V.status='Active'; V.activatedAt=stamp(); V.activatedBy=DEMO_USERS.me; V.approvedBy=DEMO_USERS.me; delete V.approval; j.updated=TODAY; j.updatedBy=DEMO_USERS.me; j.cur=V.v;
   addLog('acc',`${C.id}  activated · by ${DEMO_USERS.me} · entry: ${entryText(C).k} ${entryText(C).sub}`,{j:C.id,node:C.nodes[0].id,kind:'system'});
   if(!entryIsEvent(C)){ const S=simOf(C); let added=0; entryPool(C).forEach(c=>{ if(admit(C,S,c.id,'activation')==='ok'){ added++; runNow(C,S,c.id); } }); if(added) addLog('ok',`${C.id}  ${added} contact(s) admitted by the ${entryText(C).k} entry on activation — immediate steps executed`,{j:C.id,node:C.nodes[0].id,kind:'entry'}); S.history[S.history.length-1]=snapshot(S.parts); }
   autoClose(); render();
   toast(`Activated · ${j.id} v${V.v}`, prev?`v${prev.v} is now Closing: no new entries, the contacts inside finish their steps, and it closes itself when empty.`:'First activation — the version admits contacts from its entry rule. Structure is locked from now on; step content stays editable.');
 }
+/* maker/checker on the version: the marketer submits a validated Draft, the approver activates it (C5 reused) */
+function submitVersion(j,V){ const C=ctxOf(j,V); if(V.status!=='Draft'){ toast('Not a draft',`v${V.v} is ${V.status}.`,'warn'); return; }
+  const r=jValidate(C); const miss=r.items.filter(i=>!i.ok); if(miss.length){ validOpen=true; renderValidation(C); toast('Cannot submit',`Fix the validation first: ${miss.map(i=>i.l).join('; ')}.`,'bad'); return; }
+  V.approval='pending'; V.submittedAt=stamp(); V.submittedBy=DEMO_USERS.me; j.updated=TODAY; j.updatedBy=DEMO_USERS.me;
+  addLog('acc',`${C.id}  submitted for approval · by ${DEMO_USERS.me}${V.note?' · "'+V.note+'"':''}`,{j:C.id,node:C.nodes[0].id,kind:'system'}); render();
+  toast(`Submitted · ${j.id} v${V.v}`,'An approver activates it from the version bar. Editing the version withdraws the submission.'); }
+function withdrawVersion(j,V){ delete V.approval; delete V.submittedAt; delete V.submittedBy; j.updated=TODAY; j.updatedBy=DEMO_USERS.me; render(); toast(`Withdrawn · ${j.id} v${V.v}`,'The version is a plain Draft again.','warn'); }
 function stopVersion(j,V,mode){
   if(!jCanAct()){ toast('Approver needed','Only an approver or an admin stops a version.','warn'); return; }
   if(V.status!=='Active'&&V.status!=='Closing'){ toast('Nothing to stop',`v${V.v} is ${V.status}.`,'warn'); return; }
@@ -2687,22 +2703,24 @@ function stopVersion(j,V,mode){
   else { V.status='Closing'; V.closingAt=stamp(); addLog('warn',`${C.id}  closing by ${DEMO_USERS.me} — no new entries, ${Object.values(S.parts).filter(p=>p.status==='active').length} contact(s) finish their steps`,{j:C.id,node:C.nodes[0].id,kind:'system'}); toast(`Closing · ${j.id} v${V.v}`,'No new entries. Contacts inside finish their steps; the version closes itself when empty.','warn'); }
   autoClose(); render();
 }
-function copyVersion(j,V){ const nv=Math.max(...j.versions.map(x=>x.v))+1; const N={v:nv,status:'Draft',createdAt:stamp(),from:V.v,nodes:JSON.parse(JSON.stringify(V.nodes))}; j.versions.push(N); j.cur=nv; j.updated=TODAY; selNode=null; initVersionSim(j,N); addLog('',`${j.id}@${nv}  draft created from v${V.v}`,{j:j.id+'@'+nv,node:N.nodes[0].id,kind:'system'}); render(); toast(`v${nv} · Draft`,`A copy of v${V.v}. Edit the structure freely, then Activate — v${jActive(j)?jActive(j).v+' goes to Closing':'—'} when you do.`); return N; }
+function copyVersion(j,V){ const nv=Math.max(...j.versions.map(x=>x.v))+1; const N={v:nv,status:'Draft',createdAt:stamp(),from:V.v,note:'',createdBy:DEMO_USERS.me,nodes:JSON.parse(JSON.stringify(V.nodes))}; j.versions.push(N); j.cur=nv; j.updated=TODAY; j.updatedBy=DEMO_USERS.me; selNode=null; initVersionSim(j,N); addLog('',`${j.id}@${nv}  draft created from v${V.v}`,{j:j.id+'@'+nv,node:N.nodes[0].id,kind:'system'}); render(); toast(`v${nv} · Draft`,`A copy of v${V.v}. Give it a version note, edit it, then submit for approval — v${jActive(j)?jActive(j).v+' goes to Closing':'—'} when it is activated.`); return N; }
 /* version bar on top of the canvas */
 const fmtWhen=t=>t?String(t).replace(TODAY,'today'):'';
 function renderVersionBar(C,active,conv){
   const j=C.j, V=C.V, bar=document.getElementById('vbar'); const live=V.status==='Active'||V.status==='Closing';
   if(bar.querySelector('.pop:not([hidden])')) return; // a menu is open: the 1 s canvas refresh must not rebuild the bar under it
-  const vopt=j.versions.slice().reverse().map(x=>`<option value="${x.v}" ${x.v===V.v?'selected':''}>v${x.v} · ${x.status}${x.activatedAt?' · '+fmtWhen(x.activatedAt):''}</option>`).join('');
-  const who=V.status==='Draft'?`created ${fmtWhen(V.createdAt||j.created)}${V.from?' from v'+V.from:''}`:`activated by ${esc(V.activatedBy||'—')} · ${fmtWhen(V.activatedAt)}${V.status==='Closing'?' · closing since '+fmtWhen(V.closingAt):V.status==='Closed'?' · closed '+fmtWhen(V.closedAt):''}`;
+  const vopt=j.versions.slice().reverse().map(x=>`<option value="${x.v}" ${x.v===V.v?'selected':''}>v${x.v}${x.note?' · '+esc(x.note):''} · ${vPending(x)?'pending approval':x.status}${x.activatedAt?' · '+fmtWhen(x.activatedAt):''}</option>`).join('');
+  const who=V.status==='Draft'?(vPending(V)?`submitted by ${esc(V.submittedBy||'—')} · ${fmtWhen(V.submittedAt)} — waiting for an approver`:`created ${fmtWhen(V.createdAt||j.created)}${V.from?' from v'+V.from:''}`):`activated by ${esc(V.activatedBy||'—')} · ${fmtWhen(V.activatedAt)}${V.status==='Closing'?' · closing since '+fmtWhen(V.closingAt):V.status==='Closed'?' · closed '+fmtWhen(V.closedAt):''}`;
   bar.innerHTML=`<button class="btn sm outline" id="btn-jback" style="white-space:nowrap">‹ Journey list</button>
-    <span class="vb-name" title="${esc(j.desc||'')}"><b>${esc(j.name)}</b> <span class="mono" style="color:var(--ink-3)">${j.id}</span> <span class="pill ${J_STATUS_CLS[jStatus(j)]}">${jStatus(j)}</span></span>
+    <span class="vb-name" title="${esc(j.desc||'')}"><b>${esc(j.name)}</b> <span class="mono" style="color:var(--ink-3)">${j.id}</span> <span class="pill ${J_STATUS_CLS[jStatus(j)]}">${jStatus(j)}</span>${j.overrideUnsub?'<span class="pill warn" title="Override unsubscribe is on: service messages only; each Delivery confirms it">override unsubscribe</span>':''}</span>
     <span class="vb-sep"></span>
     <label for="vsel" style="color:var(--ink-2)">Version</label><select id="vsel" class="btn sm outline" style="background:#fff">${vopt}</select>
-    <span class="pill ${V_STATUS_CLS[V.status]}" data-tour="v-status">${V.status}</span><span class="vb-who">${who}</span>
+    <span class="pill ${vPending(V)?'warn':V_STATUS_CLS[V.status]}" data-tour="v-status">${vPending(V)?'Pending approval':V.status}</span><input class="vb-note" id="vb-note" value="${esc(V.note||'')}" placeholder="V${V.v} – version note" title="Version note — what changes in this version" ${V.status==='Closed'?'disabled':''} aria-label="Version note"><span class="vb-who">${who}</span>
     ${live?`<span class="pill acc" title="one simulated contact ≈ ${DEMO_K.toLocaleString()} real contacts">${fmtK(active*DEMO_K)} inside · ${fmtK(conv*DEMO_K)} converted</span>`:''}
     <div class="grow"></div>
-    ${V.status==='Draft'?`<button class="btn sm primary" id="btn-activate" ${jCanAct()?'':'disabled title="Only an approver or an admin activates a version"'}>Activate</button>`:''}
+    ${V.status==='Draft'&&!vPending(V)&&!jCanAct()?`<button class="btn sm primary" id="btn-submit">Submit for approval</button>`:''}
+    ${V.status==='Draft'&&vPending(V)&&!jCanAct()?`<button class="btn sm outline" id="btn-withdraw">Withdraw</button>`:''}
+    ${V.status==='Draft'&&jCanAct()?`<button class="btn sm primary" id="btn-activate" title="${vPending(V)?'Approve and activate':'Activate without a submission'}">Activate</button>`:''}
     ${live?`<span class="dm-menu"><button class="btn sm outline" id="btn-stop" ${jCanAct()?'':'disabled title="Only an approver or an admin stops a version"'}>Stop ▾</button><div class="pop" hidden><button data-stop="closing" ${V.status==='Closing'?'disabled':''}>Closing — no new entries, contacts finish</button><button data-stop="closed" class="danger">Closed — release everyone now</button></div></span>`:''}
     <button class="btn sm outline" id="btn-copyv" title="New Draft version with these steps">Copy to new version</button>
     <span class="dm-menu"><button class="btn sm outline" id="btn-test">Test ▾</button><div class="pop" hidden><button data-test="count">Count matches of the entry</button><button data-test="first">Show first 10 matching contacts</button><button data-test="send">Test send every Delivery to the test users</button></div></span>
@@ -2711,6 +2729,9 @@ function renderVersionBar(C,active,conv){
   q('#btn-jback').onclick=jToList;
   q('#vsel').onchange=e=>{ j.cur=+e.target.value; selNode=null; validOpen=false; render(); fitView(); };
   const ba=q('#btn-activate'); if(ba) ba.onclick=()=>activateVersion(j,V);
+  const bs=q('#btn-submit'); if(bs) bs.onclick=()=>submitVersion(j,V);
+  const bw=q('#btn-withdraw'); if(bw) bw.onclick=()=>withdrawVersion(j,V);
+  q('#vb-note').onchange=e=>{ V.note=e.target.value.trim(); j.updated=TODAY; j.updatedBy=DEMO_USERS.me; renderCanvas(); }; q('#vb-note').onkeydown=e=>{ if(e.key==='Enter') e.target.blur(); };
   q('#btn-copyv').onclick=()=>copyVersion(j,V);
   q('#btn-report').onclick=()=>{ renderReport(); repModal.hidden=false; };
   bar.querySelectorAll('.dm-menu > .btn').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const pop=b.nextElementSibling, was=!pop.hidden; document.querySelectorAll('.dm-menu .pop').forEach(p=>p.hidden=true); pop.hidden=was; if(!was){ const r=b.getBoundingClientRect(); pop.style.left=Math.max(8,Math.min(r.left,innerWidth-pop.offsetWidth-8))+'px'; pop.style.top=(r.bottom+4)+'px'; } });
@@ -2728,14 +2749,14 @@ function renderJSettings(){ const j=jById(curJ), box=document.getElementById('js
   const sel=(k,label,opts,fmt)=>`<div class="fld"><label for="js-${k}">${label}</label><select id="js-${k}" data-js="${k}">${opts.map(o=>{ const [v,l]=Array.isArray(o)?o:[o,o]; return `<option value="${esc(v)}" ${String(j[k])===String(v)?'selected':''}>${esc(l)}</option>`; }).join('')}</select></div>`;
   box.innerHTML=`<div class="fld"><label class="req" for="js-name">Name</label><input id="js-name" data-js="name" value="${esc(j.name)}"></div>
     <div class="fld"><label for="js-desc">Description</label><input id="js-desc" data-js="desc" value="${esc(j.desc||'')}" placeholder="What this journey does, for your team"></div>
-    <div class="js-2">${sel('folder','Folder (project)',FOLDERS)}${PHASE2?sel('phase','Lifecycle phase',PHASES):''}</div>
+    <div class="js-2">${sel('folder','Project',FOLDERS)}${sel('contactList','Contact list',CONTACT_LISTS)}</div>${PHASE2?`<div class="js-2">${sel('phase','Lifecycle phase',PHASES)}</div>`:''}
     ${PHASE2?`<div class="js-2"><div class="fld"><label for="js-priority">Priority <span style="color:var(--ink-3)">1–100</span></label><input id="js-priority" data-js="priority" type="number" min="1" max="100" value="${j.priority}"></div>
       <div class="fld"><label for="js-endDate">End date</label><input id="js-endDate" data-js="endDate" type="date" value="${j.endDate||''}"></div></div>
     ${sel('expiryAction','At the end date',EXPIRY_ACTIONS)}`:''}
-    <label class="ck"><input type="checkbox" id="js-ignoreUnsub" ${j.ignoreUnsub?'checked':''}> Ignore unsubscribe <span class="tip" data-tip="Service messages only. When on, each Delivery step still has to confirm 'send even if unsubscribed' on its own.">i</span></label>
+    <label class="ck"><input type="checkbox" id="js-overrideUnsub" ${j.overrideUnsub?'checked':''}> Override unsubscribe <span class="tip" data-tip="Service messages only. When on, the journey carries a visible badge and each Delivery step still has to confirm 'send even if unsubscribed' on its own.">i</span></label>
     <div class="sec">Test users</div><div class="chips">${j.testUsers.map((t,i)=>`<span class="chip">${esc(t)} <a data-tu-del="${i}" title="Remove" style="cursor:pointer;color:var(--ink-3)">×</a></span>`).join('')}<button class="btn sm outline" id="js-tu-add">+ Add</button></div>`;
-  box.querySelectorAll('[data-js]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.js; j[k]=k==='priority'?Math.max(1,Math.min(100,+el.value||1)):el.value; j.updated=TODAY; if(k==='name'||k==='folder'||k==='phase') renderCanvas(); }));
-  box.querySelector('#js-ignoreUnsub').onchange=e=>{ if(e.target.checked&&!confirm('Ignore unsubscribe is for service messages only. Every Delivery step of this journey will ask you to confirm "send even if unsubscribed" separately. Turn it on?')){ e.target.checked=false; return; } j.ignoreUnsub=e.target.checked; renderNodePanel(); };
+  box.querySelectorAll('[data-js]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.js; j[k]=k==='priority'?Math.max(1,Math.min(100,+el.value||1)):el.value; j.updated=TODAY; j.updatedBy=DEMO_USERS.me; if(k==='name'||k==='folder'||k==='phase'||k==='contactList') renderCanvas(); }));
+  box.querySelector('#js-overrideUnsub').onchange=e=>{ if(e.target.checked&&!confirm('Override unsubscribe is for service messages only. Every Delivery step of this journey will ask you to confirm "send even if unsubscribed" separately. Turn it on?')){ e.target.checked=false; return; } j.overrideUnsub=e.target.checked; j.updated=TODAY; j.updatedBy=DEMO_USERS.me; renderCanvas(); renderNodePanel(); };
   box.querySelector('#js-tu-add').onclick=()=>{ const t=prompt('Test user (name or MSISDN):',''); if(t&&t.trim()){ j.testUsers.push(t.trim()); renderJSettings(); } };
   box.querySelectorAll('[data-tu-del]').forEach(a=>a.onclick=()=>{ j.testUsers.splice(+a.dataset.tuDel,1); renderJSettings(); });
 }
@@ -2748,9 +2769,12 @@ function journeyTemplate(kind,cfg){ const e=Object.assign(entryDefaults(kind),cf
    Journey Builder opens on a list, like Campaign (decision J1): campaign and journey are equal
    top-level entities and a journey estate has to be searchable. The canvas opens when a journey is
    opened or created. Creation uses the same centred screen as campaigns (decision J2). */
-let jMode='list', jQ='', jStatusF='All', jPage=1, jFitFor=null, jSel=new Set();
-const jFilter={folder:'',phase:'',trigger:''};
+let jMode='list', jQ='', jStatusF='Live', jPage=1, jFitFor=null, jSel=new Set();
+const jFilter={folder:'',phase:'',trigger:'',event:'',channel:''};
 const J_STATUSES=['Draft','Live','Past'];
+const J_TABS=[['Draft','Drafts'],['Live','Live'],['Past','Past']];
+const jEvent=j=>{ const e=mainCtx(j).nodes[0].cfg; return e.kind&&e.kind.startsWith('event')?e.event:''; };
+const jChannels=j=>[...new Set(mainCtx(j).nodes.filter(n=>n.type==='delivery').map(n=>String(n.cfg.channel).startsWith('Preferred')?'cascade':n.cfg.channel))];
 function jTrigger(j){ return entryText(mainCtx(j)); }
 /* entered (30 d) = contacts admitted into any version; the Monitor shows the per-version split */
 function jStats(j){ let inside=0, entered=0, conv=0; j.versions.forEach(V=>{ const ps=Object.values((sim[j.id+'@'+V.v]||{parts:{}}).parts); entered+=ps.length; inside+=ps.filter(p=>p.status==='active').length; conv+=ps.filter(p=>p.status==='converted').length; }); return {inside,entered,conv}; }
@@ -2779,7 +2803,7 @@ function jValidHtml(j){ const r=jValidate(j), pct=Math.round(100*r.done/r.total)
   return `<span class="mini" title="${esc(miss.length?miss.map(i=>'✕ '+i.l+(i.why?': '+i.why:'')).join(' · '):'Validation passed — every check is green')}"><i><b style="width:${pct}%"></b></i>${miss.length?'⚠ ':'✓ '}${r.done}/${r.total}</span>`; }
 function jFiltered(){ const q=jQ.toLowerCase(), f=jFilter;
   return JOURNEYS.filter(j=>(jStatusF==='All'||jStatus(j)===jStatusF)&&(!q||(j.id+' '+j.name+' '+(j.desc||'')).toLowerCase().includes(q))
-    &&(!f.folder||j.folder===f.folder)&&(!f.phase||j.phase===f.phase)&&(!f.trigger||mainCtx(j).nodes[0].cfg.kind===f.trigger)); }
+    &&(!f.folder||j.folder===f.folder)&&(!f.phase||j.phase===f.phase)&&(!f.trigger||mainCtx(j).nodes[0].cfg.kind===f.trigger)&&(!f.event||jEvent(j)===f.event)&&(!f.channel||jChannels(j).includes(f.channel))); }
 
 /* open a journey on the canvas; the first time a journey is shown it is fitted, later visits keep the pan and zoom */
 function jOpen(id,nodeId,v){ const j=jById(id); if(!j) return; curJ=id; validOpen=false; if(v) j.cur=v; else if(!jVer(j,j.cur)) j.cur=jMainV(j).v; selNode=nodeId||null; jMode='canvas';
@@ -2788,7 +2812,7 @@ function jOpen(id,nodeId,v){ const j=jById(id); if(!j) return; curJ=id; validOpe
 function jToList(){ jMode='list'; if(curView!=='journeys') showView('journeys'); else render(); }
 function jCreate(){ jMode='create'; jcc={name:'',desc:'',folder:FOLDERS[0],phase:PHASES[2],kind:'event',ev:EVENT_NAMES[0],seg:(MLS.find(m=>!m.excl)?mlLabel(MLS.find(m=>!m.excl)):''),attr:DATE_ATTRS[0]}; if(curView!=='journeys') showView('journeys'); else render(); }
 /* Duplicate = a new journey whose v1 Draft is a copy of the source's main version */
-function jCopy(id,folder){ const src=jById(id); const V=jMainV(src); const j=jBlank({id:nextJourneyId(),name:src.name+' (copy)',desc:src.desc,folder:folder||src.folder,phase:src.phase,priority:src.priority,endDate:src.endDate,expiryAction:src.expiryAction,ignoreUnsub:src.ignoreUnsub,testUsers:[...src.testUsers],entry:Object.assign({},src.entry),exit:Object.assign({},src.exit),versions:[{v:1,status:'Draft',createdAt:stamp(),nodes:JSON.parse(JSON.stringify(V.nodes))}],cur:1}); registerJourney(j); return j; }
+function jCopy(id,folder){ const src=jById(id); const V=jMainV(src); const j=jBlank({id:nextJourneyId(),name:src.name+' (copy)',desc:src.desc,folder:folder||src.folder,phase:src.phase,priority:src.priority,endDate:src.endDate,expiryAction:src.expiryAction,overrideUnsub:src.overrideUnsub,contactList:src.contactList,testUsers:[...src.testUsers],entry:Object.assign({},src.entry),exit:Object.assign({},src.exit),versions:[{v:1,status:'Draft',createdAt:stamp(),nodes:JSON.parse(JSON.stringify(V.nodes))}],cur:1}); registerJourney(j); return j; }
 
 function renderJourneysView(){ const lc=document.getElementById('jl-card'), sp=document.getElementById('jsplit'); if(!lc||!sp) return;
   sp.hidden=jMode!=='canvas'; lc.hidden=jMode==='canvas';
@@ -2799,32 +2823,33 @@ function renderJourneysView(){ const lc=document.getElementById('jl-card'), sp=d
 function coverageHtml(){ const live=JOURNEYS.filter(j=>jStatus(j)==='Live');
   return `<div class="cover" data-tour="coverage"><div class="cv-l">Lifecycle coverage<small>live journeys per phase</small></div>${PHASES.map(p=>{ const n=live.filter(j=>j.phase===p).length, all=JOURNEYS.filter(j=>j.phase===p).length; return `<button class="cv ${n?'':'gap'} ${jFilter.phase===p?'on':''}" data-cvp="${p}" title="${n} live · ${all} in total — click to filter"><b>${n}</b><span>${p}</span>${n?'':'<em>no live journey</em>'}</button>`; }).join('')}</div>`; }
 function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, pages=Math.max(1,Math.ceil(rows.length/per)); if(jPage>pages) jPage=pages; const page=rows.slice((jPage-1)*per,jPage*per);
-  const chip=(v)=>`<button class="fchip ${jStatusF===v?'on':''}" data-jst="${v}">${v}</button>`;
+  const tab=([v,l])=>`<button class="${jStatusF===v?'on':''}" data-jst="${v}">${l} <span class="n">${JOURNEYS.filter(j=>jStatus(j)===v).length}</span></button>`;
+  const evs=[...new Set(JOURNEYS.map(jEvent).filter(Boolean))].sort(), chans=[...new Set(JOURNEYS.flatMap(jChannels))];
   const sel=(k,label,opts)=>`<select data-jf="${k}" aria-label="${label}"><option value="">${label}: any</option>${opts.map(o=>`<option value="${esc(o)}" ${f[k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
   const selN=jSel.size;
   card.innerHTML=`<div class="card-h"><h2>Journeys</h2><div class="grow"></div><button class="btn primary sm" id="jl-new" style="white-space:nowrap">+ New journey</button>
-      <p>${CONTACTS_TOTAL.toLocaleString()} contacts · ${FOLDERS.length} folders · ${JOURNEYS.filter(j=>jStatus(j)==='Live').length} live journeys. A journey is a container; its steps live in a version (Draft → Active → Closing → Closed); a journey is Live while a version is Active or Closing.</p></div>
+      <p>${CONTACTS_TOTAL.toLocaleString()} contacts · ${FOLDERS.length} projects · ${JOURNEYS.filter(j=>jStatus(j)==='Live').length} live journeys. Every journey starts from an event; its steps live in a version (Draft → Active → Closing → Closed).</p></div>
+    <div class="tabs jtabs" id="jtabs">${J_TABS.map(tab).join('')}</div>
     ${PHASE2?coverageHtml():''}
     <div class="toolrow" style="gap:8px">
       <div class="search-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="jl-q" placeholder="Search by name, description or journey ID" value="${esc(jQ)}" aria-label="Search journeys"></div>
-      <div class="chipbar"><span style="color:var(--ink-3);font-size:11px">STATUS</span>${chip('All')}${J_STATUSES.map(chip).join('')}</div>
-      ${sel('folder','Folder',FOLDERS)}${PHASE2?sel('phase','Phase',PHASES):''}<select data-jf="trigger" aria-label="Entry type"><option value="">Entry type: any</option>${Object.entries(ENTRY_KINDS).filter(([k,m])=>p1(m)).map(([k,m])=>`<option value="${k}" ${f.trigger===k?'selected':''}>${esc(m.k)}</option>`).join('')}</select>
+      ${sel('folder','Project',FOLDERS)}${sel('event','Event',evs)}${sel('channel','Channel',chans)}${PHASE2?sel('phase','Phase',PHASES)+`<select data-jf="trigger" aria-label="Entry type"><option value="">Entry type: any</option>${Object.entries(ENTRY_KINDS).map(([k,m])=>`<option value="${k}" ${f.trigger===k?'selected':''}>${esc(m.k)}</option>`).join('')}</select>`:''}
       <span class="kpi"><b>${rows.length}</b> journeys</span>
     </div>
-    ${selN?`<div class="bulk"><b>${selN} selected</b><button class="btn sm outline" id="jl-bdup">Duplicate</button><label>Move to folder <select id="jl-bmove"><option value="">choose…</option>${FOLDERS.map(x=>`<option>${esc(x)}</option>`).join('')}</select></label><button class="btn sm outline" id="jl-bclear">Clear selection</button></div>`:''}
+    ${selN?`<div class="bulk"><b>${selN} selected</b><button class="btn sm outline" id="jl-bdup">Duplicate</button><label>Move to project <select id="jl-bmove"><option value="">choose…</option>${FOLDERS.map(x=>`<option>${esc(x)}</option>`).join('')}</select></label><button class="btn sm outline" id="jl-bclear">Clear selection</button></div>`:''}
     <div class="padx" style="overflow:auto">
-    <table class="tbl" id="jl-table"><thead><tr><th style="width:28px"><input type="checkbox" id="jl-all" aria-label="Select all on this page" ${page.length&&page.every(j=>jSel.has(j.id))?'checked':''}></th><th>Journey</th><th>Folder</th><th>Phase</th><th>Status</th><th>Active version</th><th class="num" title="Contacts admitted in the last 30 days">Entered (30d)</th><th>Last activated</th><th>Actions</th></tr></thead>
+    <table class="tbl" id="jl-table"><thead><tr><th style="width:28px"><input type="checkbox" id="jl-all" aria-label="Select all on this page" ${page.length&&page.every(j=>jSel.has(j.id))?'checked':''}></th><th>Journey</th><th>Project</th><th>Event</th><th>Channels</th><th>Active version</th><th class="num" title="Contacts admitted in the last 30 days">Entered (30d)</th><th>Last modified</th><th>Modified by</th><th>Actions</th></tr></thead>
     <tbody>${page.map(j=>{ const t=jTrigger(j), s=jStats(j), st=jStatus(j), A=jActive(j), cl=j.versions.filter(v=>v.status==='Closing'), D=j.versions.filter(v=>v.status==='Draft');
       return `<tr class="row" data-jid="${j.id}"><td><input type="checkbox" data-jsel="${j.id}" ${jSel.has(j.id)?'checked':''} aria-label="Select ${esc(j.name)}"></td>
-        <td><span class="lnk">${esc(j.name)}</span><br><span style="color:var(--ink-3);font-size:11px"><span class="mono">${j.id}</span> · ${t.k}${t.sub?' · '+esc(t.sub):''}</span></td>
-        <td><span class="chip">${esc(j.folder)}</span></td><td>${esc(j.phase)}</td>
-        <td><span class="pill ${J_STATUS_CLS[st]}">${st}</span></td>
-        <td>${A?`<b>v${A.v}</b>`:'<span style="color:var(--ink-3)">—</span>'}${cl.length?` <span class="pill warn" title="Closing: no new entries, contacts finish">v${cl.map(v=>v.v).join(', v')} closing</span>`:''}${D.length?` <span class="pill grey">v${D.map(v=>v.v).join(', v')} draft</span>`:''}</td>
+        <td><span class="lnk">${esc(j.name)}</span>${j.overrideUnsub?' <span class="pill warn" title="Override unsubscribe is on">override unsubscribe</span>':''}<br><span style="color:var(--ink-3);font-size:11px"><span class="mono">${j.id}</span> · ${esc(j.contactList||'Customers')}${j.desc?' · '+esc(j.desc):''}</span></td>
+        <td><span class="chip">${esc(j.folder)}</span></td><td>${jEvent(j)?`<span class="mono">${esc(jEvent(j))}</span><br><span style="color:var(--ink-3);font-size:11px">${esc(t.k)}</span>`:esc(t.k)}</td>
+        <td>${jChannels(j).map(c=>`<span class="chip">${esc(chName(c))}</span>`).join(' ')||'<span style="color:var(--ink-3)">—</span>'}</td>
+        <td>${A?`<b>v${A.v}</b>${A.note?`<br><span style="color:var(--ink-2);font-size:11px">${esc(A.note)}</span>`:''}`:'<span style="color:var(--ink-3)">—</span>'}${cl.length?` <span class="pill warn" title="Closing: no new entries, contacts finish">v${cl.map(v=>v.v).join(', v')} closing</span>`:''}${D.length?` <span class="pill ${D.some(vPending)?'warn':'grey'}">v${D.map(v=>v.v).join(', v')} ${D.some(vPending)?'pending approval':'draft'}</span>`:''}</td>
         <td class="num">${fmtK(s.entered*DEMO_K)}${s.inside?` <span style="color:var(--ink-3);font-size:11px">· ${fmtK(s.inside*DEMO_K)} inside</span>`:''}</td>
-        <td class="num" style="white-space:nowrap">${fmtWhen(jLastActivated(j))||'—'}</td>
+        <td class="num" style="white-space:nowrap">${esc(j.updated||j.created||'—')}</td><td style="white-space:nowrap">${esc(j.updatedBy||j.createdBy||'—')}</td>
         <td><span class="act"><button class="btn sm outline" data-jopen="${j.id}">Open</button><span class="dm-menu"><button class="btn sm outline" data-jmore="${j.id}" aria-haspopup="true" title="More actions">More ▾</button>
-          <div class="pop" hidden><button data-jmon="${j.id}">Monitor</button><button data-jrep="${j.id}">Execution report</button><button data-jcopy="${j.id}">Duplicate</button><hr>${FOLDERS.filter(x=>x!==j.folder).map(x=>`<button data-jmove="${j.id}" data-to="${esc(x)}">Move to ${esc(x)}</button>`).join('')}</div></span></span></td></tr>`; }).join('')
-      ||`<tr><td colspan="9" class="empty">No journey matches that. Clear the filters, or start a new one — the canvas opens with the entry step in place.<div style="margin-top:10px;display:flex;gap:8px;justify-content:center"><button class="btn sm outline" id="jl-clear">Clear filters</button><button class="btn sm primary" id="jl-new2">+ New journey</button></div></td></tr>`}</tbody></table></div>
+          <div class="pop" hidden><button data-jmon="${j.id}">Monitor</button><button data-jrep="${j.id}">Execution report</button><button data-jcopy="${j.id}">Duplicate</button><hr><div class="pop-l">Move to project</div>${FOLDERS.filter(x=>x!==j.folder).map(x=>`<button data-jmove="${j.id}" data-to="${esc(x)}">${esc(x)}</button>`).join('')}</div></span></span></td></tr>`; }).join('')
+      ||`<tr><td colspan="10" class="empty">No journey matches that. Clear the filters, or start a new one — the canvas opens with the entry step in place.<div style="margin-top:10px;display:flex;gap:8px;justify-content:center"><button class="btn sm outline" id="jl-clear">Clear filters</button><button class="btn sm primary" id="jl-new2">+ New journey</button></div></td></tr>`}</tbody></table></div>
     <div class="pager">${Array.from({length:pages},(_,i)=>`<button class="${i+1===jPage?'on':''}" data-jp="${i+1}">${i+1}</button>`).join('')}</div>`;
   const q=s=>card.querySelector(s);
   q('#jl-q').oninput=e=>{ jQ=e.target.value; jPage=1; const v=jQ; renderJList(card); const i=q('#jl-q'); i.focus(); i.setSelectionRange(v.length,v.length); };
@@ -2832,13 +2857,14 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
   card.querySelectorAll('[data-jf]').forEach(el=>el.onchange=()=>{ jFilter[el.dataset.jf]=el.value; jPage=1; renderJList(card); });
   card.querySelectorAll('[data-cvp]').forEach(b=>b.onclick=()=>{ jFilter.phase=jFilter.phase===b.dataset.cvp?'':b.dataset.cvp; jPage=1; renderJList(card); });
   q('#jl-new').onclick=jCreate; if(q('#jl-new2')) q('#jl-new2').onclick=jCreate;
-  if(q('#jl-clear')) q('#jl-clear').onclick=()=>{ jQ=''; jStatusF='All'; Object.keys(jFilter).forEach(k=>jFilter[k]=''); jPage=1; renderJList(card); };
+  if(q('#jl-clear')) q('#jl-clear').onclick=()=>{ jQ=''; jStatusF='Live'; Object.keys(jFilter).forEach(k=>jFilter[k]=''); jPage=1; renderJList(card); };
   q('#jl-all').onchange=e=>{ page.forEach(j=>e.target.checked?jSel.add(j.id):jSel.delete(j.id)); renderJList(card); };
   card.querySelectorAll('[data-jsel]').forEach(c=>c.onchange=()=>{ c.checked?jSel.add(c.dataset.jsel):jSel.delete(c.dataset.jsel); renderJList(card); });
   const bd=q('#jl-bdup'); if(bd) bd.onclick=()=>{ const ids=[...jSel]; ids.forEach(id=>jCopy(id)); jSel.clear(); toast('Duplicated',`${ids.length} journey(s) copied as new Drafts (v1).`); renderJList(card); };
   const bm=q('#jl-bmove'); if(bm) bm.onchange=()=>{ const to=bm.value; if(!to) return; let n=0; jSel.forEach(id=>{ const j=jById(id); if(j.folder!==to){ j.folder=to; j.updated=TODAY; n++; } }); jSel.clear(); toast('Moved',`${n} journey(s) moved to ${to}.`); renderJList(card); };
   const bc=q('#jl-bclear'); if(bc) bc.onclick=()=>{ jSel.clear(); renderJList(card); };
   card.querySelectorAll('#jl-table tr[data-jid]').forEach(tr=>tr.onclick=e=>{ if(e.target.closest('button,.pop,input')) return; jOpen(tr.dataset.jid); });
+  card.querySelectorAll('.jtabs button').forEach(b=>b.onclick=()=>{ jStatusF=b.dataset.jst; jPage=1; renderJList(card); });
   card.querySelectorAll('[data-jopen]').forEach(b=>b.onclick=()=>jOpen(b.dataset.jopen));
   /* the menu is placed against the viewport, so the table's scroll box never clips it */
   const place=(b,pop)=>{ const r=b.getBoundingClientRect(), h=pop.offsetHeight, w=pop.offsetWidth; pop.style.left=Math.max(8,r.right-w)+'px'; pop.style.top=(r.bottom+4+h>innerHeight-8?r.top-4-h:r.bottom+4)+'px'; };
