@@ -2,6 +2,14 @@
 
 Version numbers follow the published artifact versions.
 
+## v65 — 8 Oct 2026
+**Journey Studio Phase 1, step (c): Event entries, Delivery parity, flow nodes.**
+- Entry types are **Event – single contact** and **Event – multiple contacts** (events: order_abandoned, account_created, device_back_in_stock, plan_changed, payment_failed; the journey's contact list; payload fields shown as `{{payload.…}}` placeholders; create-if-missing; "processed within 60 s"; **API code** with a single or a batch sample request).
+- Delivery: channels **Email · SMS · Push**; the existing per-channel fields (Email subject / preheader / body, SMS text with a character and segment counter, Push title / text / link); **FR / EN language variants** with a default language, picked by the contact's `LANGUAGE`; an optional **offer** picker whose name and URL become placeholders; placeholders from contact attributes and the entry event's payload; control-group share, policy picker, per-step "send even if unsubscribed" when the journey overrides; **skip rule** — a contact without an address / token / consent skips the step, continues, and is counted as skipped (stats strip sent · skipped · opened · clicked; channel totals likewise).
+- Wait duration in hours or days (relative to the previous step); Control group gets a **name**; Engagement split is opened / clicked + Remaining.
+- Test mode: **Send a test event** with an editable JSON payload goes through the real entry; test send per language variant on each Delivery.
+- Validation: "every Delivery has content in its default language".
+
 ## v64 — 8 Oct 2026
 **Journey Studio Phase 1, step (b): versions, notes, approval, management.**
 - Every version has a free-text **version note**, edited inline on the version bar and shown in the version dropdown and the list's active-version column.
