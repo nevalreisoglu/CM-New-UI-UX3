@@ -2,6 +2,9 @@
 
 Version numbers follow the published artifact versions.
 
+## v63 — 8 Oct 2026
+**Journey Studio Phase 1, step (a): the `PHASE2` flag.** The Phase 1 brief (v3, 8 Oct) narrows the prototype to event-triggered journeys. Everything built from the earlier brief that is now Phase 2 stays in the file behind one flag (`PHASE2=false`, next to `PHASES`): Segment / Date attribute / Joins list / Unengaged / Digital Twin / Agent entries and the schedule component, Until date / For event / For segment match / Priority waits, Set attribute / Call external / Audience sync, lifecycle phase + coverage strip, priority, end date + expiry action, anomaly alerts, step export, the Engagement split's converted / bounced. Palette, create screen, entry panel, settings, list filters, monitor and validation read the flag. Specs follow the Phase 1 state.
+
 ## v62 — 5 Oct 2026
 **Journey Studio, phase (e): Fizz sample data, scale, docs.**
 - Demo datamart is Fizz-flavoured: FR/EN first names, Québec cities, Fizz-like plan names, `fr`/`en` language, `+1 5XX` numbers, CAD. Signed-in users are bilingual fictional names. The chrome reads "Etiya · Journey Studio".

@@ -18,18 +18,13 @@ test.describe('journey monitor', () => {
     const tiles = await app.$$eval('#mon-body .stats .stat .l', (els) => els.map((e) => e.textContent.trim()));
     expect(tiles).toEqual(['Entered', 'Active now', 'Exited', 'Conversions']);
     await expect(app.locator('#mon-body .tbl').first()).toContainText('Email');
-    // alerts are framed as the Marketing Agent's, with a confidence level
-    await expect(app.locator('#mon-body .pill.acc', { hasText: 'Marketing Agent' })).toBeVisible();
-    const alerts = app.locator('#mon-body .alert');
-    expect(await alerts.count()).toBeGreaterThanOrEqual(2);
-    expect(await alerts.count()).toBeLessThanOrEqual(3);
-    await expect(alerts.first()).toContainText(/confidence/);
-    await expect(alerts.first()).toContainText('vs 30-day baseline');
+    // anomaly alerts are Phase 2: nothing of the Marketing Agent shows while PHASE2 is off
+    expect(await app.locator('#mon-body .alert').count()).toBe(0);
+    await expect(app.locator('#mon-body')).not.toContainText('Marketing Agent');
     // one row per version, newest first
     const vs = await app.$$eval('#mvtable tbody tr td:first-child', (els) => els.map((e) => e.textContent.trim()));
     expect(vs).toEqual(['v4', 'v3']);
-    await alerts.first().locator('[data-al-dismiss]').click();
-    expect(await app.locator('#mon-body .alert').count()).toBeLessThanOrEqual(2);
+    expect(await app.locator('[data-mexport]').count(), 'step export is Phase 2').toBe(0);
   });
 
   test('View version draws the read-only canvas with the stats strip and lists the steps', async ({ app }) => {
@@ -51,20 +46,12 @@ test.describe('journey monitor', () => {
     await expect(app.locator('#vsel')).toHaveValue('3');
   });
 
-  test('a step opens the export with four strategies and a mock download', async ({ app }) => {
+  test('a step on the version canvas selects it in the steps table (export is Phase 2)', async ({ app }) => {
     await openMonitor(app);
     await app.locator('#mon-tabs [data-mt="version"]').click();
     await app.locator('#mcanvas .node[data-id="s2"]').click();
-    const m = app.locator('#exp-modal');
-    await expect(m).toBeVisible();
-    await expect(m.locator('#exp-sub')).toContainText('Email winback');
-    const strategies = await m.locator('.exp-s b').allTextContents();
-    expect(strategies).toEqual(['Entered the step', 'Exited the step', 'Was in the step', 'Entered and exited']);
-    await m.locator('input[value="exited"]').check();
-    await expect(m.locator('#exp-count')).toContainText('contact(s)');
-    await m.locator('#exp-go').click();
-    await expect(m).toBeHidden();
-    await expect(app.locator('#toast')).toContainText('Export started (mock)');
+    await expect(app.locator('#exp-modal')).toBeHidden();
+    await expect(app.locator('#mon-body tr[data-mn="s2"]')).toHaveClass(/sel/);
   });
 
   test('the time range scales the numbers; the simulation strip drives the stats strip', async ({ app }) => {

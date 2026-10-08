@@ -13,19 +13,15 @@ async function openJourney(app, id) {
 const versions = (app, id) => app.evaluate((jid) => JOURNEYS.find((j) => j.id === jid).versions.map((v) => [v.v, v.status]), id);
 
 test.describe('journey versions', () => {
-  test('the list derives Draft / Live / Past from the versions and shows the lifecycle coverage', async ({ app }) => {
+  test('the list derives Draft / Live / Past from the versions', async ({ app }) => {
     const statuses = await app.$$eval('#jl-table tbody tr[data-jid] td:nth-child(5) .pill', (ps) => ps.map((p) => p.textContent.trim()));
     expect(statuses).toEqual(['Live', 'Live', 'Live', 'Live', 'Live', 'Draft', 'Past']);
     // JRN-01 carries an Active v13 and a Closing v12
     const row = app.locator('#jl-table tr[data-jid="JRN-01"]');
     await expect(row).toContainText('v13');
     await expect(row.locator('.pill.warn')).toContainText('v12 closing');
-    // five phases, one of them without a live journey (Retain only has the Draft)
-    expect(await app.locator('.cover .cv').count()).toBe(5);
-    expect(await app.locator('.cover .cv.gap').count()).toBe(1);
-    await app.locator('.cover .cv[data-cvp="Retain"]').click();
-    expect(await app.locator('#jl-table tbody tr[data-jid]').count()).toBe(1);
-    await expect(app.locator('#jl-table tbody tr[data-jid]')).toHaveAttribute('data-jid', 'JRN-06');
+    // the lifecycle coverage strip is Phase 2
+    expect(await app.locator('.cover').count()).toBe(0);
   });
 
   test('the version bar names the version, who activated it and when; the structure is locked', async ({ app }) => {
@@ -79,22 +75,21 @@ test.describe('journey versions', () => {
     await expect(app.locator('#jl-table tr[data-jid="JRN-04"] td:nth-child(5) .pill')).toHaveText('Past');
   });
 
-  test('journey settings live on the panel: folder, phase, priority, end date, ignore unsubscribe, test users', async ({ app }) => {
+  test('journey settings live on the panel: folder, ignore unsubscribe, test users (phase / priority / end date are Phase 2)', async ({ app }) => {
     await openJourney(app, 'JRN-05');
     const set = app.locator('#jset');
     await expect(set).toHaveAttribute('open', '');
-    await app.selectOption('#js-phase', 'Retain');
-    await app.fill('#js-priority', '90');
+    await app.selectOption('#js-folder', 'churn_reduction');
+    expect(await app.locator('#js-phase, #js-priority, #js-endDate').count(), 'phase, priority and end date are Phase 2').toBe(0);
     await app.locator('#js-tu-add').click({ trial: true }); // the prompt() is not driven here
-    const j = await app.evaluate(() => { const x = JOURNEYS.find((j) => j.id === 'JRN-05'); return { phase: x.phase, priority: x.priority, tu: x.testUsers.length }; });
-    expect(j).toEqual({ phase: 'Retain', priority: 90, tu: 1 });
+    const j = await app.evaluate(() => { const x = JOURNEYS.find((j) => j.id === 'JRN-05'); return { folder: x.folder, tu: x.testUsers.length }; });
+    expect(j).toEqual({ folder: 'churn_reduction', tu: 1 });
     // selecting a step folds the settings away and shows the step
     await app.locator('#canvas .node').first().click();
     await expect(set).not.toHaveAttribute('open', '');
     await expect(app.locator('#jp-title')).toContainText('Step');
-    // and the phase change is already on the list's coverage strip
     await app.locator('#btn-jback').click();
-    await expect(app.locator('.cover .cv[data-cvp="Retain"] b')).toHaveText('1');
+    await expect(app.locator('#jl-table tr[data-jid="JRN-05"]')).toContainText('churn_reduction');
   });
 
   test('Create your journey asks for folder and phase and starts a Draft v1', async ({ app }) => {

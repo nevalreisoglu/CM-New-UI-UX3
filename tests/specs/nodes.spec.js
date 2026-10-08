@@ -20,27 +20,16 @@ test.describe('step inventory', () => {
     const groups = await app.$$eval('#palette .pg span', (els) => els.map((e) => e.textContent.trim()));
     expect(groups).toEqual(['Entry', 'Message', 'Wait', 'Split', 'Action']);
     const labels = await app.$$eval('#palette button:not(.tog) span', (els) => els.map((e) => e.textContent.replace(/\s*CM$/, '').trim()));
-    expect(labels).toEqual([
-      'Segment', 'Date attribute', 'Event (API / BSS)', 'Joins list', 'Unengaged', 'Digital Twin signal', 'Agent suggestion',
-      'Delivery',
-      'Wait duration', 'Wait until date', 'Wait for event', 'Wait for segment match', 'Priority',
-      'Engagement split', 'Segment split', 'Shuffle',
-      'Set attribute', 'Call external', 'Control group', 'Audience sync', 'Exit',
-    ]);
+    // Phase 1 inventory (PHASE2 off): one Event entry, Delivery, Duration wait, three splits, Control group and Exit
+    expect(labels).toEqual(['Event (API / BSS)', 'Delivery', 'Wait duration', 'Engagement split', 'Segment split', 'Shuffle', 'Control group', 'Exit']);
   });
 
-  test('an Entry palette item swaps the type of the one entry step instead of adding a step', async ({ app }) => {
+  test('the Entry group offers only the Event entry in Phase 1 and shows its API code sample', async ({ app }) => {
     await openDraft(app);
-    const before = (await nodesOf(app)).length;
-    await app.locator('#palette button[data-tour="pal-entry-unengaged"]').click();
-    const nodes = await nodesOf(app);
-    expect(nodes.length).toBe(before);
-    expect(nodes.filter((n) => n[1] === 'entry').length).toBe(1);
-    expect(await app.evaluate(() => curCtx().nodes[0].cfg.kind)).toBe('unengaged');
-    await expect(app.locator('#jp-title')).toContainText('Entry · Unengaged');
-    await expect(app.locator('#f-days')).toHaveValue('90');
-    // the Event entry shows an API code sample
-    await app.locator('#jp-body [data-ek="event"]').click();
+    expect(await app.locator('#palette button[data-tour^="pal-entry-"]').count()).toBe(1);
+    await app.locator('#canvas .node[data-id="e1"]').click();
+    expect(await app.locator('#jp-body [data-ek]').count()).toBe(1);
+    await expect(app.locator('#jp-title')).toContainText('Entry · Event');
     await app.locator('#btn-apicode').click();
     await expect(app.locator('#apicode')).toContainText('POST https://api.example.com/journeys/v1/events');
   });
@@ -77,9 +66,10 @@ test.describe('step inventory', () => {
     await app.locator('#palette button[data-tour="pal-splitEng"]').click();
     await expect(app.locator('#jp-title')).toContainText('Engagement split');
     await expect(app.locator('#f-delivery')).toHaveValue('s2');
-    await app.locator('#jp-body [data-int="converted"]').click();
+    // Phase 1: opened and clicked only
+    expect(await app.locator('#jp-body [data-int]').count()).toBe(2);
     const paths = await app.$$eval('#jp-body .path b', (els) => els.map((e) => e.textContent.trim()));
-    expect(paths).toEqual(['opened', 'clicked', 'converted', 'Remaining']);
+    expect(paths).toEqual(['opened', 'clicked', 'Remaining']);
   });
 
   test('validation names the gaps and blocks Activate until they are fixed', async ({ app }) => {

@@ -287,6 +287,7 @@ svg.canvas{display:block;width:100%;height:100%;user-select:none}
 .jvalid li a{color:var(--cta-hover);cursor:pointer;text-decoration:underline}
 .mon-top{flex-wrap:wrap}.mon-tabs{margin:0 6px}.mon-top select{border:1px solid var(--line);border-radius:4px;padding:5px 8px;background:#fff}
 .mon-2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.mon-2.one{grid-template-columns:1fr}
 .mon-canvas{position:relative;margin:0 20px 8px;height:380px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
 .mon-canvas .canvas{width:100%;height:100%}
 .node.warn rect.body{stroke:#C23B22;stroke-width:2}
@@ -1559,13 +1560,13 @@ const TODAY='2026-09-14';
    auto-Closed when empty). Journey status is derived: Draft / Live / Past (jStatus). */
 /* ---- entry: one node per version, cfg.kind picks the entry type ---- */
 const ENTRY_KINDS={
-  segment:{k:'Segment',ic:'◉',d:'Contacts matching a segment, evaluated on a schedule.'},
-  dateAttr:{k:'Date attribute',ic:'📅',d:'N days before / after a date on the contact — birthday, trial end, contract end.'},
+  segment:{p2:true,k:'Segment',ic:'◉',d:'Contacts matching a segment, evaluated on a schedule.'},
+  dateAttr:{p2:true,k:'Date attribute',ic:'📅',d:'N days before / after a date on the contact — birthday, trial end, contract end.'},
   event:{k:'Event (API / BSS)',ic:'⚡',d:'Immediate: an event arrives from the API or the BSS.'},
-  joinsList:{k:'Joins list',ic:'⊕',d:'Immediate: a contact is added to a list or datamart.'},
-  unengaged:{k:'Unengaged',ic:'◌',d:'No engagement on a channel for N days.'},
-  twin:{k:'Digital Twin signal',ic:'✦',d:'A score or community change from Digital Twin.',cm:true},
-  agent:{k:'Agent suggestion',ic:'✧',d:'Proposed by the Marketing Agent, with its rationale.',cm:true},
+  joinsList:{p2:true,k:'Joins list',ic:'⊕',d:'Immediate: a contact is added to a list or datamart.'},
+  unengaged:{p2:true,k:'Unengaged',ic:'◌',d:'No engagement on a channel for N days.'},
+  twin:{p2:true,k:'Digital Twin signal',ic:'✦',d:'A score or community change from Digital Twin.',cm:true},
+  agent:{p2:true,k:'Agent suggestion',ic:'✧',d:'Proposed by the Marketing Agent, with its rationale.',cm:true},
 };
 const DATE_ATTRS=['BIRTHDAY','TRIAL_END_DATE','CONTRACT_END_DATE','PLAN_ANNIVERSARY','LAST_PAYMENT_DATE','PORT_IN_DATE'];
 const EVENT_NAMES=['order_abandoned','account_created','plan_changed','payment_failed','payment_received','level_up','referral_sent','data_topup','trial_ended','sim_activated','plan_cancel_requested','support_ticket_closed'];
@@ -1585,6 +1586,14 @@ function entryDefaults(kind){ const base={kind,includeProject:true,reentry:'afte
     twin:{signal:TWIN_SIGNALS[0],threshold:0.7},
     agent:{rationale:'Contacts whose data use fell 40% in 30 days and who opened no email since — the Agent proposes a winback nudge before the next invoice.'}};
   return Object.assign(base,per[kind]||{}); }
+/* ---------- PHASE CONFIG ----------
+   Phase 1 of the Journey Studio roadmap shows event-triggered journeys only. Everything built from the earlier,
+   wider brief stays in the file behind this one flag: Segment / Date attribute / Joins list / Unengaged / Digital
+   Twin / Agent entries, the schedule component, Until date / For event / For segment match / Priority waits, Set
+   attribute / Call external / Audience sync, lifecycle phase + coverage strip, end date + expiry action, anomaly
+   alerts, step export, the Engagement split's converted / bounced interactions. Flip it to true to see them. */
+const PHASE2=false;
+const p1=m=>PHASE2||!m.p2;   // "is this item shown in the current phase"
 const PHASES=['Acquire','Onboard','Grow','Retain','Winback'];
 const FOLDERS=['churn_reduction','free-trial','loyalty','console-marketing'];
 const EXPIRY_ACTIONS=[['closing','Closing — no new entries, contacts inside finish'],['closed','Closed — stop everything']];
@@ -2176,21 +2185,22 @@ const NODE_META={
   entry:{k:'Entry',ic:'⇥',g:'entry',t:'entry'},
   delivery:{k:'Delivery',ic:'✉',g:'message',t:'delivery'},
   waitDur:{k:'Wait duration',ic:'◷',g:'wait',t:'timer'},
-  waitDate:{k:'Wait until date',ic:'▦',g:'wait',t:'timer'},
-  waitEvent:{k:'Wait for event',ic:'⚡',g:'wait',t:'wait',paths:()=>['accepted','rejected','timeout']},
-  waitSeg:{k:'Wait for segment match',ic:'◔',g:'wait',t:'wait',paths:()=>['matched','timeout']},
-  waitPrio:{k:'Priority',ic:'⇅',g:'wait',t:'wait',paths:()=>['allowed','denied']},
+  waitDate:{p2:true,k:'Wait until date',ic:'▦',g:'wait',t:'timer'},
+  waitEvent:{p2:true,k:'Wait for event',ic:'⚡',g:'wait',t:'wait',paths:()=>['accepted','rejected','timeout']},
+  waitSeg:{p2:true,k:'Wait for segment match',ic:'◔',g:'wait',t:'wait',paths:()=>['matched','timeout']},
+  waitPrio:{p2:true,k:'Priority',ic:'⇅',g:'wait',t:'wait',paths:()=>['allowed','denied']},
   splitEng:{k:'Engagement split',ic:'⑂',g:'split',t:'cond',paths:n=>[...(n.cfg.interactions||[]),'Remaining']},
   splitSeg:{k:'Segment split',ic:'⑃',g:'split',t:'cond',paths:n=>[...(n.cfg.segments||[]).map(s=>String(s).split(' · ')[0]),'Remaining']},
   splitShuffle:{k:'Shuffle',ic:'⤨',g:'split',t:'cond',paths:n=>(n.cfg.paths||[]).map(p=>p.label)},
-  setAttr:{k:'Set attribute',ic:'✎',g:'action',t:'ext'},
-  callExt:{k:'Call external',ic:'⇄',g:'action',t:'ext'},
+  setAttr:{p2:true,k:'Set attribute',ic:'✎',g:'action',t:'ext'},
+  callExt:{p2:true,k:'Call external',ic:'⇄',g:'action',t:'ext'},
   ctrlGroup:{k:'Control group',ic:'◐',g:'action',t:'par'},
-  audSync:{k:'Audience sync',ic:'⇪',g:'action',t:'call'},
+  audSync:{p2:true,k:'Audience sync',ic:'⇪',g:'action',t:'call'},
   exit:{k:'Exit',ic:'◎',g:'action',t:'exit'},
 };
 const pathsOf=n=>{ const m=NODE_META[n.type]; return m&&m.paths?m.paths(n):null; };
-const INTERACTIONS=[['opened','Opened'],['clicked','Clicked'],['converted','Converted'],['bounced','Bounced']];
+const INTERACTIONS_ALL=[['opened','Opened'],['clicked','Clicked'],['converted','Converted','p2'],['bounced','Bounced','p2']];
+const INTERACTIONS=INTERACTIONS_ALL.filter(x=>PHASE2||!x[2]);
 const ENDPOINTS=[['CRM ticket','webhook'],['Billing credit','mcp'],['Loyalty points','mcp'],['Partner offer','webhook'],['Slack #cvm-alerts','webhook']];
 const ROLLUPS=['Marketing outbound · max 2 / week','Service messages · no cap','Winback offers · 1 / 30 days'];
 const AD_PLATFORMS=['Meta Ads','Google Ads'];
@@ -2397,7 +2407,7 @@ function renderNodePanel(){
   let html=`<div class="fld"><label for="f-label">Step name</label><input id="f-label" data-k="__label" value="${esc(n.label)}"></div>`;
   switch(n.type){
     case 'entry': { const e=n.cfg, K=ENTRY_KINDS[e.kind]||{};
-      html+=`<div class="etype">${Object.entries(ENTRY_KINDS).map(([k,m])=>`<button type="button" class="${k===e.kind?'on':''}" data-ek="${k}" title="${esc(m.d)}" ${locked?'disabled':''}><i>${m.ic}</i>${esc(m.k)}${m.cm?'<small>CM</small>':''}</button>`).join('')}</div><div class="note" style="margin-top:4px">${esc(K.d||'')}</div>`;
+      html+=`<div class="etype">${Object.entries(ENTRY_KINDS).filter(([k,m])=>p1(m)||k===e.kind).map(([k,m])=>`<button type="button" class="${k===e.kind?'on':''}" data-ek="${k}" title="${esc(m.d)}" ${locked?'disabled':''}><i>${m.ic}</i>${esc(m.k)}${m.cm?'<small>CM</small>':''}</button>`).join('')}</div><div class="note" style="margin-top:4px">${esc(K.d||'')}</div>`;
       switch(e.kind){
         case 'segment': html+=sel('segment','Segment',segOpts)+two(selP('freq','Evaluation',EVAL_FREQ.map(x=>[x,x])),selP('slot','Time slot',EVAL_SLOTS.map(x=>[x,x]))); break;
         case 'dateAttr': html+=sel('attr','Date attribute',DATE_ATTRS)+two(f('offset','Offset (days)',e.offset,'number','min="0" max="365"'),selP('dir','Relative to the date',[['before','before'],['on','on the date'],['after','after']]))+ck('yearly','Repeats every year (birthday, anniversary)'); break;
@@ -2473,8 +2483,8 @@ function buildPalette(){
   const p=document.getElementById('palette');
   NODE_GROUPS.forEach(([g,label,hint])=>{
     const h=document.createElement('div'); h.className='pg'; h.innerHTML=`<span>${label}</span>${hint?`<small>${hint}</small>`:''}`; p.appendChild(h);
-    if(g==='entry'){ Object.entries(ENTRY_KINDS).forEach(([k,m])=>{ const b=document.createElement('button'); b.style.setProperty('--c','var(--t-entry-i)'); b.style.setProperty('--bg2','var(--t-entry)'); b.innerHTML=`<i>${m.ic}</i><span>${m.k}${m.cm?' <em>CM</em>':''}</span>`; b.title=m.k+' — '+m.d; b.dataset.tour='pal-entry-'+k; b.addEventListener('pointerdown',e=>{ if(e.button===0) window.paletteDown(b,'entry',e,k,m.k); }); b.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setEntryKind(k); } }); p.appendChild(b); }); return; }
-    Object.entries(NODE_META).filter(([t,m])=>m.g===g).forEach(([t,m])=>{
+    if(g==='entry'){ Object.entries(ENTRY_KINDS).filter(([k,m])=>p1(m)).forEach(([k,m])=>{ const b=document.createElement('button'); b.style.setProperty('--c','var(--t-entry-i)'); b.style.setProperty('--bg2','var(--t-entry)'); b.innerHTML=`<i>${m.ic}</i><span>${m.k}${m.cm?' <em>CM</em>':''}</span>`; b.title=m.k+' — '+m.d; b.dataset.tour='pal-entry-'+k; b.addEventListener('pointerdown',e=>{ if(e.button===0) window.paletteDown(b,'entry',e,k,m.k); }); b.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setEntryKind(k); } }); p.appendChild(b); }); return; }
+    Object.entries(NODE_META).filter(([t,m])=>m.g===g&&p1(m)).forEach(([t,m])=>{
       const b=document.createElement('button'); b.style.setProperty('--c',`var(--t-${m.t}-i)`); b.style.setProperty('--bg2',`var(--t-${m.t})`);
       b.innerHTML=`<i>${m.ic}</i><span>${m.k}</span>`; b.title=m.k; b.dataset.tour='pal-'+t;
       b.addEventListener('pointerdown',e=>{ if(e.button===0) window.paletteDown(b,t,e,null,m.k); });
@@ -2529,7 +2539,7 @@ function monCtx(){ const j=jById(document.getElementById('msel').value||curJ)||J
 /* channel totals across the journey's live versions */
 function channelTotals(j){ const out={}; j.versions.forEach(V=>{ const C=ctxOf(j,V), S=simOf(C); Object.values(S.parts).forEach(p=>{ for(const nid in p.eng){ const n=node(C,nid); if(!n) continue; const ch=String(n.cfg.channel).startsWith('Preferred')?'cascade':n.cfg.channel; const o=out[ch]=out[ch]||{sent:0,opened:0,clicked:0,converted:0}; const e=p.eng[nid]; if(e.sent) o.sent++; if(e.opened) o.opened++; if(e.clicked) o.clicked++; if(e.converted) o.converted++; } }); }); return out; }
 /* Marketing Agent anomaly alerts: steps whose daily volume deviates from the 30-day baseline (mock, deterministic per journey) */
-function anomaliesFor(j){ const out=[]; j.versions.filter(V=>V.status==='Active'||V.status==='Closing').forEach(V=>{ const C=ctxOf(j,V); C.nodes.forEach((n,i)=>{ if(n.type==='entry'||n.type==='exit') return; const h=hashOf(j.id+V.v+n.id); if(h>0.42) return; const st=nodeStats(C,n); if(!st.entered) return; const base=Math.max(3,st.entered)*monScale(); const dev=h<0.2?-(0.35+h):0.4+h; const today=Math.max(0,Math.round(base/30*(1+dev)));
+function anomaliesFor(j){ const out=[]; if(!PHASE2) return out; j.versions.filter(V=>V.status==='Active'||V.status==='Closing').forEach(V=>{ const C=ctxOf(j,V); C.nodes.forEach((n,i)=>{ if(n.type==='entry'||n.type==='exit') return; const h=hashOf(j.id+V.v+n.id); if(h>0.42) return; const st=nodeStats(C,n); if(!st.entered) return; const base=Math.max(3,st.entered)*monScale(); const dev=h<0.2?-(0.35+h):0.4+h; const today=Math.max(0,Math.round(base/30*(1+dev)));
       out.push({vkey:C.id,v:V.v,node:n.id,label:n.label,type:(NODE_META[n.type]||{}).k,dev,today,baseline:Math.round(base/30),conf:Math.abs(dev)>0.5?'high':'medium',title:`${dev<0?'−':'+'}${Math.round(Math.abs(dev)*100)}% vs 30-day baseline`,
         why:n.type==='delivery'?(dev<0?'Fewer contacts reach this Delivery than usual — check the step before it and the policy caps.':'More contacts than usual reach this Delivery — a segment or the entry may have widened.'):n.type.startsWith('wait')?(dev<0?'Fewer contacts are released from this wait — the event source may be delayed.':'Contacts pile up in this wait — the timeout path is taking most of them.'):(dev<0?'This path receives fewer contacts than its baseline.':'This path receives more contacts than its baseline.')}); }); });
   return out.sort((a,b)=>Math.abs(b.dev)-Math.abs(a.dev)).slice(0,3); }
@@ -2548,12 +2558,12 @@ function renderMonGeneral(body,j,k){
   const r=S.history.length-1; const at=Math.min(ptimeAt===null?r:ptimeAt,r); const snap=S.history[at]||{};
   body.innerHTML=`<div class="h4" style="display:flex;align-items:center;gap:8px">${esc(j.name)} <span class="mono" style="color:var(--ink-3);font-weight:400">${j.id}</span><span class="pill ${J_STATUS_CLS[jStatus(j)]}">${jStatus(j)}</span><span class="chip">${esc(j.folder)}</span><span class="chip">${esc(j.phase)}</span><span style="margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px">${monRange==='all'?'all time':'last '+monRange+' days'}</span></div>
     <div class="stats"><div class="stat"><div class="l">Entered</div><div class="v">${fmtK(entered*k)}</div><div class="s">all versions</div></div><div class="stat"><div class="l">Active now</div><div class="v">${fmtK(active*k)}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Exited</div><div class="v">${fmtK(exited*k)}</div><div class="s">incl. held out</div></div><div class="stat"><div class="l">Conversions</div><div class="v">${fmtK(conv*k)}</div><div class="s">${pct(conv,entered)} of entered</div></div></div>
-    <div class="mon-2">
+    <div class="mon-2 ${PHASE2?'':'one'}">
       <div><div class="h4">Channel totals</div><div class="padx"><table class="tbl"><thead><tr><th>Channel</th><th class="num">Sent</th><th class="num">Opened</th><th class="num">Clicked</th><th class="num">Converted</th></tr></thead><tbody>${Object.entries(ch).map(([c,o])=>`<tr><td><b>${esc(chName(c))}</b></td><td class="num">${fmtK(o.sent*k)}</td><td class="num">${fmtK(o.opened*k)} <small style="color:var(--ink-3)">${pct(o.opened,o.sent)}</small></td><td class="num">${fmtK(o.clicked*k)} <small style="color:var(--ink-3)">${pct(o.clicked,o.opened)}</small></td><td class="num">${fmtK(o.converted*k)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No delivery has run yet — advance the simulated clock.</td></tr>'}</tbody></table></div></div>
-      <div><div class="h4" style="display:flex;align-items:center;gap:8px">Anomaly alerts <span class="pill acc" style="font-weight:400">Marketing Agent</span></div><div class="padx alerts">${an.map(a=>`<div class="alert ${a.dev<0?'down':'up'}"><div class="al-h"><b>${esc(a.label)}</b><span class="mono">v${a.v} · ${a.node}</span><span class="pill ${a.conf==='high'?'bad':'warn'}">${a.conf} confidence</span></div><div class="al-n"><b>${fmtK(a.today)}</b> today vs <b>${fmtK(a.baseline)}</b>/day baseline <em>${esc(a.title)}</em></div><div class="al-w">${esc(a.why)}</div><div class="al-f"><button class="btn sm outline" data-al-open="${a.v}" data-al-node="${a.node}">Open step</button><button class="btn sm outline" data-al-dismiss="${a.vkey}/${a.node}">Dismiss</button></div></div>`).join('')||'<div class="empty">No step deviates from its 30-day baseline right now.</div>'}</div></div>
+      ${PHASE2?`<div><div class="h4" style="display:flex;align-items:center;gap:8px">Anomaly alerts <span class="pill acc" style="font-weight:400">Marketing Agent</span></div><div class="padx alerts">${an.map(a=>`<div class="alert ${a.dev<0?'down':'up'}"><div class="al-h"><b>${esc(a.label)}</b><span class="mono">v${a.v} · ${a.node}</span><span class="pill ${a.conf==='high'?'bad':'warn'}">${a.conf} confidence</span></div><div class="al-n"><b>${fmtK(a.today)}</b> today vs <b>${fmtK(a.baseline)}</b>/day baseline <em>${esc(a.title)}</em></div><div class="al-w">${esc(a.why)}</div><div class="al-f"><button class="btn sm outline" data-al-open="${a.v}" data-al-node="${a.node}">Open step</button><button class="btn sm outline" data-al-dismiss="${a.vkey}/${a.node}">Dismiss</button></div></div>`).join('')||'<div class="empty">No step deviates from its 30-day baseline right now.</div>'}</div></div>`:''}
     </div>
     <div class="h4">Versions</div>
-    <div class="padx"><table class="tbl" id="mvtable"><thead><tr><th>Version</th><th>Status</th><th>Activated</th><th>Entry</th><th class="num">Entered</th><th class="num">Inside</th><th class="num">Exited</th><th class="num">Converted</th><th></th></tr></thead><tbody>${j.versions.slice().reverse().map(V=>{ const C=ctxOf(j,V), ps=Object.values(simOf(C).parts), t=entryText(C); return `<tr class="row" data-mv="${V.v}"><td><b>v${V.v}</b></td><td><span class="pill ${V_STATUS_CLS[V.status]}">${V.status}</span></td><td>${V.activatedAt?esc(fmtWhen(V.activatedAt))+'<br><span style="color:var(--ink-3);font-size:11px">'+esc(V.activatedBy||'')+'</span>':'<span style="color:var(--ink-3)">—</span>'}</td><td>${esc(t.k)}<br><span style="color:var(--ink-3);font-size:11px">${esc(t.sub)}</span></td><td class="num">${fmtK(ps.length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status==='active').length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status!=='active').length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status==='converted').length*k)}</td><td><span class="act"><button class="btn sm outline" data-mview="${V.v}">View version</button><button class="btn sm outline" data-mexport="${V.v}">Step export</button></span></td></tr>`; }).join('')}</tbody></table></div>
+    <div class="padx"><table class="tbl" id="mvtable"><thead><tr><th>Version</th><th>Status</th><th>Activated</th><th>Entry</th><th class="num">Entered</th><th class="num">Inside</th><th class="num">Exited</th><th class="num">Converted</th><th></th></tr></thead><tbody>${j.versions.slice().reverse().map(V=>{ const C=ctxOf(j,V), ps=Object.values(simOf(C).parts), t=entryText(C); return `<tr class="row" data-mv="${V.v}"><td><b>v${V.v}</b></td><td><span class="pill ${V_STATUS_CLS[V.status]}">${V.status}</span></td><td>${V.activatedAt?esc(fmtWhen(V.activatedAt))+'<br><span style="color:var(--ink-3);font-size:11px">'+esc(V.activatedBy||'')+'</span>':'<span style="color:var(--ink-3)">—</span>'}</td><td>${esc(t.k)}<br><span style="color:var(--ink-3);font-size:11px">${esc(t.sub)}</span></td><td class="num">${fmtK(ps.length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status==='active').length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status!=='active').length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status==='converted').length*k)}</td><td><span class="act"><button class="btn sm outline" data-mview="${V.v}">View version</button>${PHASE2?`<button class="btn sm outline" data-mexport="${V.v}">Step export</button>`:''}</span></td></tr>`; }).join('')}</tbody></table></div>
     <div class="h4">Participants at a point in time <span style="font-weight:400;color:var(--ink-3)">— v${main.v}</span></div>
     <div class="toolrow"><label for="ptime" style="color:var(--ink-2)">Show state as of</label><input type="range" id="ptime" min="0" max="${r}" value="${at}"><span class="pill" id="ptime-lbl">Day ${at}${at===r?' (now)':''}</span><button class="btn sm outline" id="btn-csv">Download CSV</button></div>
     <div class="padx"><table class="tbl" id="ptable"><thead><tr><th>Contact</th><th>Segment</th><th>Current step(s)</th><th>Status</th><th>Entered by</th><th>Preferred channels</th><th>Since</th></tr></thead><tbody>${Object.entries(snap).slice(0,40).map(([cid,p])=>{ const c=CUSTOMERS.find(x=>x.id===cid)||{seg:'',pref:[],name:''}; const st=p.status; const cls=st==='converted'?'ok':st==='active'?'acc':''; const live=S.parts[cid]||{}; return `<tr><td class="mono">${cid}<br><span style="color:var(--ink-3)">${esc(c.name)}</span></td><td>${esc(c.seg)}</td><td>${p.pos.map(x=>{const nd=node(main,x); return nd?`<span class="chip">${esc(nd.label)}</span>`:''}).join(' ')||'—'}</td><td><span class="pill ${cls}">${st}</span></td><td>${live.enteredBy||'preload'}</td><td>${c.pref.join(' → ')}</td><td class="num">day ${p.since}</td></tr>`; }).join('')||'<tr><td colspan="7" class="empty">Nobody has entered this version yet.</td></tr>'}</tbody></table></div>`;
@@ -2568,11 +2578,11 @@ let ptimeAt=null, monSel=null;
 function renderMonVersion(body,C,k){
   const j=C.j, V=C.V, live=V.status==='Active'||V.status==='Closing'; const an=anomaliesFor(j);
   body.innerHTML=`<div class="h4" style="display:flex;align-items:center;gap:8px">${esc(j.name)} <span class="mono" style="color:var(--ink-3);font-weight:400">${j.id}</span> · v${V.v} <span class="pill ${V_STATUS_CLS[V.status]}">${V.status}</span>${V.activatedAt?`<span style="font-weight:400;color:var(--ink-2);font-size:12px">activated by ${esc(V.activatedBy||'')} · ${esc(fmtWhen(V.activatedAt))}</span>`:''}<span style="margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px">${live?'stats strip · '+(monRange==='all'?'all time':'last '+monRange+' days'):'no statistics — version is '+V.status}</span><button class="btn sm outline" id="mon-open">Open in builder</button></div>
-    <div class="mon-canvas" id="mcwrap"><svg class="canvas" id="mcanvas" xmlns="http://www.w3.org/2000/svg"></svg><div class="legend">read-only · click a step for its export · ! = Marketing Agent alert</div></div>
+    <div class="mon-canvas" id="mcwrap"><svg class="canvas" id="mcanvas" xmlns="http://www.w3.org/2000/svg"></svg><div class="legend">read-only${PHASE2?' · click a step for its export · ! = Marketing Agent alert':' · click a step to select it'}</div></div>
     <div class="h4">Steps</div>
-    <div class="padx"><table class="tbl"><thead><tr><th>Step</th><th>Type</th><th class="num">Entered</th><th class="num">Waiting</th><th class="num">Exited</th><th>Delivery funnel</th><th></th></tr></thead><tbody>${C.nodes.map(n=>{ const st=nodeStats(C,n); const a=an.find(x=>x.vkey===C.id&&x.node===n.id); return `<tr class="row ${monSel===n.id?'sel':''}" data-mn="${n.id}"><td><b>${esc(n.label)}</b> <span class="mono" style="color:var(--ink-3)">${n.id}</span>${a?' <span class="pill bad" title="'+esc(a.title)+'">!</span>':''}</td><td>${esc(n.type==='entry'?(ENTRY_KINDS[n.cfg.kind]||{}).k||'Entry':(NODE_META[n.type]||{}).k||n.type)}</td><td class="num">${fmtK(st.entered*k)}</td><td class="num">${fmtK(st.waiting*k)}</td><td class="num">${fmtK(st.exited*k)}</td><td>${n.type==='delivery'?`sent ${fmtK(st.sent*k)} · opened ${fmtK(st.opened*k)} · clicked ${fmtK(st.clicked*k)} · conv ${fmtK(st.converted*k)}`:'<span style="color:var(--ink-3)">—</span>'}</td><td><button class="btn sm outline" data-mexp="${n.id}">Export</button></td></tr>`; }).join('')}</tbody></table></div>`;
+    <div class="padx"><table class="tbl"><thead><tr><th>Step</th><th>Type</th><th class="num">Entered</th><th class="num">Waiting</th><th class="num">Exited</th><th>Delivery funnel</th><th></th></tr></thead><tbody>${C.nodes.map(n=>{ const st=nodeStats(C,n); const a=an.find(x=>x.vkey===C.id&&x.node===n.id); return `<tr class="row ${monSel===n.id?'sel':''}" data-mn="${n.id}"><td><b>${esc(n.label)}</b> <span class="mono" style="color:var(--ink-3)">${n.id}</span>${a?' <span class="pill bad" title="'+esc(a.title)+'">!</span>':''}</td><td>${esc(n.type==='entry'?(ENTRY_KINDS[n.cfg.kind]||{}).k||'Entry':(NODE_META[n.type]||{}).k||n.type)}</td><td class="num">${fmtK(st.entered*k)}</td><td class="num">${fmtK(st.waiting*k)}</td><td class="num">${fmtK(st.exited*k)}</td><td>${n.type==='delivery'?`sent ${fmtK(st.sent*k)} · opened ${fmtK(st.opened*k)} · clicked ${fmtK(st.clicked*k)} · conv ${fmtK(st.converted*k)}`:'<span style="color:var(--ink-3)">—</span>'}</td><td>${PHASE2?`<button class="btn sm outline" data-mexp="${n.id}">Export</button>`:''}</td></tr>`; }).join('')}</tbody></table></div>`;
   const svg=body.querySelector('#mcanvas'); const vw=fitInto(svg,C); drawVersion(svg,C,vw,{locked:true,closed:!live,live,readonly:true,sel:monSel,anomalies:an,scale:k});
-  svg.querySelectorAll('.node').forEach(g=>g.onclick=()=>{ monSel=g.dataset.id; openExport(j,V.v,monSel); });
+  svg.querySelectorAll('.node').forEach(g=>g.onclick=()=>{ monSel=g.dataset.id; if(PHASE2) openExport(j,V.v,monSel); else renderMonitor(); });
   body.querySelectorAll('[data-mn]').forEach(tr=>tr.onclick=e=>{ if(e.target.closest('button')) return; monSel=tr.dataset.mn; renderMonitor(); });
   body.querySelectorAll('[data-mexp]').forEach(b=>b.onclick=()=>openExport(j,V.v,b.dataset.mexp));
   body.querySelector('#mon-open').onclick=()=>jOpen(j.id,monSel,V.v);
@@ -2718,10 +2728,10 @@ function renderJSettings(){ const j=jById(curJ), box=document.getElementById('js
   const sel=(k,label,opts,fmt)=>`<div class="fld"><label for="js-${k}">${label}</label><select id="js-${k}" data-js="${k}">${opts.map(o=>{ const [v,l]=Array.isArray(o)?o:[o,o]; return `<option value="${esc(v)}" ${String(j[k])===String(v)?'selected':''}>${esc(l)}</option>`; }).join('')}</select></div>`;
   box.innerHTML=`<div class="fld"><label class="req" for="js-name">Name</label><input id="js-name" data-js="name" value="${esc(j.name)}"></div>
     <div class="fld"><label for="js-desc">Description</label><input id="js-desc" data-js="desc" value="${esc(j.desc||'')}" placeholder="What this journey does, for your team"></div>
-    <div class="js-2">${sel('folder','Folder (project)',FOLDERS)}${sel('phase','Lifecycle phase',PHASES)}</div>
-    <div class="js-2"><div class="fld"><label for="js-priority">Priority <span style="color:var(--ink-3)">1–100</span></label><input id="js-priority" data-js="priority" type="number" min="1" max="100" value="${j.priority}"></div>
+    <div class="js-2">${sel('folder','Folder (project)',FOLDERS)}${PHASE2?sel('phase','Lifecycle phase',PHASES):''}</div>
+    ${PHASE2?`<div class="js-2"><div class="fld"><label for="js-priority">Priority <span style="color:var(--ink-3)">1–100</span></label><input id="js-priority" data-js="priority" type="number" min="1" max="100" value="${j.priority}"></div>
       <div class="fld"><label for="js-endDate">End date</label><input id="js-endDate" data-js="endDate" type="date" value="${j.endDate||''}"></div></div>
-    ${sel('expiryAction','At the end date',EXPIRY_ACTIONS)}
+    ${sel('expiryAction','At the end date',EXPIRY_ACTIONS)}`:''}
     <label class="ck"><input type="checkbox" id="js-ignoreUnsub" ${j.ignoreUnsub?'checked':''}> Ignore unsubscribe <span class="tip" data-tip="Service messages only. When on, each Delivery step still has to confirm 'send even if unsubscribed' on its own.">i</span></label>
     <div class="sec">Test users</div><div class="chips">${j.testUsers.map((t,i)=>`<span class="chip">${esc(t)} <a data-tu-del="${i}" title="Remove" style="cursor:pointer;color:var(--ink-3)">×</a></span>`).join('')}<button class="btn sm outline" id="js-tu-add">+ Add</button></div>`;
   box.querySelectorAll('[data-js]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const k=el.dataset.js; j[k]=k==='priority'?Math.max(1,Math.min(100,+el.value||1)):el.value; j.updated=TODAY; if(k==='name'||k==='folder'||k==='phase') renderCanvas(); }));
@@ -2757,7 +2767,7 @@ function jValidate(j){ if(j.versions) j=mainCtx(j); const ids=new Set(j.nodes.ma
   const badShuffle=j.nodes.filter(n=>n.type==='splitShuffle'&&(n.cfg.paths||[]).reduce((t,p)=>t+(+p.w||0),0)!==100);
   const items=[
     {l:'An entry step exists and is set up',ok:!!entry&&!(entry.cfg.kind==='segment'&&!entry.cfg.segment)&&!(entry.cfg.kind==='event'&&!entry.cfg.event)},
-    {l:'Every wait has a duration or a date',ok:!noWait.length,why:names(noWait)},
+    ...(PHASE2?[{l:'Every wait has a duration or a date',ok:!noWait.length,why:names(noWait)}]:[]),
     {l:'Every segment split / wait names a segment',ok:!noSeg.length,why:names(noSeg)},
     {l:'Every engagement split is bound to a Delivery',ok:!unbound.length,why:names(unbound)},
     {l:'Every path ends in an Exit',ok:!dangling.length,why:names(dangling)},
@@ -2794,11 +2804,11 @@ function renderJList(card){ const f=jFilter, rows=jFiltered(); const per=8, page
   const selN=jSel.size;
   card.innerHTML=`<div class="card-h"><h2>Journeys</h2><div class="grow"></div><button class="btn primary sm" id="jl-new" style="white-space:nowrap">+ New journey</button>
       <p>${CONTACTS_TOTAL.toLocaleString()} contacts · ${FOLDERS.length} folders · ${JOURNEYS.filter(j=>jStatus(j)==='Live').length} live journeys. A journey is a container; its steps live in a version (Draft → Active → Closing → Closed); a journey is Live while a version is Active or Closing.</p></div>
-    ${coverageHtml()}
+    ${PHASE2?coverageHtml():''}
     <div class="toolrow" style="gap:8px">
       <div class="search-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="jl-q" placeholder="Search by name, description or journey ID" value="${esc(jQ)}" aria-label="Search journeys"></div>
       <div class="chipbar"><span style="color:var(--ink-3);font-size:11px">STATUS</span>${chip('All')}${J_STATUSES.map(chip).join('')}</div>
-      ${sel('folder','Folder',FOLDERS)}${sel('phase','Phase',PHASES)}<select data-jf="trigger" aria-label="Entry type"><option value="">Entry type: any</option>${Object.entries(ENTRY_KINDS).map(([k,m])=>`<option value="${k}" ${f.trigger===k?'selected':''}>${esc(m.k)}</option>`).join('')}</select>
+      ${sel('folder','Folder',FOLDERS)}${PHASE2?sel('phase','Phase',PHASES):''}<select data-jf="trigger" aria-label="Entry type"><option value="">Entry type: any</option>${Object.entries(ENTRY_KINDS).filter(([k,m])=>p1(m)).map(([k,m])=>`<option value="${k}" ${f.trigger===k?'selected':''}>${esc(m.k)}</option>`).join('')}</select>
       <span class="kpi"><b>${rows.length}</b> journeys</span>
     </div>
     ${selN?`<div class="bulk"><b>${selN} selected</b><button class="btn sm outline" id="jl-bdup">Duplicate</button><label>Move to folder <select id="jl-bmove"><option value="">choose…</option>${FOLDERS.map(x=>`<option>${esc(x)}</option>`).join('')}</select></label><button class="btn sm outline" id="jl-bclear">Clear selection</button></div>`:''}
@@ -2855,7 +2865,7 @@ function renderJCreate(card){ const c=jcc;
     <div class="fld cc-name"><label for="jc-name" class="req">Journey name</label><input id="jc-name" maxlength="100" value="${esc(c.name)}" placeholder="e.g. Payment failed – dunning" autocomplete="off"></div>
     <div class="fld"><label for="jc-desc">Description</label><input id="jc-desc" value="${esc(c.desc)}" placeholder="What this journey does, for your team"></div>
     <div class="jc-2"><div class="fld"><label for="jc-folder">Folder (project)</label><select id="jc-folder">${FOLDERS.map(x=>`<option ${c.folder===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div><div class="fld"><label for="jc-phase">Lifecycle phase</label><select id="jc-phase">${PHASES.map(x=>`<option ${c.phase===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div></div>
-    <div class="cc-sec"><div class="cc-l">What starts it? <small>— the entry type; it can be changed on the canvas</small></div><div class="cc-trig ek">${Object.entries(ENTRY_KINDS).map(([k,m])=>`<button type="button" class="cc-card ${c.kind===k?'on':''}" data-trig="${k}" aria-pressed="${c.kind===k}"><i>${m.ic}</i><b>${esc(m.k)}${m.cm?' <small>CM</small>':''}</b><span>${esc(m.d)}</span></button>`).join('')}</div>
+    <div class="cc-sec"><div class="cc-l">What starts it? <small>— the entry type; it can be changed on the canvas</small></div><div class="cc-trig ek">${Object.entries(ENTRY_KINDS).filter(([k,m])=>p1(m)).map(([k,m])=>`<button type="button" class="cc-card ${c.kind===k?'on':''}" data-trig="${k}" aria-pressed="${c.kind===k}"><i>${m.ic}</i><b>${esc(m.k)}${m.cm?' <small>CM</small>':''}</b><span>${esc(m.d)}</span></button>`).join('')}</div>
       <div class="jc-follow">${follow}</div></div>
     <div class="cc-go"><button class="btn primary" id="jc-start">Start building</button></div>
     <div class="cc-tpl"><div class="cc-l">Start from a template <small>— a copy of an existing journey</small></div>

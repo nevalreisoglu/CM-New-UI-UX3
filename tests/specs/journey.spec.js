@@ -35,16 +35,17 @@ test.describe('journey builder and monitor', () => {
     await expect(app.locator('#jl-card .cc-hd h2')).toHaveText('Create your journey');
     await expect(app.locator('#jsplit')).toBeHidden();
     await expect(app.locator('#jc-name')).toBeFocused();
-    await expect(app.locator('#jl-card [data-trig]')).toHaveCount(7);
-    await app.locator('[data-trig="segment"]').click();
-    await expect(app.locator('#jc-seg')).toBeVisible();
+    // Phase 1: only the Event entry is offered (PHASE2 off)
+    await expect(app.locator('#jl-card [data-trig]')).toHaveCount(1);
+    await app.locator('[data-trig="event"]').click();
+    await expect(app.locator('#jc-ev')).toBeVisible();
     await app.locator('#jc-start').click();
     await expect(app.locator('#toast')).toContainText('Name is required');
     await app.locator('#jc-name').fill('Package expiring — renewal nudge');
     await app.locator('#jc-start').click();
     await expect(app.locator('#jsplit')).toBeVisible();
     const j = await app.evaluate(() => { const x = JOURNEYS.find((y) => y.id === curJ); const n = x.versions[0].nodes; return { name: x.name, status: jStatus(x), entry: n[0].type, kind: n[0].cfg.kind, exit: n[1].type }; });
-    expect(j).toEqual({ name: 'Package expiring — renewal nudge', status: 'Draft', entry: 'entry', kind: 'segment', exit: 'exit' });
+    expect(j).toEqual({ name: 'Package expiring — renewal nudge', status: 'Draft', entry: 'entry', kind: 'event', exit: 'exit' });
     await expect(app.locator('#canvas .node').first()).toBeVisible();
   });
 
