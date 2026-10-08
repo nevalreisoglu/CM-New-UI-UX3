@@ -2,6 +2,12 @@
 
 Version numbers follow the published artifact versions.
 
+## v66 — 8 Oct 2026
+**Journey Studio Phase 1, step (d): monitoring.**
+- Journey Monitor · General: totals **entered / in journey / exited**, channel totals with the skipped column, the versions table. The participant slider is gone.
+- New **Contacts tab** — the per-customer log CM lacks for event-triggered sends: contact, event, received at, version, current step, status (waiting / in step / exited / held out), last delivery result (incl. *skipped · reason*); a lookup box; a row opens the contact's **step history** and, for a test event, its payload.
+- Validation panel blocks *Submit for approval* with the Phase 1 set (entry, split without segment, shuffle ≠ 100 %, unbound engagement split, Delivery without default-language content, dangling path). Stats strip: entered · waiting · exited; Delivery sent · skipped · opened · clicked.
+
 ## v65 — 8 Oct 2026
 **Journey Studio Phase 1, step (c): Event entries, Delivery parity, flow nodes.**
 - Entry types are **Event – single contact** and **Event – multiple contacts** (events: order_abandoned, account_created, device_back_in_stock, plan_changed, payment_failed; the journey's contact list; payload fields shown as `{{payload.…}}` placeholders; create-if-missing; "processed within 60 s"; **API code** with a single or a batch sample request).

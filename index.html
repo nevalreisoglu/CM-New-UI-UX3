@@ -282,6 +282,12 @@ svg.canvas{display:block;width:100%;height:100%;user-select:none}
 /* delivery language tabs, sms counter (Phase 1) */
 .langtabs{display:flex;align-items:center;gap:8px}.langtabs .tabs{flex:1}.langtabs .tabs button small{font-size:9px;padding:0 4px;border-radius:3px;background:var(--acc-soft);color:var(--cta-hover);vertical-align:middle}.langtabs .tabs button i{font-style:normal;color:var(--warn)}
 .smscount{font-weight:400;color:var(--ink-3);margin-left:6px}.smscount.warn{color:var(--warn)}
+/* contacts tab (Phase 1) */
+.clog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-size:12px}
+.clog li{display:grid;grid-template-columns:120px 150px 1fr;gap:10px;padding:4px 8px;border-radius:4px;background:var(--surface-2)}
+.clog li .t{color:var(--ink-3);font-family:var(--mono);font-size:11px}.clog li .n{font-weight:600}
+.clog li.ok span:last-child{color:var(--ok)}.clog li.warn span:last-child{color:var(--warn)}
+tr.chist td{background:var(--surface);padding:10px 12px 14px}
 /* validation panel, monitor (Journey Studio) */
 .jvalid{border-bottom:1px solid var(--line);background:var(--warn-soft);padding:8px 14px;font-size:12.5px}
 .jvalid .jv-h{display:flex;align-items:center;gap:10px}.jvalid .jv-h span{color:var(--ink-2);font-size:11.5px}.jvalid .jv-h .x{margin-left:auto}
@@ -1343,10 +1349,10 @@ i.pro,.tb .tc i.pro{background:var(--ok)} i.pas,.tb .tc i.pas{background:#9595B0
     <!-- MONITOR -->
     <section class="view" id="view-monitor">
       <div class="card left" id="mon-card" style="flex:1;overflow:auto">
-        <div class="card-h"><h2>Journey Monitor</h2><p>Per journey: totals, versions and step statistics. The stats strip on every step comes from the same counters the builder shows.</p></div>
+        <div class="card-h"><h2>Journey Monitor</h2><p>Per journey: totals, versions, the version canvas with its stats strip, and every contact's current step and history. The counters are the ones the builder shows.</p></div>
         <div class="toolrow mon-top">
           <label for="msel" style="color:var(--ink-2)">Journey</label><select id="msel"></select>
-          <div class="tabs mon-tabs" id="mon-tabs"><button data-mt="general" class="on">General</button><button data-mt="version">View version</button></div>
+          <div class="tabs mon-tabs" id="mon-tabs"><button data-mt="general" class="on">General</button><button data-mt="version">View version</button><button data-mt="contacts">Contacts</button></div>
           <span id="mon-vwrap" hidden><label for="mvsel" style="color:var(--ink-2)">Version</label><select id="mvsel"></select></span>
           <div class="grow"></div>
           <label for="mrange" style="color:var(--ink-2)">Time range</label><select id="mrange"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select>
@@ -2609,32 +2615,46 @@ function renderMonitor(){
   document.querySelectorAll('#mon-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.mt===monTab));
   document.getElementById('mon-vwrap').hidden=monTab!=='version';
   const mv=document.getElementById('mvsel'); mv.innerHTML=j.versions.slice().reverse().map(V=>`<option value="${V.v}" ${V.v===C.v?'selected':''}>v${V.v} · ${V.status}</option>`).join('');
-  if(monTab==='general') renderMonGeneral(body,j,k); else renderMonVersion(body,C,k);
+  if(monTab==='general') renderMonGeneral(body,j,k); else if(monTab==='contacts') renderMonContacts(body,j,k); else renderMonVersion(body,C,k);
 }
 function renderMonGeneral(body,j,k){
   let entered=0, active=0, exited=0, conv=0; j.versions.forEach(V=>{ const ps=Object.values(simOf(ctxOf(j,V)).parts); entered+=ps.length; active+=ps.filter(p=>p.status==='active').length; conv+=ps.filter(p=>p.status==='converted').length; exited+=ps.filter(p=>p.status!=='active').length; });
   const ch=channelTotals(j), an=anomaliesFor(j); const pct=(a,b)=>b?Math.round(1000*a/b)/10+'%':'—';
   const main=mainCtx(j), S=simOf(main);
   const r=S.history.length-1; const at=Math.min(ptimeAt===null?r:ptimeAt,r); const snap=S.history[at]||{};
-  body.innerHTML=`<div class="h4" style="display:flex;align-items:center;gap:8px">${esc(j.name)} <span class="mono" style="color:var(--ink-3);font-weight:400">${j.id}</span><span class="pill ${J_STATUS_CLS[jStatus(j)]}">${jStatus(j)}</span><span class="chip">${esc(j.folder)}</span><span class="chip">${esc(j.phase)}</span><span style="margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px">${monRange==='all'?'all time':'last '+monRange+' days'}</span></div>
-    <div class="stats"><div class="stat"><div class="l">Entered</div><div class="v">${fmtK(entered*k)}</div><div class="s">all versions</div></div><div class="stat"><div class="l">Active now</div><div class="v">${fmtK(active*k)}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Exited</div><div class="v">${fmtK(exited*k)}</div><div class="s">incl. held out</div></div><div class="stat"><div class="l">Conversions</div><div class="v">${fmtK(conv*k)}</div><div class="s">${pct(conv,entered)} of entered</div></div></div>
+  body.innerHTML=`<div class="h4" style="display:flex;align-items:center;gap:8px">${esc(j.name)} <span class="mono" style="color:var(--ink-3);font-weight:400">${j.id}</span><span class="pill ${J_STATUS_CLS[jStatus(j)]}">${jStatus(j)}</span><span class="chip">${esc(j.folder)}</span>${PHASE2?`<span class="chip">${esc(j.phase)}</span>`:''}${j.overrideUnsub?'<span class="pill warn">override unsubscribe</span>':''}<span style="margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px">${monRange==='all'?'all time':'last '+monRange+' days'}</span></div>
+    <div class="stats"><div class="stat"><div class="l">Entered</div><div class="v">${fmtK(entered*k)}</div><div class="s">all versions</div></div><div class="stat"><div class="l">In journey</div><div class="v">${fmtK(active*k)}</div><div class="s">in a step or waiting</div></div><div class="stat"><div class="l">Exited</div><div class="v">${fmtK(exited*k)}</div><div class="s">${fmtK(conv*k)} at a goal · incl. held out</div></div></div>
     <div class="mon-2 ${PHASE2?'':'one'}">
       <div><div class="h4">Channel totals</div><div class="padx"><table class="tbl"><thead><tr><th>Channel</th><th class="num">Sent</th><th class="num">Skipped</th><th class="num">Opened</th><th class="num">Clicked</th></tr></thead><tbody>${Object.entries(ch).map(([c,o])=>`<tr><td><b>${esc(chName(c))}</b></td><td class="num">${fmtK(o.sent*k)}</td><td class="num">${fmtK(o.skipped*k)}</td><td class="num">${fmtK(o.opened*k)} <small style="color:var(--ink-3)">${pct(o.opened,o.sent)}</small></td><td class="num">${fmtK(o.clicked*k)} <small style="color:var(--ink-3)">${pct(o.clicked,o.opened)}</small></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No delivery has run yet — advance the simulated clock.</td></tr>'}</tbody></table></div></div>
       ${PHASE2?`<div><div class="h4" style="display:flex;align-items:center;gap:8px">Anomaly alerts <span class="pill acc" style="font-weight:400">Marketing Agent</span></div><div class="padx alerts">${an.map(a=>`<div class="alert ${a.dev<0?'down':'up'}"><div class="al-h"><b>${esc(a.label)}</b><span class="mono">v${a.v} · ${a.node}</span><span class="pill ${a.conf==='high'?'bad':'warn'}">${a.conf} confidence</span></div><div class="al-n"><b>${fmtK(a.today)}</b> today vs <b>${fmtK(a.baseline)}</b>/day baseline <em>${esc(a.title)}</em></div><div class="al-w">${esc(a.why)}</div><div class="al-f"><button class="btn sm outline" data-al-open="${a.v}" data-al-node="${a.node}">Open step</button><button class="btn sm outline" data-al-dismiss="${a.vkey}/${a.node}">Dismiss</button></div></div>`).join('')||'<div class="empty">No step deviates from its 30-day baseline right now.</div>'}</div></div>`:''}
     </div>
     <div class="h4">Versions</div>
     <div class="padx"><table class="tbl" id="mvtable"><thead><tr><th>Version</th><th>Status</th><th>Activated</th><th>Entry</th><th class="num">Entered</th><th class="num">Inside</th><th class="num">Exited</th><th class="num">Converted</th><th></th></tr></thead><tbody>${j.versions.slice().reverse().map(V=>{ const C=ctxOf(j,V), ps=Object.values(simOf(C).parts), t=entryText(C); return `<tr class="row" data-mv="${V.v}"><td><b>v${V.v}</b></td><td><span class="pill ${V_STATUS_CLS[V.status]}">${V.status}</span></td><td>${V.activatedAt?esc(fmtWhen(V.activatedAt))+'<br><span style="color:var(--ink-3);font-size:11px">'+esc(V.activatedBy||'')+'</span>':'<span style="color:var(--ink-3)">—</span>'}</td><td>${esc(t.k)}<br><span style="color:var(--ink-3);font-size:11px">${esc(t.sub)}</span></td><td class="num">${fmtK(ps.length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status==='active').length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status!=='active').length*k)}</td><td class="num">${fmtK(ps.filter(p=>p.status==='converted').length*k)}</td><td><span class="act"><button class="btn sm outline" data-mview="${V.v}">View version</button>${PHASE2?`<button class="btn sm outline" data-mexport="${V.v}">Step export</button>`:''}</span></td></tr>`; }).join('')}</tbody></table></div>
-    <div class="h4">Participants at a point in time <span style="font-weight:400;color:var(--ink-3)">— v${main.v}</span></div>
-    <div class="toolrow"><label for="ptime" style="color:var(--ink-2)">Show state as of</label><input type="range" id="ptime" min="0" max="${r}" value="${at}"><span class="pill" id="ptime-lbl">Day ${at}${at===r?' (now)':''}</span><button class="btn sm outline" id="btn-csv">Download CSV</button></div>
-    <div class="padx"><table class="tbl" id="ptable"><thead><tr><th>Contact</th><th>Segment</th><th>Current step(s)</th><th>Status</th><th>Entered by</th><th>Preferred channels</th><th>Since</th></tr></thead><tbody>${Object.entries(snap).slice(0,40).map(([cid,p])=>{ const c=CUSTOMERS.find(x=>x.id===cid)||{seg:'',pref:[],name:''}; const st=p.status; const cls=st==='converted'?'ok':st==='active'?'acc':''; const live=S.parts[cid]||{}; return `<tr><td class="mono">${cid}<br><span style="color:var(--ink-3)">${esc(c.name)}</span></td><td>${esc(c.seg)}</td><td>${p.pos.map(x=>{const nd=node(main,x); return nd?`<span class="chip">${esc(nd.label)}</span>`:''}).join(' ')||'—'}</td><td><span class="pill ${cls}">${st}</span></td><td>${live.enteredBy||'preload'}</td><td>${c.pref.join(' → ')}</td><td class="num">day ${p.since}</td></tr>`; }).join('')||'<tr><td colspan="7" class="empty">Nobody has entered this version yet.</td></tr>'}</tbody></table></div>`;
+    <div class="padx" style="padding-top:0"><button class="btn sm outline" id="mon-tocontacts">Open the Contacts tab — every contact's current step and history</button></div>`;
   body.querySelectorAll('[data-mview]').forEach(b=>b.onclick=()=>{ monV=+b.dataset.mview; monTab='version'; renderMonitor(); });
   body.querySelectorAll('[data-mexport]').forEach(b=>b.onclick=()=>openExport(j,+b.dataset.mexport,null));
   body.querySelectorAll('[data-al-open]').forEach(b=>b.onclick=()=>{ monV=+b.dataset.alOpen; monTab='version'; monSel=b.dataset.alNode; renderMonitor(); });
   body.querySelectorAll('[data-al-dismiss]').forEach(b=>b.onclick=()=>{ b.closest('.alert').remove(); toast('Alert dismissed','The Marketing Agent keeps watching the step; a new deviation would raise it again.'); });
-  const pt=body.querySelector('#ptime'); pt.oninput=()=>{ ptimeAt=+pt.value===+pt.max?null:+pt.value; renderMonitor(); };
-  body.querySelector('#btn-csv').onclick=()=>toast('Export','CSV export is not enabled in this environment — the participant list at the selected time would download here.','warn');
+  body.querySelector('#mon-tocontacts').onclick=()=>{ monTab='contacts'; renderMonitor(); };
 }
-let ptimeAt=null, monSel=null;
+let ptimeAt=null, monSel=null, conQ='', conOpen=null;
+/* per-contact state: where the contact is and what it is doing (roadmap item 2) */
+function contactState(C,p){ if(p.status==='active'){ const atWait=p.pos.some(id=>{ const n=node(C,id); return n&&WAIT_TYPES.has(n.type); }); return atWait?'waiting':'in step'; } if(p.status==='holdout') return 'held out'; return 'exited'; }
+const CS_CLS={'waiting':'warn','in step':'acc','exited':'','held out':'grey'};
+const mockTime=(cid,d)=>{ const h=hashOf(cid+'|t'+d); return `${String(8+Math.floor(h*11)).padStart(2,'0')}:${String(Math.floor((h*997)%60)).padStart(2,'0')}`; };
+function lastDelivery(C,p){ let last=null; C.nodes.forEach(n=>{ if(n.type==='delivery'&&p.eng[n.id]) last={n,e:p.eng[n.id]}; }); if(!last) return {txt:'—',cls:''}; const e=last.e; if(e.skipped) return {txt:`skipped · ${e.reason}`,cls:'warn'}; return {txt:`${chName(last.n.cfg.channel)} (${e.lang||'fr'}) · ${e.clicked?'clicked':e.opened?'opened':'sent'}`,cls:e.clicked||e.opened?'ok':''}; }
+function renderMonContacts(body,j,k){
+  const rows=[]; j.versions.forEach(V=>{ const C=ctxOf(j,V), S=simOf(C); Object.entries(S.parts).forEach(([cid,p])=>{ const c=custOf(cid)||{name:'',attrs:{}}; const q=conQ.toLowerCase(); if(q&&!(cid+' '+c.name+' '+(c.cid||'')).toLowerCase().includes(q)) return; rows.push({cid,p,C,V,c}); }); });
+  rows.sort((a,b)=>b.p.since-a.p.since||a.cid.localeCompare(b.cid));
+  const evName=C=>{ const e=C.nodes[0].cfg; return isEventKind(e.kind)?e.event:entryText(C).k; };
+  body.innerHTML=`<div class="h4" style="display:flex;align-items:center;gap:8px">Contacts in ${esc(j.name)} <span style="font-weight:400;color:var(--ink-3);font-size:12px">${rows.length} simulated contact(s) · each stands for ≈${DEMO_K.toLocaleString()} real ones</span></div>
+    <div class="toolrow"><div class="search-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="con-q" placeholder="Look up a contact by number, name or id" value="${esc(conQ)}" aria-label="Contact lookup"></div><span class="kpi"><b>${rows.filter(r=>r.p.status==='active').length}</b> in journey</span></div>
+    <div class="padx"><table class="tbl" id="ctable"><thead><tr><th>Contact</th><th>Event</th><th>Received at</th><th>Version</th><th>Current step</th><th>Status</th><th>Last delivery result</th></tr></thead><tbody>${rows.map(r=>{ const st=contactState(r.C,r.p), ld=lastDelivery(r.C,r.p); const key=r.C.id+'|'+r.cid; const steps=r.p.pos.map(x=>{ const nd=node(r.C,x); return nd?`<span class="chip">${esc(nd.label)}</span>`:''; }).join(' ');
+      const hist=conOpen===key?`<tr class="chist"><td colspan="7"><div class="sec" style="padding-top:0">Step history · ${esc(r.c.name||r.cid)} · v${r.V.v}</div><ol class="clog">${log.filter(l=>l.cid===r.cid&&l.j===r.C.id).map(l=>`<li class="${l.cls}"><span class="t">day ${l.d} · ${mockTime(r.cid,l.d+(l.node||''))}</span><span class="n">${l.node?esc((node(r.C,l.node)||{label:l.node}).label):'—'}</span><span>${esc(l.msg.replace(/^.*?@\d+(?:\/\w+)?\s+/,''))}</span></li>`).join('')||'<li>No step has run for this contact yet.</li>'}</ol>${lastPayload[r.cid]?`<div class="sec">Last test event payload</div><pre class="code apicode">${esc(JSON.stringify(lastPayload[r.cid],null,2))}</pre>`:''}</td></tr>`:'';
+      return `<tr class="row ${conOpen===key?'sel':''}" data-ck="${key}"><td class="mono">${r.cid}<br><span style="color:var(--ink-3)">${esc(r.c.name)} · ${esc(r.c.attrs.lang||'')}</span></td><td><span class="mono">${esc(r.p.enteredBy&&r.p.enteredBy!=='preload'&&r.p.enteredBy!=='schedule'&&r.p.enteredBy!=='activation'?r.p.enteredBy:evName(r.C))}</span></td><td class="num">day ${r.p.since} · ${mockTime(r.cid,r.p.since)}</td><td class="num">v${r.V.v}</td><td>${steps||'<span style="color:var(--ink-3)">—</span>'}</td><td><span class="pill ${CS_CLS[st]}">${st}</span></td><td class="${ld.cls==='warn'?'':''}">${ld.cls==='warn'?'<span class="pill warn">'+esc(ld.txt)+'</span>':esc(ld.txt)}</td></tr>`+hist; }).join('')||'<tr><td colspan="7" class="empty">No contact has entered this journey yet — send an event from the simulation strip.</td></tr>'}</tbody></table></div>`;
+  const q=body.querySelector('#con-q'); q.oninput=e=>{ conQ=e.target.value; const v=conQ; renderMonitor(); const i=document.getElementById('con-q'); if(i){ i.focus(); i.setSelectionRange(v.length,v.length); } };
+  body.querySelectorAll('#ctable tr[data-ck]').forEach(tr=>tr.onclick=()=>{ conOpen=conOpen===tr.dataset.ck?null:tr.dataset.ck; renderMonitor(); });
+}
 function renderMonVersion(body,C,k){
   const j=C.j, V=C.V, live=V.status==='Active'||V.status==='Closing'; const an=anomaliesFor(j);
   body.innerHTML=`<div class="h4" style="display:flex;align-items:center;gap:8px">${esc(j.name)} <span class="mono" style="color:var(--ink-3);font-weight:400">${j.id}</span> · v${V.v} <span class="pill ${V_STATUS_CLS[V.status]}">${V.status}</span>${V.activatedAt?`<span style="font-weight:400;color:var(--ink-2);font-size:12px">activated by ${esc(V.activatedBy||'')} · ${esc(fmtWhen(V.activatedAt))}</span>`:''}<span style="margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px">${live?'stats strip · '+(monRange==='all'?'all time':'last '+monRange+' days'):'no statistics — version is '+V.status}</span><button class="btn sm outline" id="mon-open">Open in builder</button></div>
@@ -2719,7 +2739,7 @@ document.getElementById('rep-csv').onclick=()=>toast('Export','CSV export is not
 document.getElementById('btn-pal').onclick=()=>{ document.getElementById('jb').classList.toggle('pal-closed'); setTimeout(renderCanvas,160); };
 document.getElementById('btn-info').onclick=()=>{ document.getElementById('jsplit').classList.toggle('info-closed'); setTimeout(renderCanvas,160); };
 window.addEventListener('resize',()=>{ if(document.getElementById('view-journeys').classList.contains('active')) renderCanvas(); });
-msel.onchange=()=>{ monV=null; monSel=null; monTab='general'; renderMonitor(); };
+msel.onchange=()=>{ monV=null; monSel=null; conOpen=null; conQ=''; monTab='general'; renderMonitor(); };
 document.getElementById('btn-tick').onclick=tick;
 document.getElementById('btn-tick5').onclick=()=>{ for(let i=0;i<5;i++) tick(); };
 document.getElementById('btn-reset').onclick=()=>{ initSim(); render(); };

@@ -16,7 +16,7 @@ test.describe('journey monitor', () => {
   test('General shows totals, channel totals, anomaly alerts and the versions table', async ({ app }) => {
     await openMonitor(app);
     const tiles = await app.$$eval('#mon-body .stats .stat .l', (els) => els.map((e) => e.textContent.trim()));
-    expect(tiles).toEqual(['Entered', 'Active now', 'Exited', 'Conversions']);
+    expect(tiles).toEqual(['Entered', 'In journey', 'Exited']);
     await expect(app.locator('#mon-body .tbl').first()).toContainText('Email');
     // anomaly alerts are Phase 2: nothing of the Marketing Agent shows while PHASE2 is off
     expect(await app.locator('#mon-body .alert').count()).toBe(0);
@@ -52,6 +52,28 @@ test.describe('journey monitor', () => {
     await app.locator('#mcanvas .node[data-id="s2"]').click();
     await expect(app.locator('#exp-modal')).toBeHidden();
     await expect(app.locator('#mon-body tr[data-mn="s2"]')).toHaveClass(/sel/);
+  });
+
+  test('the Contacts tab lists every contact with its current step and status; a row opens its step history', async ({ app }) => {
+    await openMonitor(app);
+    await app.locator('#mon-tabs [data-mt="contacts"]').click();
+    const heads = await app.$$eval('#ctable thead th', (t) => t.map((x) => x.textContent.trim()));
+    expect(heads).toEqual(['Contact', 'Event', 'Received at', 'Version', 'Current step', 'Status', 'Last delivery result']);
+    const rows = app.locator('#ctable tr[data-ck]');
+    expect(await rows.count()).toBeGreaterThan(5);
+    const statuses = await app.$$eval('#ctable tr[data-ck] td:nth-child(6) .pill', (ps) => [...new Set(ps.map((p) => p.textContent.trim()))]);
+    for (const st of statuses) expect(['waiting', 'in step', 'exited', 'held out']).toContain(st);
+    await expect(rows.first().locator('td').nth(6)).toContainText(/Email|skipped|—/);
+    // lookup narrows the list; the row opens the per-contact log
+    const name = await rows.first().locator('td:first-child span').textContent();
+    await app.fill('#con-q', name.split('·')[0].trim());
+    const n = await app.locator('#ctable tr[data-ck]').count();
+    expect(n).toBeGreaterThanOrEqual(1);
+    expect(n).toBeLessThan(await rows.count() + 1);
+    await app.locator('#ctable tr[data-ck]').first().click();
+    await expect(app.locator('#ctable tr.chist')).toBeVisible();
+    expect(await app.locator('#ctable tr.chist .clog li').count()).toBeGreaterThan(0);
+    await expect(app.locator('#ctable tr.chist')).toContainText('Step history');
   });
 
   test('the time range scales the numbers; the simulation strip drives the stats strip', async ({ app }) => {
